@@ -1,9 +1,9 @@
-# 3. ROCm and GPU memory
+# 2. ROCm and GPU memory
 
 ## ROCm
 
 AMD's apt repository stops at ROCm 7.2.4 and has no Ubuntu 26.04 (`resolute`) packages.
-`owl` uses the AMD TheRock build for `gfx1151` instead. The Strata Strix Halo guide uses the same build.
+The `rocm` role installs the AMD TheRock build for `gfx1151` instead. The Strata Strix Halo guide uses the same build.
 
 | Item | Value |
 |------|-------|
@@ -16,7 +16,7 @@ AMD's apt repository stops at ROCm 7.2.4 and has no Ubuntu 26.04 (`resolute`) pa
 
 libosmos expects `hipcc` and `rocminfo` in `/opt/rocm/bin`. The symlink gives that path.
 
-`jwmoss` is in the `render` and `video` groups, so it can open `/dev/kfd` and `/dev/dri`.
+The `base` role adds your user to the `render` and `video` groups, so it can open `/dev/kfd` and `/dev/dri`.
 
 Check the GPU:
 
@@ -30,22 +30,12 @@ Expected: `AMD RYZEN AI MAX+ 395 w/ Radeon 8060S` and `gfx1151`.
 
 The CPU and the GPU share 128 GB. Two settings control how the GPU uses it.
 
-### 1. BIOS: UMA frame buffer (to do)
+### 1. BIOS: UMA frame buffer
 
-The BIOS gave a fixed 64 GB to the GPU. Linux then saw only 61 GB.
-The engines use the GPU through GTT memory, which comes from the memory that Linux sees.
-So set the fixed block to the minimum:
-
-1. Reboot and press **Del**.
-2. Find **UMA Frame Buffer Size** (or **iGPU Memory**), usually under
-   **Advanced → AMD CBS → NBIO → GFX Configuration**.
-3. Set it to the lowest value (512 MB or 1 GB).
-4. Press **F10** to save.
-
-Check after the reboot:
+Set it to the minimum (see [01-ubuntu-install.md](01-ubuntu-install.md#bios)). Ansible cannot set it. Check:
 
 ```sh
-free -g                                                    # about 125 GB total
+free -g                                                    # about 120 GB total
 cat /sys/class/drm/card*/device/mem_info_vram_total        # small value
 ```
 
@@ -57,10 +47,11 @@ cat /sys/class/drm/card*/device/mem_info_vram_total        # small value
 options ttm pages_limit=29637703 page_pool_size=29637703
 ```
 
-This lets the GPU map about 113 GiB (29637703 pages of 4 KiB). libosmos checks for this value.
-The initramfs was rebuilt, so the setting is active after the next reboot.
+This lets the GPU map about 113 GiB (29637703 pages of 4 KiB) on a 128 GB machine with a 2 GB frame buffer.
+libosmos checks for this value. Set `ttm_pages_limit` in `ansible/inventory/group_vars/all.yml`.
+The `rocm` role rebuilds the initramfs and reboots one time, so the setting is active.
 
-Check after the reboot:
+Check:
 
 ```sh
 cat /sys/module/ttm/parameters/pages_limit                 # 29637703

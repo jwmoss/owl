@@ -1,5 +1,6 @@
 ---
-# GMKtec EVO-X2, Ryzen AI Max+ 395 (gfx1151), 128 GB, Ubuntu Server 26.04 LTS.
+# Defaults for an AMD Strix Halo machine (Ryzen AI Max+ 395, gfx1151, 128 GB) on Ubuntu Server 26.04 LTS.
+# Override a value for one machine in inventory/host_vars/<host>.yml.
 
 rocm_version: "7.14.1"
 rocm_sha256: "c40e8f2bd6630a7d11557c762b99c6fa8afb04c9bd0e51ed1675ee1ca24afb00"

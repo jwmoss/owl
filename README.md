@@ -1,103 +1,66 @@
-# owl — local AI server
+# owl
 
-`owl` is a GMKtec EVO-X2 mini PC that runs large language models on the local network.
-This repository records how the machine is set up, so that you can rebuild it.
+Ansible playbooks that set up an AMD Strix Halo machine (Ryzen AI Max+ 395, 128 GB) to run large language models.
+They install ROCm and one or more inference engines on Ubuntu Server 26.04 LTS. Each engine serves an
+OpenAI-compatible API on your network.
 
-## Status
+Tested on a GMKtec EVO-X2 with 128 GB.
 
-| Step | State |
-|------|-------|
-| PXE boot through netboot.xyz | Done |
-| Ubuntu Server 26.04 LTS install | Done |
-| Passwordless `sudo` for `jwmoss` | Done |
-| ROCm 7.14.1 (TheRock, gfx1151) | Done |
-| `ttm` GPU memory limit | Done, active after reboot |
-| BIOS: UMA frame buffer at minimum (2 GB) | Done |
-| Strata + Qwen3.8-Flash-Next (systemd, port 8080) | Done |
-| libosmos + DeepSeek-V4.1-Flash | Playbook runs, download in progress |
-| gufo + Qwen3.8-Flash-Next | Playbook runs, download in progress |
-| halogen + Qwen3.8-Flash-Next | Playbook runs, download in progress |
-| Project Maya + DeepSeek Maya-XS | Setup in progress, service not written yet |
-| End-to-end test (`test.yml`) | Passes for Strata |
-| UniFi DHCP reservation for `owl` | To do |
+## Engines
 
-## Machine
+| Engine | Model | Port | Playbook |
+|--------|-------|------|----------|
+| [halogen](https://github.com/peonist-ai/halogen-flash-server) (default) | Qwen3.8-Flash-Next | 8731 | `halogen.yml` |
+| [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next | 8080 | `strata.yml` |
+| [gufo](https://github.com/gufo-org/gufo) | Qwen3.8-Flash-Next | 8081 | `gufo.yml` |
+| [libosmos](https://github.com/mrsirg97-rgb/libosmos) | DeepSeek-V4.1-Flash, abliterated | 8091 | `libosmos.yml` |
+| [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash | 8099 | `maya.yml` |
 
-| Item | Value |
-|------|-------|
-| Hostname | `owl` |
-| Model | GMKtec EVO-X2 (NucBox_EVO-X2) |
-| CPU / GPU | AMD Ryzen AI Max+ 395, Radeon 8060S (`gfx1151`, PCI `1002:1586`) |
-| Memory | 128 GB LPDDR5X, shared by the CPU and the GPU |
-| Disk | 2 TB Crucial E100 NVMe (`CT2000E100SSD8`), one ext4 root filesystem |
-| OS | Ubuntu Server 26.04 LTS, kernel 7.0 |
-| User | `jwmoss`, SSH key imported from GitHub, password login over SSH off |
+Each engine uses almost all of the memory, so only one runs at a time. See [docs/03-engines.md](docs/03-engines.md).
 
-## Network
+## Quick start
 
-| Item | Value |
-|------|-------|
-| IP address | `192.168.1.241` (DHCP, Default network) |
-| MAC (`eno1`) | `84:47:09:9a:42:3c` |
-| Switch port | Office Switch (US-24-PoE 250W), port 8, native network Default |
-| SSH | `ssh jwmoss@192.168.1.241` |
+1. Install Ubuntu Server 26.04 LTS, set the BIOS frame buffer to the minimum and allow passwordless sudo.
+   See [docs/01-ubuntu-install.md](docs/01-ubuntu-install.md).
+2. On your computer, install Ansible and the collections:
 
-## Documents
+   ```sh
+   uv tool install ansible-core
+   cd ansible
+   ansible-galaxy collection install -r requirements.yml
+   ```
 
-1. [Network boot with netboot.xyz](docs/01-netboot.md)
-2. [Ubuntu install](docs/02-ubuntu-install.md)
-3. [ROCm and GPU memory](docs/03-rocm.md)
-4. [Inference engines and models](docs/04-models.md)
+3. Copy `inventory/hosts.example.yml` to `inventory/hosts.yml`. Set your machine's address and user.
+4. Optional: run `hf auth login` on your computer. Ansible copies the token, and downloads are faster.
+5. Set up Ubuntu and halogen (about 120 GB of downloads), then test it:
 
-## Redeploy with Ansible
+   ```sh
+   ansible-playbook ubuntu.yml halogen.yml
+   ansible-playbook test.yml -e '{"engines": ["halogen"]}'
+   ```
 
-The playbook in [`ansible/`](ansible/) sets up a fresh Ubuntu Server 26.04 install:
-build tools, ROCm, the GPU memory limit and the engines. Each part has its own playbook:
+   `ubuntu.yml` reboots the machine one time to apply the GPU memory limit.
+
+6. Check the API:
+
+   ```sh
+   curl http://<host>:8731/health
+   ```
+
+## Playbooks
 
 | Playbook | Does |
 |----------|------|
-| `ubuntu.yml` | Build tools, passwordless sudo, GPU groups, Hugging Face CLI and token, ROCm, `ttm` limit |
-| `strata.yml` | Strata with Qwen3.8-Flash-Next |
-| `gufo.yml` | gufo with Qwen3.8-Flash-Next |
-| `libosmos.yml` | libosmos with DeepSeek-V4.1-Flash |
-| `halogen.yml` | halogen with Qwen3.8-Flash-Next |
-| `maya.yml` | Project Maya with DeepSeek-V4.1-Flash |
-| `test.yml` | End-to-end test of each engine |
-| `site.yml` | All of the above |
+| `ubuntu.yml` | Build tools, passwordless sudo, GPU groups, Hugging Face CLI, ROCm, GPU memory limit |
+| `<engine>.yml` | One engine, its model and its systemd service |
+| `site.yml` | `ubuntu.yml` and all engines (about 900 GB of downloads) |
+| `test.yml` | Starts each engine, sends one chat request and checks the answer |
 
-Do these steps by hand first. Ansible cannot do them:
+Settings, such as the engine that starts at boot (`default_engine`), are in
+[`ansible/inventory/group_vars/all.yml`](ansible/inventory/group_vars/all.yml).
 
-1. Install Ubuntu (see [docs/02-ubuntu-install.md](docs/02-ubuntu-install.md)).
-2. Allow passwordless sudo one time (same document).
-3. In the BIOS, set **UMA Frame Buffer Size** to the minimum (2 GB on `owl`).
+## Documents
 
-Then run from your Mac:
-
-```sh
-cd ansible
-uvx --from ansible-core==2.22.0 ansible-galaxy collection install -r requirements.yml
-uvx --from ansible-core==2.22.0 ansible-playbook site.yml   # or one playbook, e.g. strata.yml
-```
-
-### Quick start: halogen only
-
-halogen is the default engine. This sets up only Ubuntu and halogen (about 120 GB of downloads):
-
-```sh
-cd ansible
-uvx --from ansible-core==2.22.0 ansible-galaxy collection install -r requirements.yml
-uvx --from ansible-core==2.22.0 ansible-playbook ubuntu.yml halogen.yml
-uvx --from ansible-core==2.22.0 ansible-playbook test.yml -e '{"engines": ["halogen"]}'
-```
-
-`ubuntu.yml` can reboot `owl` once to apply the memory limit. `test.yml` waits for the model, then checks one answer.
-Then use it from the Mac:
-
-```sh
-curl -s http://192.168.1.241:8731/health | jq .status
-pi --model owl-halogen/halogen-qwen3.8-flash-next
-```
-
-The first run downloads about 545 GB of models. The token in `~/.cache/huggingface/token` on your Mac is copied to `owl`; without it, downloads are slow.
-To change the engine that starts at boot, set `default_engine` in
-[`inventory/host_vars/owl.yml`](ansible/inventory/host_vars/owl.yml).
+1. [Ubuntu install](docs/01-ubuntu-install.md)
+2. [ROCm and GPU memory](docs/02-rocm.md)
+3. [Inference engines and models](docs/03-engines.md)

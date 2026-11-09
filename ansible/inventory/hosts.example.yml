@@ -1,0 +1,7 @@
+---
+# Copy this file to hosts.yml (gitignored) and set your machine's address and user.
+all:
+  hosts:
+    strix:
+      ansible_host: 192.168.1.50
+      ansible_user: ubuntu
