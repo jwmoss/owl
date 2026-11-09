@@ -1,0 +1,67 @@
+---
+- name: Check for ROCm
+  ansible.builtin.stat:
+    path: "/opt/rocm-{{ rocm_version }}/bin/hipcc"
+  register: rocm_hipcc
+
+- name: Download ROCm
+  when: not rocm_hipcc.stat.exists
+  ansible.builtin.get_url:
+    url: "https://repo.amd.com/rocm/tarball-multi-arch/therock-dist-linux-gfx1151-{{ rocm_version }}.tar.gz"
+    dest: "/var/tmp/rocm-{{ rocm_version }}.tar.gz"
+    checksum: "sha256:{{ rocm_sha256 }}"
+    mode: "0644"
+
+- name: Make the ROCm folder
+  ansible.builtin.file:
+    path: "/opt/rocm-{{ rocm_version }}"
+    state: directory
+    mode: "0755"
+
+- name: Extract ROCm
+  ansible.builtin.unarchive:
+    src: "/var/tmp/rocm-{{ rocm_version }}.tar.gz"
+    dest: "/opt/rocm-{{ rocm_version }}"
+    remote_src: true
+  when: not rocm_hipcc.stat.exists
+
+- name: Link /opt/rocm
+  ansible.builtin.file:
+    src: "/opt/rocm-{{ rocm_version }}"
+    dest: /opt/rocm
+    state: link
+
+- name: Set the ROCm environment for login shells
+  ansible.builtin.copy:
+    dest: /etc/profile.d/rocm.sh
+    mode: "0644"
+    content: |
+      export ROCM_PATH=/opt/rocm HIP_PATH=/opt/rocm HIP_PLATFORM=amd
+      export PATH=/opt/rocm/bin:/opt/rocm/lib/llvm/bin:$PATH
+
+- name: Add the ROCm libraries to the linker path
+  ansible.builtin.copy:
+    dest: /etc/ld.so.conf.d/rocm.conf
+    mode: "0644"
+    content: |
+      /opt/rocm/lib
+      /opt/rocm/lib/rocm_sysdeps/lib
+      /opt/rocm/lib/llvm/lib
+  notify: Run ldconfig
+
+# The BIOS UMA frame buffer must also be at its minimum (2 GB on owl). Ansible cannot set it.
+- name: Let the GPU map about 113 GiB (libosmos checks this)
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/ttm.conf
+    mode: "0644"
+    content: "options ttm pages_limit={{ ttm_pages_limit }} page_pool_size={{ ttm_pages_limit }}\n"
+  notify: Update the initramfs and reboot
+
+- name: Apply the handlers before the engines build
+  ansible.builtin.meta: flush_handlers
+
+- name: Check that ROCm finds the gfx1151
+  ansible.builtin.command: /opt/rocm/bin/rocminfo
+  register: rocm_info
+  changed_when: false
+  failed_when: "'gfx1151' not in rocm_info.stdout"

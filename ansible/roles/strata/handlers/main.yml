@@ -1,0 +1,5 @@
+---
+- name: Stop the setup server
+  ansible.builtin.command: /home/{{ ansible_user }}/.local/bin/strata launch --stop --preset qwen
+  become: false
+  changed_when: true

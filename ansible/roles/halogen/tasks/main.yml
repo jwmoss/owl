@@ -1,0 +1,46 @@
+---
+- name: Install Podman
+  ansible.builtin.apt:
+    name: [podman, crun]
+
+- name: Download the halogen v2 checkpoint and its lookup table (about 120 GB)
+  ansible.builtin.command:
+    cmd: >-
+      hf download peonist-ai/halogen-qwen3.8-flash-next --revision {{ halogen_weights_revision }}
+      --exclude "*w4b*" --exclude "*ht43*" --local-dir /home/{{ ansible_user }}/Models/halogen
+  environment:
+    PATH: "/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
+  become: false
+  changed_when: false # hf download skips the files it has
+  async: 43200
+  poll: 60
+
+# Closed-source engine under the Peonist EULA (free, no telemetry). Without HALOGEN_DOWNLOAD it opens no outbound connections.
+- name: Install the halogen service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/halogen.service
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=halogen Qwen3.8-Flash-Next API (port {{ halogen_port }})
+      After=network-online.target
+      Wants=network-online.target
+      Conflicts=strata.service osmos.service maya.service gufo.service
+
+      [Service]
+      User={{ ansible_user }}
+      ExecStart=/usr/bin/podman run --rm --name halogen -p {{ halogen_port }}:8731 \
+        --device /dev/kfd --device /dev/dri --group-add keep-groups --ipc=host --ulimit memlock=-1:-1 \
+        -e HALOGEN_CHECKPOINT=/models/qwen38-flash-next-v2.hgn \
+        -v /home/{{ ansible_user }}/Models/halogen:/models:ro {{ halogen_image }}
+      ExecStop=/usr/bin/podman stop halogen
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Set the halogen service state
+  ansible.builtin.systemd_service:
+    name: halogen
+    enabled: "{{ default_engine == 'halogen' }}"
+    daemon_reload: true

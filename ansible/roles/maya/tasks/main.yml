@@ -1,0 +1,22 @@
+---
+- name: Clone Project Maya
+  ansible.builtin.git:
+    repo: https://github.com/mw00/project-maya
+    dest: "/home/{{ ansible_user }}/src/project-maya"
+    version: "{{ maya_commit }}"
+  become: false
+
+# Builds the HIP engine and downloads Maya-XS (about 277 GB), the 128 GB quant. Each shard is checked by SHA-256.
+- name: Set up Maya with DeepSeek-V4.1-Flash Maya-XS
+  ansible.builtin.command:
+    cmd: >-
+      ./maya.sh --backend hip --gpu 0 --model deepseek-maya-xs --no-vision
+      --yes --download-model --no-start --port {{ maya_port }}
+    chdir: "/home/{{ ansible_user }}/src/project-maya"
+    creates: "/home/{{ ansible_user }}/src/project-maya/maya-ds4-hip.json"
+  environment:
+    ROCM_PATH: /opt/rocm
+    PATH: "/opt/rocm/bin:/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
+  become: false
+  async: 86400
+  poll: 60

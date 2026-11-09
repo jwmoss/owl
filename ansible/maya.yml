@@ -1,0 +1,5 @@
+---
+- name: Set up Project Maya with DeepSeek-V4.1-Flash
+  hosts: owl
+  become: true
+  roles: [maya]

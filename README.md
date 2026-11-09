@@ -12,10 +12,14 @@ This repository records how the machine is set up, so that you can rebuild it.
 | Passwordless `sudo` for `jwmoss` | Done |
 | ROCm 7.14.1 (TheRock, gfx1151) | Done |
 | `ttm` GPU memory limit | Done, active after reboot |
-| BIOS: set UMA frame buffer to minimum | **To do** |
+| BIOS: UMA frame buffer at minimum (2 GB) | Done |
+| Strata + Qwen3.8-Flash-Next (systemd, port 8080) | Done |
+| libosmos + DeepSeek-V4.1-Flash | Playbook runs, download in progress |
+| gufo + Qwen3.8-Flash-Next | Playbook runs, download in progress |
+| halogen + Qwen3.8-Flash-Next | Playbook runs, download in progress |
+| Project Maya + DeepSeek Maya-XS | Setup in progress, service not written yet |
+| End-to-end test (`test.yml`) | Passes for Strata |
 | UniFi DHCP reservation for `owl` | To do |
-| Strata + Qwen3.8-Flash-Next | To do |
-| libosmos + DeepSeek-V4.1-Flash | To do |
 
 ## Machine
 
@@ -45,7 +49,36 @@ This repository records how the machine is set up, so that you can rebuild it.
 3. [ROCm and GPU memory](docs/03-rocm.md)
 4. [Inference engines and models](docs/04-models.md)
 
-## Scripts
+## Redeploy with Ansible
 
-- [`scripts/setup-rocm.sh`](scripts/setup-rocm.sh) installs ROCm and sets the GPU memory limit.
-  Run it on `owl` as `jwmoss`.
+The playbook in [`ansible/`](ansible/) sets up a fresh Ubuntu Server 26.04 install:
+build tools, ROCm, the GPU memory limit and the engines. Each part has its own playbook:
+
+| Playbook | Does |
+|----------|------|
+| `ubuntu.yml` | Build tools, passwordless sudo, GPU groups, Hugging Face CLI and token, ROCm, `ttm` limit |
+| `strata.yml` | Strata with Qwen3.8-Flash-Next |
+| `gufo.yml` | gufo with Qwen3.8-Flash-Next |
+| `libosmos.yml` | libosmos with DeepSeek-V4.1-Flash |
+| `halogen.yml` | halogen with Qwen3.8-Flash-Next |
+| `maya.yml` | Project Maya with DeepSeek-V4.1-Flash (setup only) |
+| `test.yml` | End-to-end test of each engine |
+| `site.yml` | All of the above |
+
+Do these steps by hand first. Ansible cannot do them:
+
+1. Install Ubuntu (see [docs/02-ubuntu-install.md](docs/02-ubuntu-install.md)).
+2. Allow passwordless sudo one time (same document).
+3. In the BIOS, set **UMA Frame Buffer Size** to the minimum (2 GB on `owl`).
+
+Then run from your Mac:
+
+```sh
+cd ansible
+uvx --from ansible-core==2.22.0 ansible-galaxy collection install -r requirements.yml
+uvx --from ansible-core==2.22.0 ansible-playbook site.yml   # or one playbook, e.g. strata.yml
+```
+
+The first run downloads about 545 GB of models. The token in `~/.cache/huggingface/token` on your Mac is copied to `owl`; without it, downloads are slow.
+To change the engine that starts at boot, set `default_engine` in
+[`inventory/host_vars/owl.yml`](ansible/inventory/host_vars/owl.yml).

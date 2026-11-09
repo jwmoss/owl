@@ -1,0 +1,58 @@
+---
+- name: Download the Strata installer
+  ansible.builtin.get_url:
+    url: "https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}/install.sh"
+    dest: /tmp/strata-install.sh
+    mode: "0644"
+  become: false
+
+# The installer checks the release checksums and its signed feed.
+- name: Install the Strata Terminal
+  ansible.builtin.command: sh /tmp/strata-install.sh
+  args:
+    creates: "/home/{{ ansible_user }}/.local/bin/strata"
+  environment:
+    STRATA_FEED: "https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}"
+  become: false
+
+# Downloads the engine and the model, writes the run config with a new API key, and starts serving.
+- name: Set up Qwen3.8-Flash-Next (about 86 GB)
+  ansible.builtin.command:
+    cmd: >-
+      /home/{{ ansible_user }}/.local/bin/strata launch --family qwen --model {{ strata_model }}
+      --context {{ strata_context }} --access lan --port {{ strata_port }} --save-preset qwen --yes --no-tui
+    creates: "/home/{{ ansible_user }}/.local/state/strata/launch/qwen.json"
+  become: false
+  async: 43200
+  poll: 60
+  notify: Stop the setup server
+
+- name: Stop the setup server before systemd starts it
+  ansible.builtin.meta: flush_handlers
+
+- name: Install the strata service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/strata.service
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Strata Qwen3.8-Flash-Next API (port {{ strata_port }}, API key required)
+      After=network-online.target
+      Wants=network-online.target
+      Conflicts=osmos.service maya.service gufo.service halogen.service
+
+      [Service]
+      User={{ ansible_user }}
+      ExecStart=/home/{{ ansible_user }}/.local/bin/strata serve --host 0.0.0.0 --port {{ strata_port }} \
+        --profile /home/{{ ansible_user }}/.local/state/strata/launch/qwen.json
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Set the strata service state
+  ansible.builtin.systemd_service:
+    name: strata
+    enabled: "{{ default_engine == 'strata' }}"
+    state: "{{ 'started' if default_engine == 'strata' else omit }}"
+    daemon_reload: true

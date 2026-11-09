@@ -1,0 +1,30 @@
+---
+# GMKtec EVO-X2, Ryzen AI Max+ 395 (gfx1151), 128 GB, Ubuntu Server 26.04 LTS.
+
+rocm_version: "7.14.1"
+rocm_sha256: "c40e8f2bd6630a7d11557c762b99c6fa8afb04c9bd0e51ed1675ee1ca24afb00"
+ttm_pages_limit: 29637703 # about 113 GiB of 4 KiB pages
+
+strata_release: "v0.2.12"
+strata_model: iq3_s
+strata_context: 128k
+strata_port: 8080
+
+libosmos_commit: "94e274cf6058aa26901495a6e9f352b73dd82186"
+libosmos_pack: ud-iq1_m
+libosmos_abliterated: true
+libosmos_port: 8091
+
+# The engine that starts at boot: strata, libosmos, gufo, maya or halogen. Each one uses almost all memory, so only one runs.
+default_engine: strata
+
+gufo_image: "ghcr.io/gufo-org/toolboxes/gufo-runtime:0.32.0"
+gufo_qwen_revision: "d96201194f103c906994f283f504209dc8d2a10c"
+gufo_port: 8081
+
+maya_commit: "22fc101f2c109b7e7174c975ff3c2d8e9ce0a867" # v1.1.56
+maya_port: 8099
+
+halogen_image: "ghcr.io/peonist-ai/halogen-flash-server:0.20.0"
+halogen_weights_revision: "c464b5b51c968ff54ea78647a4b2556355b36d2c"
+halogen_port: 8731
