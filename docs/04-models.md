@@ -74,6 +74,30 @@ pi (`~/.pi/agent/models.json`) has one provider for each engine, `owl-<engine>`.
 `owl-<engine>-<model>-<quant>[-<variant>]`, for example `owl-gufo-qwen3.8-flash-next-ud-q4_k_xl`.
 `enabledModels` in `~/.pi/agent/settings.json` sets the Ctrl+P order: the Qwen engines, then DeepSeek.
 
+Start pi on an engine with `<provider>/<model id>`. Add `:low` for less thinking (halogen defaults to `xhigh`):
+
+```sh
+pi --model owl-halogen/halogen-qwen3.8-flash-next
+pi --model owl-halogen/halogen-qwen3.8-flash-next -p "What is 17 times 3?"   # one answer, then exit
+```
+
+A shorter system prompt makes the first answer faster. These flags remove parts of it:
+
+| Flag | Removes |
+|------|---------|
+| `-ns` | skills |
+| `-nc` | AGENTS.md and CLAUDE.md |
+| `-ne` | extensions |
+| `--no-mcp` | MCP servers and their tools |
+| `-np` | prompt templates |
+| `-nt` | all tools (plain chat) |
+
+```sh
+pi --model owl-halogen/halogen-qwen3.8-flash-next -ns -nc -ne --no-mcp -np
+```
+
+Follow the engine log on `owl`: `ssh jwmoss@192.168.1.241 journalctl -u halogen -f`.
+
 `owl` in `~/.zshrc` switches engines:
 
 ```sh
