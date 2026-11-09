@@ -7,7 +7,7 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 |---------|--------|-------|------|--------|----------|
 | `strata` | [Strata](https://github.com/Niko1221/Strata) 0.2.12 | Qwen3.8-Flash-Next IQ3_S, 128K context | 8080 | LAN, API key | `strata.yml` |
 | `gufo` | [gufo](https://github.com/gufo-org/gufo) 0.32.0 (Podman) | Qwen3.8-Flash-Next UD-Q4_K_XL + MTP | 8081 | LAN, no key | `gufo.yml` |
-| `halogen` | [halogen](https://github.com/peonist-ai/halogen-flash-server) 0.20.0 (Podman, closed-source EULA) | Qwen3.8-Flash-Next halogen v2 (4.16 bpw) | 8731 | LAN, no key | `halogen.yml` |
+| `halogen` | [halogen](https://github.com/peonist-ai/halogen-flash-server) 0.20.1 (Podman, closed-source EULA) | Qwen3.8-Flash-Next halogen v2 (4.16 bpw) | 8731 | LAN, no key | `halogen.yml` |
 | `osmos` | [libosmos](https://github.com/mrsirg97-rgb/libosmos) | DeepSeek-V4.1-Flash-1017 UD-IQ1_M, abliterated | 8091 | LAN, no key | `libosmos.yml` |
 | `maya` | [Project Maya](https://github.com/mw00/project-maya) 1.1.56 | DeepSeek-V4.1-Flash-1017 Maya-XS | 8099 | LAN, no key | `maya.yml` |
 

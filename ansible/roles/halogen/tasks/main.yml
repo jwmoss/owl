@@ -17,6 +17,7 @@
 
 # Closed-source engine under the Peonist EULA (free, no telemetry). Without HALOGEN_DOWNLOAD it opens no outbound connections.
 - name: Install the halogen service
+  register: halogen_unit
   ansible.builtin.copy:
     dest: /etc/systemd/system/halogen.service
     mode: "0644"
@@ -41,8 +42,10 @@
       [Install]
       WantedBy=multi-user.target
 
+# Restart the default engine when its unit changes (a new image or setting), else make sure it runs.
 - name: Set the halogen service state
   ansible.builtin.systemd_service:
     name: halogen
     enabled: "{{ default_engine == 'halogen' }}"
+    state: "{{ ('restarted' if halogen_unit is changed else 'started') if default_engine == 'halogen' else omit }}"
     daemon_reload: true

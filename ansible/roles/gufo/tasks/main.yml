@@ -17,6 +17,7 @@
   poll: 60
 
 - name: Install the gufo service
+  register: gufo_unit
   ansible.builtin.copy:
     dest: /etc/systemd/system/gufo.service
     mode: "0644"
@@ -43,8 +44,10 @@
       [Install]
       WantedBy=multi-user.target
 
+# Restart the default engine when its unit changes (a new image or setting), else make sure it runs.
 - name: Set the gufo service state
   ansible.builtin.systemd_service:
     name: gufo
     enabled: "{{ default_engine == 'gufo' }}"
+    state: "{{ ('restarted' if gufo_unit is changed else 'started') if default_engine == 'gufo' else omit }}"
     daemon_reload: true

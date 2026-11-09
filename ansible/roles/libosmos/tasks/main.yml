@@ -19,6 +19,7 @@
   poll: 60
 
 - name: Install the osmos service
+  register: libosmos_unit
   ansible.builtin.copy:
     dest: /etc/systemd/system/osmos.service
     mode: "0644"
@@ -41,8 +42,10 @@
       [Install]
       WantedBy=multi-user.target
 
+# Restart the default engine when its unit changes (a new image or setting), else make sure it runs.
 - name: Set the osmos service state
   ansible.builtin.systemd_service:
     name: osmos
     enabled: "{{ default_engine == 'libosmos' }}"
+    state: "{{ ('restarted' if libosmos_unit is changed else 'started') if default_engine == 'libosmos' else omit }}"
     daemon_reload: true
