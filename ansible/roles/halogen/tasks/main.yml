@@ -34,7 +34,9 @@
         -e HALOGEN_CHECKPOINT=/models/qwen38-flash-next-v2.hgn \
         -v /home/{{ ansible_user }}/Models/halogen:/models:ro {{ halogen_image }}
       ExecStop=/usr/bin/podman stop halogen
+      ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
+      RestartSec=30
 
       [Install]
       WantedBy=multi-user.target

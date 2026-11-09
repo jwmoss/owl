@@ -20,3 +20,31 @@
   become: false
   async: 86400
   poll: 60
+
+- name: Install the maya service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/maya.service
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Project Maya DeepSeek-V4.1-Flash API (port {{ maya_port }}, LAN, no key)
+      After=network-online.target
+      Wants=network-online.target
+      Conflicts=strata.service osmos.service gufo.service halogen.service
+
+      [Service]
+      User={{ ansible_user }}
+      ExecStart=/home/{{ ansible_user }}/src/project-maya/run-maya-ds4-hip.sh --host 0.0.0.0
+      ExecStartPre=/usr/local/bin/owl-wait-memory
+      Restart=on-failure
+      RestartSec=30
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Set the maya service state
+  ansible.builtin.systemd_service:
+    name: maya
+    enabled: "{{ default_engine == 'maya' }}"
+    state: "{{ 'started' if default_engine == 'maya' else omit }}"
+    daemon_reload: true
