@@ -1,4 +1,4 @@
-# 4. Inference engines and models
+# 3. Inference engines and models
 
 Each engine uses almost all of the 128 GB, so only one runs at a time.
 Each engine is a systemd service, and the services conflict, so starting one stops the others.
@@ -11,28 +11,31 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 | `osmos` | [libosmos](https://github.com/mrsirg97-rgb/libosmos) | DeepSeek-V4.1-Flash-1017 UD-IQ1_M, abliterated | 8091 | LAN, no key | `libosmos.yml` |
 | `maya` | [Project Maya](https://github.com/mw00/project-maya) 1.1.56 | DeepSeek-V4.1-Flash-1017 Maya-XS | 8099 | LAN, no key | `maya.yml` |
 
-`halogen` starts at boot. To change that, set `default_engine` in `ansible/inventory/host_vars/owl.yml`.
+`halogen` starts at boot. To change that, set `default_engine` in `ansible/inventory/group_vars/all.yml`.
+
+Only Strata has an API key. The other engines are open to your network without a key, so run them only on a trusted network.
 
 ## Switch engines
 
 ```sh
-ssh jwmoss@192.168.1.241 sudo systemctl start osmos    # stops strata, starts DeepSeek
-ssh jwmoss@192.168.1.241 sudo systemctl start strata   # back to Qwen
+ssh <user>@<host> sudo systemctl start osmos     # stops the running engine, starts DeepSeek
+ssh <user>@<host> sudo systemctl start halogen   # back to Qwen
 ```
 
 A large model takes some minutes to load. `GET /health` answers when it is ready.
+Each service waits until about 100 GiB is free, because the GPU driver frees the last engine's memory some seconds after it stops.
+
+Follow an engine's log: `ssh <user>@<host> journalctl -u halogen -f`.
 
 ## Use the APIs
 
 All engines have an OpenAI-compatible `/v1/chat/completions`. Strata also has an Anthropic-compatible API.
 
-Show the Strata API key on `owl`:
+Show the Strata API key on the server:
 
 ```sh
 ~/.local/bin/strata launch --show-key --preset qwen
 ```
-
-Only Strata has an API key. The other engines are open to the LAN without a key.
 
 ## Model sources
 
@@ -45,14 +48,13 @@ All files come from Hugging Face. The engines pin the revisions, and Strata and 
 | libosmos | UD-IQ1_M and the Engram table (343 GB) | [unsloth/DeepSeek-V4.1-Flash-1017-GGUF](https://huggingface.co/unsloth/DeepSeek-V4.1-Flash-1017-GGUF) |
 | libosmos | DSpark drafter, expert picks | [mrsirg97-rgb/osmos-evo-1017](https://huggingface.co/mrsirg97-rgb/osmos-evo-1017) |
 | libosmos | Abliteration patch | [huihui-ai/Huihui-DeepSeek-V4.1-Flash-1017-abliterated-GGUF](https://huggingface.co/huihui-ai/Huihui-DeepSeek-V4.1-Flash-1017-abliterated-GGUF) |
-
 | halogen | v2 checkpoint and lookup table (about 120 GB) | [peonist-ai/halogen-qwen3.8-flash-next](https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next) |
 | Maya | Maya-XS (about 277 GB) | [peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF](https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF) |
 
 The files stay on the local NVMe disk. libosmos reads experts from the disk for each token with `O_DIRECT`,
 so a network share does not work.
 
-## Measured on owl
+## Measured on a GMKtec EVO-X2 (128 GB)
 
 | Engine | Model | Decode | Date |
 |--------|-------|--------|------|
@@ -64,17 +66,38 @@ so a network share does not work.
 
 ```sh
 cd ansible
-uvx --from ansible-core==2.22.0 ansible-playbook test.yml                          # all engines
-uvx --from ansible-core==2.22.0 ansible-playbook test.yml -e '{"engines": ["strata"]}'
+ansible-playbook test.yml                                # all engines that you installed
+ansible-playbook test.yml -e '{"engines": ["halogen"]}'
 ```
 
-## Clients on the Mac
+## Use with pi
 
-pi (`~/.pi/agent/models.json`) has one provider for each engine, `owl-<engine>`. The model names are
-`owl-<engine>-<model>-<quant>[-<variant>]`, for example `owl-gufo-qwen3.8-flash-next-ud-q4_k_xl`.
-`enabledModels` in `~/.pi/agent/settings.json` sets the Ctrl+P order: the Qwen engines, then DeepSeek.
+[pi](https://github.com/earendil-works/pi) can use each engine as a provider. Add the engine to `~/.pi/agent/models.json`.
+This example is for halogen. The `id` must match the engine's `GET /v1/models`:
 
-Start pi on an engine with `<provider>/<model id>`. Add `:low` for less thinking (halogen defaults to `xhigh`):
+```json
+{
+  "providers": {
+    "owl-halogen": {
+      "baseUrl": "http://<host>:8731/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "models": [
+        {
+          "id": "halogen-qwen3.8-flash-next",
+          "name": "owl-halogen-qwen3.8-flash-next-4.16bpw",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 262144,
+          "maxTokens": 32768
+        }
+      ]
+    }
+  }
+}
+```
+
+Start pi with `<provider>/<model id>`. Add `:low` for less thinking (halogen defaults to `xhigh`):
 
 ```sh
 pi --model owl-halogen/halogen-qwen3.8-flash-next
@@ -94,13 +117,4 @@ A shorter system prompt makes the first answer faster. These flags remove parts 
 
 ```sh
 pi --model owl-halogen/halogen-qwen3.8-flash-next -ns -nc -ne --no-mcp -np
-```
-
-Follow the engine log on `owl`: `ssh jwmoss@192.168.1.241 journalctl -u halogen -f`.
-
-`owl` in `~/.zshrc` switches engines:
-
-```sh
-owl use gufo     # start gufo, stop the others, wait until the model is loaded
-owl status       # show which engine runs
 ```

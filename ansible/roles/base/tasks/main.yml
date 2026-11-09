@@ -28,13 +28,14 @@
     name: huggingface-hub
   become: false
 
-# The token stays on the Mac that runs Ansible (~/.cache/huggingface/token). Downloads are throttled without it.
+# Optional: the token on the computer that runs Ansible (hf auth login). Hugging Face throttles downloads without it.
 - name: Copy the Hugging Face token
   ansible.builtin.copy:
     src: ~/.cache/huggingface/token
     dest: "/home/{{ ansible_user }}/.cache/huggingface/token"
     mode: "0600"
   become: false
+  when: "'~/.cache/huggingface/token' | expanduser is file"
 
 # The GPU driver frees an engine's memory some seconds after its process stops.
 # Each engine service runs this first, so a new engine does not start out of memory.

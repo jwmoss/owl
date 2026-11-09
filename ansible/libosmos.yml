@@ -1,5 +1,5 @@
 ---
 - name: Set up libosmos with DeepSeek-V4.1-Flash
-  hosts: owl
+  hosts: all
   become: true
   roles: [libosmos]

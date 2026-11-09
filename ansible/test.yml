@@ -2,7 +2,7 @@
 # End-to-end test: start each engine, wait for its model, send one chat request, check the answer.
 # Run one engine: ansible-playbook test.yml -e '{"engines": ["strata"]}'
 - name: Test the engines
-  hosts: owl
+  hosts: all
   become: true
   vars:
     engines: [strata, gufo, halogen, osmos, maya]
