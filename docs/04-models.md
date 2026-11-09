@@ -11,7 +11,7 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 | `osmos` | [libosmos](https://github.com/mrsirg97-rgb/libosmos) | DeepSeek-V4.1-Flash-1017 UD-IQ1_M, abliterated | 8091 | LAN, no key | `libosmos.yml` |
 | `maya` | [Project Maya](https://github.com/mw00/project-maya) 1.1.56 | DeepSeek-V4.1-Flash-1017 Maya-XS | 8099 | LAN, no key | `maya.yml` |
 
-`strata` starts at boot. To change that, set `default_engine` in `ansible/inventory/host_vars/owl.yml`.
+`halogen` starts at boot. To change that, set `default_engine` in `ansible/inventory/host_vars/owl.yml`.
 
 ## Switch engines
 

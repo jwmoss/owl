@@ -16,7 +16,7 @@ libosmos_abliterated: true
 libosmos_port: 8091
 
 # The engine that starts at boot: strata, libosmos, gufo, maya or halogen. Each one uses almost all memory, so only one runs.
-default_engine: strata
+default_engine: halogen
 
 gufo_image: "ghcr.io/gufo-org/toolboxes/gufo-runtime:0.32.0"
 gufo_qwen_revision: "d96201194f103c906994f283f504209dc8d2a10c"
