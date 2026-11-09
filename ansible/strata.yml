@@ -1,0 +1,5 @@
+---
+- name: Set up Strata with Qwen3.8-Flash-Next
+  hosts: owl
+  become: true
+  roles: [strata]

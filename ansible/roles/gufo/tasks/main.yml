@@ -1,0 +1,48 @@
+---
+- name: Install Podman
+  ansible.builtin.apt:
+    name: [podman, crun]
+
+- name: Download Qwen3.8-Flash-Next Q4_K_XL, its MTP head and picture reader (about 113 GB)
+  ansible.builtin.command:
+    cmd: >-
+      hf download unsloth/Qwen3.8-Flash-Next-GGUF --revision {{ gufo_qwen_revision }}
+      --include "UD-Q4_K_XL/*" --include "MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf" --include "mmproj-BF16.gguf"
+      --local-dir /home/{{ ansible_user }}/Models/gufo/qwen3.8-flash-next
+  environment:
+    PATH: "/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
+  become: false
+  changed_when: false # hf download skips the files it has
+  async: 43200
+  poll: 60
+
+- name: Install the gufo service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/gufo.service
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=gufo Qwen3.8-Flash-Next API (port {{ gufo_port }})
+      After=network-online.target
+      Wants=network-online.target
+      Conflicts=strata.service osmos.service maya.service
+
+      [Service]
+      User={{ ansible_user }}
+      ExecStart=/usr/bin/podman run --rm --name gufo --userns=keep-id:uid=1000,gid=1000 \
+        --device /dev/kfd --device /dev/dri --group-add keep-groups --ulimit memlock=-1 \
+        -p 127.0.0.1:{{ gufo_port }}:8080 -v /home/{{ ansible_user }}/Models/gufo:/models:ro {{ gufo_image }} \
+        gufo serve --host 0.0.0.0 --port 8080 llm --context 131072 --sessions 2 \
+        --model /models/qwen3.8-flash-next/UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf \
+        --speculative mtp --mtp-model /models/qwen3.8-flash-next/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf
+      ExecStop=/usr/bin/podman stop gufo
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Set the gufo service state
+  ansible.builtin.systemd_service:
+    name: gufo
+    enabled: "{{ default_engine == 'gufo' }}"
+    daemon_reload: true
