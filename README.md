@@ -61,7 +61,7 @@ build tools, ROCm, the GPU memory limit and the engines. Each part has its own p
 | `gufo.yml` | gufo with Qwen3.8-Flash-Next |
 | `libosmos.yml` | libosmos with DeepSeek-V4.1-Flash |
 | `halogen.yml` | halogen with Qwen3.8-Flash-Next |
-| `maya.yml` | Project Maya with DeepSeek-V4.1-Flash (setup only) |
+| `maya.yml` | Project Maya with DeepSeek-V4.1-Flash |
 | `test.yml` | End-to-end test of each engine |
 | `site.yml` | All of the above |
 
@@ -77,6 +77,25 @@ Then run from your Mac:
 cd ansible
 uvx --from ansible-core==2.22.0 ansible-galaxy collection install -r requirements.yml
 uvx --from ansible-core==2.22.0 ansible-playbook site.yml   # or one playbook, e.g. strata.yml
+```
+
+### Quick start: halogen only
+
+halogen is the default engine. This sets up only Ubuntu and halogen (about 120 GB of downloads):
+
+```sh
+cd ansible
+uvx --from ansible-core==2.22.0 ansible-galaxy collection install -r requirements.yml
+uvx --from ansible-core==2.22.0 ansible-playbook ubuntu.yml halogen.yml
+uvx --from ansible-core==2.22.0 ansible-playbook test.yml -e '{"engines": ["halogen"]}'
+```
+
+`ubuntu.yml` can reboot `owl` once to apply the memory limit. `test.yml` waits for the model, then checks one answer.
+Then use it from the Mac:
+
+```sh
+curl -s http://192.168.1.241:8731/health | jq .status
+pi --model owl-halogen/halogen-qwen3.8-flash-next
 ```
 
 The first run downloads about 545 GB of models. The token in `~/.cache/huggingface/token` on your Mac is copied to `owl`; without it, downloads are slow.
