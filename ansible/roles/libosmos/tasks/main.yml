@@ -24,15 +24,15 @@
     mode: "0644"
     content: |
       [Unit]
-      Description=libosmos DeepSeek-V4.1-Flash API (localhost:{{ libosmos_port }})
+      Description=libosmos DeepSeek-V4.1-Flash API (port {{ libosmos_port }})
       After=network-online.target
       Wants=network-online.target
       # Each engine uses almost all memory, so only one runs.
-      Conflicts=strata.service maya.service gufo.service
+      Conflicts=strata.service maya.service gufo.service halogen.service
 
       [Service]
       User={{ ansible_user }}
-      ExecStart=/home/{{ ansible_user }}/src/libosmos/bin/osmos-api --port {{ libosmos_port }} \
+      ExecStart=/home/{{ ansible_user }}/src/libosmos/bin/osmos-api --host 0.0.0.0 --port {{ libosmos_port }} \
         --config /home/{{ ansible_user }}/Models/osmos/{{ libosmos_pack }}/osmos.json
       Restart=on-failure
 

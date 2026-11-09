@@ -25,13 +25,13 @@
       Description=gufo Qwen3.8-Flash-Next API (port {{ gufo_port }})
       After=network-online.target
       Wants=network-online.target
-      Conflicts=strata.service osmos.service maya.service
+      Conflicts=strata.service osmos.service maya.service halogen.service
 
       [Service]
       User={{ ansible_user }}
       ExecStart=/usr/bin/podman run --rm --name gufo --userns=keep-id:uid=1000,gid=1000 \
         --device /dev/kfd --device /dev/dri --group-add keep-groups --ulimit memlock=-1 \
-        -p 127.0.0.1:{{ gufo_port }}:8080 -v /home/{{ ansible_user }}/Models/gufo:/models:ro {{ gufo_image }} \
+        -p {{ gufo_port }}:8080 -v /home/{{ ansible_user }}/Models/gufo:/models:ro {{ gufo_image }} \
         gufo serve --host 0.0.0.0 --port 8080 llm --context 131072 --sessions 2 \
         --model /models/qwen3.8-flash-next/UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf \
         --speculative mtp --mtp-model /models/qwen3.8-flash-next/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf

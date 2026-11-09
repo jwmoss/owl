@@ -14,9 +14,11 @@ This repository records how the machine is set up, so that you can rebuild it.
 | `ttm` GPU memory limit | Done, active after reboot |
 | BIOS: UMA frame buffer at minimum (2 GB) | Done |
 | Strata + Qwen3.8-Flash-Next (systemd, port 8080) | Done |
-| libosmos + DeepSeek-V4.1-Flash | Downloading |
-| gufo + Qwen3.8-Flash-Next | Playbook written, not run |
-| Project Maya | To do |
+| libosmos + DeepSeek-V4.1-Flash | Playbook runs, download in progress |
+| gufo + Qwen3.8-Flash-Next | Playbook runs, download in progress |
+| halogen + Qwen3.8-Flash-Next | Playbook runs, download in progress |
+| Project Maya + DeepSeek Maya-XS | Setup in progress, service not written yet |
+| End-to-end test (`test.yml`) | Passes for Strata |
 | UniFi DHCP reservation for `owl` | To do |
 
 ## Machine
@@ -58,6 +60,9 @@ build tools, ROCm, the GPU memory limit and the engines. Each part has its own p
 | `strata.yml` | Strata with Qwen3.8-Flash-Next |
 | `gufo.yml` | gufo with Qwen3.8-Flash-Next |
 | `libosmos.yml` | libosmos with DeepSeek-V4.1-Flash |
+| `halogen.yml` | halogen with Qwen3.8-Flash-Next |
+| `maya.yml` | Project Maya with DeepSeek-V4.1-Flash (setup only) |
+| `test.yml` | End-to-end test of each engine |
 | `site.yml` | All of the above |
 
 Do these steps by hand first. Ansible cannot do them:

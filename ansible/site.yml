@@ -7,3 +7,7 @@
   ansible.builtin.import_playbook: libosmos.yml
 - name: Set up gufo
   ansible.builtin.import_playbook: gufo.yml
+- name: Set up Project Maya
+  ansible.builtin.import_playbook: maya.yml
+- name: Set up halogen
+  ansible.builtin.import_playbook: halogen.yml

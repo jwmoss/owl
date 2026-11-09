@@ -39,7 +39,7 @@
       Description=Strata Qwen3.8-Flash-Next API (port {{ strata_port }}, API key required)
       After=network-online.target
       Wants=network-online.target
-      Conflicts=osmos.service maya.service gufo.service
+      Conflicts=osmos.service maya.service gufo.service halogen.service
 
       [Service]
       User={{ ansible_user }}
