@@ -31,6 +31,7 @@
   ansible.builtin.meta: flush_handlers
 
 - name: Install the strata service
+  register: strata_unit
   ansible.builtin.copy:
     dest: /etc/systemd/system/strata.service
     mode: "0644"
@@ -52,9 +53,10 @@
       [Install]
       WantedBy=multi-user.target
 
+# Restart the default engine when its unit changes (a new image or setting), else make sure it runs.
 - name: Set the strata service state
   ansible.builtin.systemd_service:
     name: strata
     enabled: "{{ default_engine == 'strata' }}"
-    state: "{{ 'started' if default_engine == 'strata' else omit }}"
+    state: "{{ ('restarted' if strata_unit is changed else 'started') if default_engine == 'strata' else omit }}"
     daemon_reload: true
