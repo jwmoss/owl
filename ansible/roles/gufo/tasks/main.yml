@@ -36,7 +36,9 @@
         --model /models/qwen3.8-flash-next/UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf \
         --speculative mtp --mtp-model /models/qwen3.8-flash-next/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf
       ExecStop=/usr/bin/podman stop gufo
+      ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
+      RestartSec=30
 
       [Install]
       WantedBy=multi-user.target

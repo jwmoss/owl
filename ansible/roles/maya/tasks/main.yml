@@ -35,7 +35,9 @@
       [Service]
       User={{ ansible_user }}
       ExecStart=/home/{{ ansible_user }}/src/project-maya/run-maya-ds4-hip.sh --host 0.0.0.0
+      ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
+      RestartSec=30
 
       [Install]
       WantedBy=multi-user.target
