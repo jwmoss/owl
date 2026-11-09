@@ -1,0 +1,28 @@
+---
+# End-to-end test: start each engine, wait for its model, send one chat request, check the answer.
+# Run one engine: ansible-playbook test.yml -e '{"engines": ["strata"]}'
+- name: Test the engines
+  hosts: owl
+  become: true
+  vars:
+    engines: [strata, gufo, halogen, osmos, maya]
+    ports: {strata: "{{ strata_port }}", gufo: "{{ gufo_port }}", osmos: "{{ libosmos_port }}", maya: "{{ maya_port }}", halogen: "{{ halogen_port }}"}
+    auth: "{{ {'Authorization': 'Bearer ' ~ (strata_key.stdout | regex_search('sk-strata-\\S+'))} if engine == 'strata' else {} }}"
+  tasks:
+    - name: Read the Strata API key
+      ansible.builtin.command: /home/{{ ansible_user }}/.local/bin/strata launch --show-key --preset qwen
+      become: false
+      register: strata_key
+      changed_when: false
+      when: "'strata' in engines"
+
+    - name: Test each engine
+      ansible.builtin.include_tasks: tests/engine.yml
+      loop: "{{ engines }}"
+      loop_control:
+        loop_var: engine
+
+    - name: Start the default engine again
+      ansible.builtin.systemd_service:
+        name: "{{ {'libosmos': 'osmos'}.get(default_engine, default_engine) }}"
+        state: started

@@ -1,0 +1,40 @@
+---
+- name: "Start the engine: {{ engine }}"
+  ansible.builtin.systemd_service:
+    name: "{{ engine }}"
+    state: started
+
+- name: "Wait for the model to load: {{ engine }}"
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ ports[engine] }}/health"
+  register: health
+  until: health.status == 200 and (health.json.loaded | default(true))
+  retries: 120
+  delay: 15
+
+- name: "Read the model name: {{ engine }}"
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ ports[engine] }}/v1/models"
+    headers: "{{ auth }}"
+  register: models
+
+- name: "Send a chat request: {{ engine }}"
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ ports[engine] }}/v1/chat/completions"
+    method: POST
+    headers: "{{ auth }}"
+    body_format: json
+    body:
+      model: "{{ models.json.data[0].id }}"
+      messages: [{role: user, content: "What is 17 times 3? Answer with the number only."}]
+      max_tokens: 2000
+    timeout: 600
+  register: chat
+
+- name: "Check the answer: {{ engine }}"
+  ansible.builtin.assert:
+    that: "'51' in chat.json.choices[0].message.content"
+    fail_msg: "{{ engine }} answered: {{ chat.json.choices[0].message.content }}"
+    success_msg: >-
+      {{ engine }} ({{ models.json.data[0].id }}) answered 51,
+      {{ chat.json.usage.completion_tokens }} tokens in {{ chat.elapsed }} s
