@@ -3,14 +3,27 @@
   ansible.builtin.apt:
     name: [podman, crun]
 
-- name: Download Qwen3.8-Flash-Next Q4_K_XL, its MTP head and picture reader (about 113 GB)
+- name: Download the MTP head and the picture reader (about 4 GB)
   ansible.builtin.command:
     cmd: >-
       hf download unsloth/Qwen3.8-Flash-Next-GGUF --revision {{ gufo_qwen_revision }}
-      --include "UD-Q4_K_XL/*" --include "MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf" --include "mmproj-BF16.gguf"
+      --include "MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf" --include "mmproj-BF16.gguf"
       --local-dir /home/{{ ansible_user }}/Models/gufo/qwen3.8-flash-next
   environment:
     PATH: "/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
+    HF_HUB_DISABLE_XET: "1" # Xet downloads stalled on owl; plain HTTP does not
+  become: false
+  changed_when: false # hf download skips the files it has
+
+- name: "Download the model, about 112 GB: {{ gufo_model_repo }}"
+  ansible.builtin.command:
+    cmd: >-
+      hf download {{ gufo_model_repo }} --revision {{ gufo_model_revision }}
+      --include "{{ gufo_model_file | dirname }}/*-of-*.gguf"
+      --local-dir /home/{{ ansible_user }}/Models/gufo/{{ gufo_model_repo | basename }}
+  environment:
+    PATH: "/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
+    HF_HUB_DISABLE_XET: "1" # Xet downloads stalled on owl; plain HTTP does not
   become: false
   changed_when: false # hf download skips the files it has
   async: 43200
@@ -23,7 +36,7 @@
     mode: "0644"
     content: |
       [Unit]
-      Description=gufo Qwen3.8-Flash-Next API (port {{ gufo_port }})
+      Description=gufo {{ gufo_model_repo | basename }} API (port {{ gufo_port }})
       After=network-online.target
       Wants=network-online.target
       Conflicts=strata.service osmos.service maya.service halogen.service
@@ -34,7 +47,7 @@
         --device /dev/kfd --device /dev/dri --group-add keep-groups --ulimit memlock=-1 \
         -p {{ gufo_port }}:8080 -v /home/{{ ansible_user }}/Models/gufo:/models:ro {{ gufo_image }} \
         gufo serve --host 0.0.0.0 --port 8080 llm --context 131072 --sessions 2 \
-        --model /models/qwen3.8-flash-next/UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf \
+        --model /models/{{ gufo_model_repo | basename }}/{{ gufo_model_file }} \
         --speculative mtp --mtp-model /models/qwen3.8-flash-next/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf
       ExecStop=/usr/bin/podman stop gufo
       ExecStartPre=/usr/local/bin/owl-wait-memory
