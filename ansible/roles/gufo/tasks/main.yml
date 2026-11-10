@@ -1,7 +1,7 @@
 ---
 - name: Install Podman
   ansible.builtin.apt:
-    name: [podman, crun]
+    name: [podman, crun, aria2]
 
 - name: Download the MTP head and the picture reader (about 4 GB)
   ansible.builtin.command:
@@ -15,17 +15,39 @@
   become: false
   changed_when: false # hf download skips the files it has
 
-- name: "Download the model, about 112 GB: {{ gufo_model_repo }}"
-  ansible.builtin.command:
-    cmd: >-
-      hf download {{ gufo_model_repo }} --revision {{ gufo_model_revision }}
-      --include "{{ gufo_model_file | dirname }}/*-of-*.gguf"
-      --local-dir /home/{{ ansible_user }}/Models/gufo/{{ gufo_model_repo | basename }}
-  environment:
-    PATH: "/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
-    HF_HUB_DISABLE_XET: "1" # Xet downloads stalled on owl; plain HTTP does not
+- name: "Read the model's file list: {{ gufo_model_repo }}"
+  ansible.builtin.uri:
+    url: "https://huggingface.co/api/models/{{ gufo_model_repo }}/tree/{{ gufo_model_revision }}/{{ gufo_model_file | dirname }}"
+  register: gufo_tree
+
+# aria2c opens 8 connections for each file, resumes, and checks each file's SHA-256.
+# hf download stalled or slowed to a few MB/s on its one connection for each file.
+- name: Write the download list
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/.cache/gufo-model.aria2"
+    mode: "0600"
+    content: |
+      {% for f in gufo_tree.json if f.path is search('-of-[0-9]+[.]gguf$') %}
+      https://huggingface.co/{{ gufo_model_repo }}/resolve/{{ gufo_model_revision }}/{{ f.path }}
+        out={{ f.path }}
+        checksum=sha-256={{ f.lfs.oid }}
+      {% if gufo_hf_token %}
+        header=Authorization: Bearer {{ gufo_hf_token }}
+      {% endif %}
+      {% endfor %}
   become: false
-  changed_when: false # hf download skips the files it has
+  no_log: true # the file holds the Hugging Face token
+
+- name: "Download the model, about 112 GB: {{ gufo_model_repo }}"
+  ansible.builtin.shell:
+    cmd: >-
+      aria2c --input-file /home/{{ ansible_user }}/.cache/gufo-model.aria2 --dir {{ gufo_model_dir }}
+      --max-connection-per-server 8 --split 8 --min-split-size 64M --max-concurrent-downloads 3
+      --continue --check-integrity --auto-file-renaming=false --file-allocation=falloc
+      --max-tries 20 --retry-wait 10 --summary-interval 0 --console-log-level warn
+      && touch {{ gufo_model_dir }}/.complete-{{ gufo_model_revision }}
+    creates: "{{ gufo_model_dir }}/.complete-{{ gufo_model_revision }}"
+  become: false
   async: 43200
   poll: 60
 
