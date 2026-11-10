@@ -33,4 +33,8 @@ maya_port: 8099
 
 halogen_image: "ghcr.io/peonist-ai/halogen-flash-server:0.20.1"
 halogen_weights_revision: "c464b5b51c968ff54ea78647a4b2556355b36d2c"
+# true: Quat3rnion's uncensored v2 (about 89 GB more on disk). Same speed, refusals removed.
+halogen_abliterated: false
+halogen_abliterated_revision: "e7783c5822dfda2785a0f5b435abf54df89fe8ee" # r2, validated with the stock companions
+halogen_abliterated_sha256: "7bbac319851b500639462133085156b4f998dec562f511e65ca1c14d7af5163e"
 halogen_port: 8731
