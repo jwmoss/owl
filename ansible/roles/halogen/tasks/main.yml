@@ -1,7 +1,7 @@
 ---
 - name: Install Podman
   ansible.builtin.apt:
-    name: [podman, crun]
+    name: [podman, crun, aria2]
 
 - name: Download the halogen v2 checkpoint and its lookup table (about 120 GB)
   ansible.builtin.command:
@@ -19,27 +19,19 @@
 # The uncensored build: Quat3rnion's r2 transplant of orcarouter's refusal-direction edit into
 # peonist's v2. Pinned to r2 because only r2 is validated against the stock lookup table and
 # tokenizer. The checkpoint carries its own MTP head, so the unit needs no other change.
-- name: Download the abliterated checkpoint (about 89 GB)
+- name: Download the abliterated checkpoint and check its SHA-256 (about 89 GB)
   ansible.builtin.command:
     cmd: >-
-      hf download Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated
-      qwen38-flash-next-v2-abliterated.hgn --revision {{ halogen_abliterated_revision }}
-      --local-dir /home/{{ ansible_user }}/Models/halogen
-  environment:
-    PATH: "/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
-    HF_HUB_DISABLE_XET: "1" # Xet downloads stalled on owl; plain HTTP does not
+      aria2c https://huggingface.co/Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated/resolve/{{
+      halogen_abliterated_revision }}/qwen38-flash-next-v2-abliterated.hgn
+      --dir /home/{{ ansible_user }}/Models/halogen --out qwen38-flash-next-v2-abliterated.hgn
+      --checksum sha-256={{ halogen_abliterated_sha256 }} --check-integrity --continue
+      --max-connection-per-server 8 --split 8 --min-split-size 64M --auto-file-renaming=false
+      --file-allocation=falloc --max-tries 20 --retry-wait 10 --summary-interval 0 --console-log-level warn
   become: false
-  changed_when: false # hf download skips the files it has
+  changed_when: false # a complete file only gets its SHA-256 checked
   async: 43200
   poll: 60
-  when: halogen_abliterated
-
-- name: Check the abliterated checkpoint SHA-256
-  ansible.builtin.command:
-    cmd: sha256sum /home/{{ ansible_user }}/Models/halogen/qwen38-flash-next-v2-abliterated.hgn
-  register: halogen_abliterated_file
-  changed_when: false
-  failed_when: not halogen_abliterated_file.stdout.startswith(halogen_abliterated_sha256)
   when: halogen_abliterated
 
 # Closed-source engine under the Peonist EULA (free, no telemetry). Without HALOGEN_DOWNLOAD it opens no outbound connections.
