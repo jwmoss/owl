@@ -16,6 +16,32 @@
   async: 43200
   poll: 60
 
+# The uncensored build: Quat3rnion's r2 transplant of orcarouter's refusal-direction edit into
+# peonist's v2. Pinned to r2 because only r2 is validated against the stock lookup table and
+# tokenizer. The checkpoint carries its own MTP head, so the unit needs no other change.
+- name: Download the abliterated checkpoint (about 89 GB)
+  ansible.builtin.command:
+    cmd: >-
+      hf download Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated
+      qwen38-flash-next-v2-abliterated.hgn --revision {{ halogen_abliterated_revision }}
+      --local-dir /home/{{ ansible_user }}/Models/halogen
+  environment:
+    PATH: "/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
+    HF_HUB_DISABLE_XET: "1" # Xet downloads stalled on owl; plain HTTP does not
+  become: false
+  changed_when: false # hf download skips the files it has
+  async: 43200
+  poll: 60
+  when: halogen_abliterated
+
+- name: Check the abliterated checkpoint SHA-256
+  ansible.builtin.command:
+    cmd: sha256sum /home/{{ ansible_user }}/Models/halogen/qwen38-flash-next-v2-abliterated.hgn
+  register: halogen_abliterated_file
+  changed_when: false
+  failed_when: not halogen_abliterated_file.stdout.startswith(halogen_abliterated_sha256)
+  when: halogen_abliterated
+
 # Closed-source engine under the Peonist EULA (free, no telemetry). Without HALOGEN_DOWNLOAD it opens no outbound connections.
 - name: Install the halogen service
   register: halogen_unit
@@ -33,7 +59,7 @@
       User={{ ansible_user }}
       ExecStart=/usr/bin/podman run --rm --name halogen -p {{ halogen_port }}:8731 \
         --device /dev/kfd --device /dev/dri --group-add keep-groups --ipc=host --ulimit memlock=-1:-1 \
-        -e HALOGEN_CHECKPOINT=/models/qwen38-flash-next-v2.hgn \
+        -e HALOGEN_CHECKPOINT=/models/qwen38-flash-next-v2{{ '-abliterated' if halogen_abliterated else '' }}.hgn \
         -v /home/{{ ansible_user }}/Models/halogen:/models:ro {{ halogen_image }}
       ExecStop=/usr/bin/podman stop halogen
       ExecStartPre=/usr/local/bin/owl-wait-memory
