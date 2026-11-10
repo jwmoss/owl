@@ -10,6 +10,7 @@
       --exclude "*w4b*" --exclude "*ht43*" --local-dir /home/{{ ansible_user }}/Models/halogen
   environment:
     PATH: "/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
+    HF_HUB_DISABLE_XET: "1" # Xet downloads stalled on owl; plain HTTP does not
   become: false
   changed_when: false # hf download skips the files it has
   async: 43200

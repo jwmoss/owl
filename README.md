@@ -12,7 +12,7 @@ Tested on a GMKtec EVO-X2 with 128 GB.
 |--------|-------|------|----------|
 | [halogen](https://github.com/peonist-ai/halogen-flash-server) (default, closed source, free under an EULA) | Qwen3.8-Flash-Next | 8731 | `halogen.yml` |
 | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next | 8080 | `strata.yml` |
-| [gufo](https://github.com/gufo-org/gufo) | Qwen3.8-Flash-Next | 8081 | `gufo.yml` |
+| [gufo](https://github.com/gufo-org/gufo) | Qwen3.8-Flash-Next, optional abliterated | 8081 | `gufo.yml` |
 | [libosmos](https://github.com/mrsirg97-rgb/libosmos) | DeepSeek-V4.1-Flash, abliterated | 8091 | `libosmos.yml` |
 | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash | 8099 | `maya.yml` |
 
@@ -58,6 +58,12 @@ Each engine uses almost all of the memory, so only one runs at a time. See [docs
 
 Settings, such as the engine that starts at boot (`default_engine`), are in
 [`ansible/inventory/group_vars/all.yml`](ansible/inventory/group_vars/all.yml).
+To change a setting for one machine, put it in `ansible/inventory/host_vars/<host>.yml` (gitignored), for example:
+
+```yaml
+default_engine: gufo
+gufo_abliterated: true   # gufo runs huihui-ai's abliterated Qwen3.8-Flash-Next
+```
 
 ## Documents
 
