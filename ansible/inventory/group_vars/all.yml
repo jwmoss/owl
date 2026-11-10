@@ -26,6 +26,8 @@ gufo_abliterated: false
 gufo_model_repo: "{{ 'huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF' if gufo_abliterated else 'unsloth/Qwen3.8-Flash-Next-GGUF' }}"
 gufo_model_revision: "{{ 'cbc7fba13f1939ac3fa42b18d77ccf43847d74ef' if gufo_abliterated else gufo_qwen_revision }}"
 gufo_model_file: "{{ 'unsloth-UD-Q4_K_XL-V2' if gufo_abliterated else 'UD-Q4_K_XL' }}/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf"
+gufo_model_dir: "/home/{{ ansible_user }}/Models/gufo/{{ gufo_model_repo | basename }}"
+gufo_hf_token: "{{ lookup('ansible.builtin.file', '~/.cache/huggingface/token', errors='ignore') | default('', true) }}"
 gufo_port: 8081
 
 maya_commit: "22fc101f2c109b7e7174c975ff3c2d8e9ce0a867" # v1.1.56
