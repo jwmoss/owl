@@ -39,7 +39,7 @@ gufo_hf_token: "{{ lookup('ansible.builtin.file', '~/.cache/huggingface/token', 
 gufo_port: 8081
 
 # renovate: datasource=github-tags depName=mw00/project-maya
-maya_commit: "22fc101f2c109b7e7174c975ff3c2d8e9ce0a867" # v1.1.56
+maya_commit: "f4067232fa599494122508b55556c4dbaad945ba" # v1.1.58
 maya_port: 8099
 
 # renovate: datasource=docker depName=ghcr.io/peonist-ai/halogen-flash-server
