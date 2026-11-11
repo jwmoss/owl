@@ -26,7 +26,7 @@ default_engine: halogen
 gufo_image: "ghcr.io/gufo-org/toolboxes/gufo-runtime:0.32.0"
 # unsloth: the model, the MTP head and the picture reader. Most new revisions change only the README.
 # renovate: datasource=git-refs depName=https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF
-gufo_qwen_revision: "d96201194f103c906994f283f504209dc8d2a10c" # main
+gufo_qwen_revision: "084c631ac221016019d6e0a863afe92d90edd3b0" # main
 # true: huihui-ai's abliterated v2 of the same UD-Q4_K_XL quant (about 112 GB more). gufo keeps unsloth's MTP head.
 gufo_abliterated: false
 gufo_model_repo: "{{ 'huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF' if gufo_abliterated else 'unsloth/Qwen3.8-Flash-Next-GGUF' }}"
