@@ -19,20 +19,28 @@
       ansible.builtin.set_fact:
         installed: "{{ engines | select('in', units.files | map(attribute='path') | map('basename') | map('regex_replace', '[.]service$', '') | list) | list }}"
 
+    - name: Require at least one installed engine
+      ansible.builtin.assert:
+        that: installed | length > 0
+        fail_msg: No requested engine is installed. Install an engine before this test.
+
     - name: Read the Strata API key
       ansible.builtin.command: /home/{{ ansible_user }}/.local/bin/strata launch --show-key --preset qwen
       become: false
       register: strata_key
+      no_log: true
       changed_when: false
       when: "'strata' in installed"
 
-    - name: Test each engine
-      ansible.builtin.include_tasks: tests/engine.yml
-      loop: "{{ installed }}"
-      loop_control:
-        loop_var: engine
-
-    - name: Start the default engine again
-      ansible.builtin.systemd_service:
-        name: "{{ {'libosmos': 'osmos'}.get(default_engine, default_engine) }}"
-        state: started
+    - name: Test engines and restore the default
+      block:
+        - name: Test each engine
+          ansible.builtin.include_tasks: tests/engine.yml
+          loop: "{{ installed }}"
+          loop_control:
+            loop_var: engine
+      always:
+        - name: Start the default engine again
+          ansible.builtin.systemd_service:
+            name: "{{ {'libosmos': 'osmos'}.get(default_engine, default_engine) }}"
+            state: started

@@ -12,10 +12,11 @@
   ansible.builtin.shell:
     cmd: >-
       ./maya.sh --backend hip --gpu 0 --model deepseek-maya-xs --no-vision
-      --yes --download-model --no-start --port {{ maya_port }}
-      && touch .installed-{{ maya_commit }}
+      --yes --download-model --no-start --no-speed-calibration
+      --vram-reserve-mib {{ maya_vram_reserve_mib }} --port {{ maya_port }}
+      && touch .installed-{{ maya_commit }}-reserve-{{ maya_vram_reserve_mib }}
     chdir: "/home/{{ ansible_user }}/src/project-maya"
-    creates: "/home/{{ ansible_user }}/src/project-maya/.installed-{{ maya_commit }}"
+    creates: "/home/{{ ansible_user }}/src/project-maya/.installed-{{ maya_commit }}-reserve-{{ maya_vram_reserve_mib }}"
   environment:
     ROCM_PATH: /opt/rocm
     PATH: "/opt/rocm/bin:/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"

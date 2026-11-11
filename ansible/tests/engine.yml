@@ -8,7 +8,9 @@
   ansible.builtin.uri:
     url: "http://127.0.0.1:{{ ports[engine] }}/health"
   register: health
-  until: health.status == 200 and (health.json.loaded | default(true))
+  until: >-
+    health.status == 200 and (health.json.loaded | default(true))
+    and (health.json.status | default('ok')) != 'loading'
   retries: 120
   delay: 15
 
