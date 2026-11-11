@@ -18,6 +18,13 @@ Tested on a GMKtec EVO-X2 with 128 GB.
 
 Each engine uses almost all of the memory, so only one runs at a time. See [docs/03-engines.md](docs/03-engines.md).
 
+## Set up with an AI agent
+
+Clone the repository, start your coding agent (Claude Code, Codex, pi or another agent that reads `AGENTS.md`)
+in it, and ask: "Set up my Strix Halo at `<host>` as user `<user>`." The agent follows
+[the setup skill](.agents/skills/strix-halo-setup/SKILL.md). It stops for the steps that only you can do:
+the BIOS, the Ubuntu install and the sudo password.
+
 ## Quick start
 
 1. Install Ubuntu Server 26.04 LTS, set the BIOS frame buffer to the minimum and allow passwordless sudo.
