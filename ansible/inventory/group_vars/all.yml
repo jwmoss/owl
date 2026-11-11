@@ -12,12 +12,14 @@ strata_release: "v0.2.13"
 strata_model: iq3_s
 strata_context: 128k
 strata_port: 8080
+strata_env: {} # extra environment variables for the engine, for example { NAME: "value" }
 
 # renovate: datasource=github-tags depName=mrsirg97-rgb/libosmos
 libosmos_commit: "9142b2293c54af3d8de4d88ebff146e3f4b7d63d" # v0.6.1
 libosmos_pack: ud-iq1_m
 libosmos_abliterated: true
 libosmos_port: 8091
+libosmos_env: {} # extra environment variables for the engine, for example { NAME: "value" }
 
 # The engine that starts at boot: strata, libosmos, gufo, maya or halogen. Each one uses almost all memory, so only one runs.
 default_engine: halogen
@@ -37,10 +39,12 @@ gufo_model_file: "{{ 'unsloth-UD-Q4_K_XL-V2' if gufo_abliterated else 'UD-Q4_K_X
 gufo_model_dir: "/home/{{ ansible_user }}/Models/gufo/{{ gufo_model_repo | basename }}"
 gufo_hf_token: "{{ lookup('ansible.builtin.file', '~/.cache/huggingface/token', errors='ignore') | default('', true) }}"
 gufo_port: 8081
+gufo_env: {} # extra environment variables for the engine, for example { NAME: "value" }
 
 # renovate: datasource=github-tags depName=mw00/project-maya
 maya_commit: "f4067232fa599494122508b55556c4dbaad945ba" # v1.1.58
 maya_port: 8099
+maya_env: {} # extra environment variables for the engine, for example { NAME: "value" }
 # Leave headroom below the shared GPU memory limit on a 128 GB Strix Halo.
 maya_vram_reserve_mib: 16384
 
@@ -53,3 +57,10 @@ halogen_abliterated: false
 halogen_abliterated_revision: "e7783c5822dfda2785a0f5b435abf54df89fe8ee" # r2, validated with the stock companions
 halogen_abliterated_sha256: "7bbac319851b500639462133085156b4f998dec562f511e65ca1c14d7af5163e"
 halogen_port: 8731
+# Small models on the NPU beside the Flash model, on the same port, for example
+# "decider-0.8b,qwen3-embedding-0.6b,qwen3-reranker-0.6b,qwen3guard-gen-0.6b,qwen3.5-2b" (about 8 GiB more memory).
+# halogen fetches them on its first start. Empty: no NPU. See https://peonist.ai/halogen/docs/NPU/
+halogen_npu_models: ""
+# Any other halogen setting, as environment variables. The list: https://peonist.ai/halogen/docs/FLAGS/
+# For example { HALOGEN_WEIGHTS_LOCK: "1" }
+halogen_env: {}

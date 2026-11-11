@@ -40,6 +40,9 @@
 
       [Service]
       User={{ ansible_user }}
+      {% for k, v in libosmos_env.items() %}
+      Environment="{{ k }}={{ v }}"
+      {% endfor %}
       ExecStart=/home/{{ ansible_user }}/src/libosmos/bin/osmos-api --host 0.0.0.0 --port {{ libosmos_port }} \
         --config /home/{{ ansible_user }}/Models/osmos/{{ libosmos_pack }}/osmos.json
       ExecStartPre=/usr/local/bin/owl-wait-memory

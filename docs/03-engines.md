@@ -61,6 +61,35 @@ with the refusal direction from orcarouter's uncensored fine-tune transplanted i
 Speed and memory stay the same. The playbook pins the r2 revision, the one validated against the
 stock lookup table and tokenizer, and checks the file's SHA-256.
 
+### halogen on the NPU
+
+halogen can serve small models on the NPU beside the Flash model on the GPU, on the same port.
+Name them in `halogen_npu_models`, for example `decider-0.8b,qwen3-embedding-0.6b,qwen3-reranker-0.6b,qwen3guard-gen-0.6b,qwen3.5-2b`.
+The request's `model` picks the NPU model, on `/v1/embeddings`, `/v1/rerank`, `/v1/systemone` and the others.
+[halogen's NPU page](https://peonist.ai/halogen/docs/NPU/) lists the models and the request shapes.
+
+The playbook then does three things:
+
+- It passes `/dev/accel/accel0` to the container.
+- It installs halogen's `halogen-fabric-clock` unit. GPU and NPU work at once can hang Strix Halo unless the GPU
+  fabric clock is held ([ROCm/TheRock#8709](https://github.com/ROCm/TheRock/issues/8709)).
+  The hold costs about 1 W. Install your vendor's newest BIOS too.
+- It lets halogen fetch the NPU models (a few GB) into `~/Models/halogen/npu` on its first start.
+
+The NPU models use about 8 GiB of memory more, and the Flash model is a little slower while the NPU works.
+
+### Engine settings
+
+Each engine has an `<engine>_env` setting, for example `halogen_env` or `gufo_env`. Its entries go to the engine
+as environment variables, with `-e` for a container and `Environment=` for a host service. For halogen, use the names in
+[halogen's flags](https://peonist.ai/halogen/docs/FLAGS/):
+
+```yaml
+# ansible/inventory/host_vars/<host>.yml
+halogen_env:
+  HALOGEN_WEIGHTS_LOCK: "1" # keep the Flash model in memory while NPU models work
+```
+
 The files stay on the local NVMe disk. libosmos reads experts from the disk for each token with `O_DIRECT`,
 so a network share does not work.
 
