@@ -67,6 +67,9 @@
       User={{ ansible_user }}
       ExecStart=/usr/bin/podman run --rm --name gufo --userns=keep-id:uid=1000,gid=1000 \
         --device /dev/kfd --device /dev/dri --group-add keep-groups --ulimit memlock=-1 \
+      {% for k, v in gufo_env.items() %}
+        -e "{{ k }}={{ v }}" \
+      {% endfor %}
         -p {{ gufo_port }}:8080 -v /home/{{ ansible_user }}/Models/gufo:/models:ro {{ gufo_image }} \
         gufo serve --host 0.0.0.0 --port 8080 llm --context 131072 --sessions 2 \
         --model /models/{{ gufo_model_repo | basename }}/{{ gufo_model_file }} \

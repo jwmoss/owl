@@ -84,6 +84,9 @@
 
       [Service]
       User={{ ansible_user }}
+      {% for k, v in strata_env.items() %}
+      Environment="{{ k }}={{ v }}"
+      {% endfor %}
       ExecStart=/home/{{ ansible_user }}/.local/bin/strata serve --host 0.0.0.0 --port {{ strata_port }} \
         --profile /home/{{ ansible_user }}/.local/state/strata/launch/qwen.json
       ExecStartPre=/usr/local/bin/owl-wait-memory

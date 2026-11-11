@@ -34,7 +34,29 @@
   poll: 60
   when: halogen_abliterated
 
+# GPU and NPU work at once can hang Strix Halo unless the GPU fabric clock is held (ROCm/TheRock#8709).
+# Rootless Podman cannot hold it, so halogen's own unit does, at the same version as the image.
+- name: Install halogen's fabric clock unit for the NPU
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/peonist-ai/halogen-flash-server/v{{ halogen_image.split(':')[-1] }}/deploy/host/{{ item.name }}
+    dest: "{{ item.dest }}/{{ item.name }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { name: halogen-fabric-clock, dest: /usr/local/sbin, mode: "0755" }
+    - { name: halogen-fabric-clock.service, dest: /etc/systemd/system, mode: "0644" }
+  when: halogen_npu_models | length > 0
+
+- name: Hold the GPU fabric clock at every boot
+  ansible.builtin.systemd_service:
+    name: halogen-fabric-clock
+    enabled: true
+    state: started
+    daemon_reload: true
+  changed_when: false # a oneshot that exits, so each start only holds the clock again
+  when: halogen_npu_models | length > 0
+
 # Closed-source engine under the Peonist EULA (free, no telemetry). Without HALOGEN_DOWNLOAD it opens no outbound connections.
+# With NPU models it gets HALOGEN_DOWNLOAD and a writable volume to fetch them into Models/halogen/npu (skips files it has).
 - name: Install the halogen service
   register: halogen_unit
   ansible.builtin.copy:
@@ -45,14 +67,28 @@
       Description=halogen Qwen3.8-Flash-Next API (port {{ halogen_port }})
       After=network-online.target
       Wants=network-online.target
+      {% if halogen_npu_models %}
+      After=halogen-fabric-clock.service
+      {% endif %}
       Conflicts=strata.service osmos.service maya.service gufo.service
 
       [Service]
       User={{ ansible_user }}
+      {% if halogen_npu_models %}
+      # The NPU pins its models in memory; a service's default memlock limit is 8 MiB.
+      LimitMEMLOCK=infinity
+      {% endif %}
       ExecStart=/usr/bin/podman run --rm --name halogen -p {{ halogen_port }}:8731 \
         --device /dev/kfd --device /dev/dri --group-add keep-groups --ipc=host --ulimit memlock=-1:-1 \
         -e HALOGEN_CHECKPOINT=/models/qwen38-flash-next-v2{{ '-abliterated' if halogen_abliterated else '' }}.hgn \
-        -v /home/{{ ansible_user }}/Models/halogen:/models:ro {{ halogen_image }}
+      {% for k, v in halogen_env.items() %}
+        -e "{{ k }}={{ v }}" \
+      {% endfor %}
+      {% if halogen_npu_models %}
+        --device /dev/accel/accel0 -e HALOGEN_NPU_MODELS={{ halogen_npu_models }} \
+        -e HALOGEN_DOWNLOAD=peonist-ai/halogen-qwen3.8-flash-next \
+      {% endif %}
+        -v /home/{{ ansible_user }}/Models/halogen:/models{{ '' if halogen_npu_models else ':ro' }} {{ halogen_image }}
       ExecStop=/usr/bin/podman stop halogen
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure

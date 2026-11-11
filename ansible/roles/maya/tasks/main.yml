@@ -38,6 +38,9 @@
 
       [Service]
       User={{ ansible_user }}
+      {% for k, v in maya_env.items() %}
+      Environment="{{ k }}={{ v }}"
+      {% endfor %}
       ExecStart=/home/{{ ansible_user }}/src/project-maya/run-maya-ds4-hip.sh --host 0.0.0.0
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
