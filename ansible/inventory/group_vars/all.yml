@@ -24,7 +24,9 @@ default_engine: halogen
 
 # renovate: datasource=docker depName=ghcr.io/gufo-org/toolboxes/gufo-runtime
 gufo_image: "ghcr.io/gufo-org/toolboxes/gufo-runtime:0.32.0"
-gufo_qwen_revision: "d96201194f103c906994f283f504209dc8d2a10c" # unsloth: the model, the MTP head and the picture reader
+# unsloth: the model, the MTP head and the picture reader. Most new revisions change only the README.
+# renovate: datasource=git-refs depName=https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF
+gufo_qwen_revision: "d96201194f103c906994f283f504209dc8d2a10c" # main
 # true: huihui-ai's abliterated v2 of the same UD-Q4_K_XL quant (about 112 GB more). gufo keeps unsloth's MTP head.
 gufo_abliterated: false
 gufo_model_repo: "{{ 'huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF' if gufo_abliterated else 'unsloth/Qwen3.8-Flash-Next-GGUF' }}"
@@ -40,7 +42,8 @@ maya_port: 8099
 
 # renovate: datasource=docker depName=ghcr.io/peonist-ai/halogen-flash-server
 halogen_image: "ghcr.io/peonist-ai/halogen-flash-server:0.20.1"
-halogen_weights_revision: "c464b5b51c968ff54ea78647a4b2556355b36d2c"
+# renovate: datasource=git-refs depName=https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next
+halogen_weights_revision: "c464b5b51c968ff54ea78647a4b2556355b36d2c" # main
 # true: Quat3rnion's uncensored v2 (about 89 GB more on disk). Same speed, refusals removed.
 halogen_abliterated: false
 halogen_abliterated_revision: "e7783c5822dfda2785a0f5b435abf54df89fe8ee" # r2, validated with the stock companions
