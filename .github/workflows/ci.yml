@@ -1,0 +1,44 @@
+---
+# Lint and syntax-check the playbooks. GitHub runners have no Strix Halo GPU,
+# so the engines are tested on a real machine with ansible/test.yml before a release.
+name: CI
+"on":
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 5 * * 1" # weekly: catches a new ansible-core or ansible-lint that breaks main
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ansible
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: false
+
+      - name: Install the collections
+        run: uvx --from ansible-core ansible-galaxy collection install -r requirements.yml
+
+      - name: Run ansible-lint
+        run: uvx ansible-lint --exclude .collections
+
+      - name: Check the syntax of each playbook
+        run: |
+          for p in *.yml; do
+            [ "$p" = requirements.yml ] && continue
+            uvx --from ansible-core ansible-playbook -i inventory/hosts.example.yml --syntax-check "$p"
+          done

@@ -38,5 +38,7 @@ Run all Ansible commands from `ansible/`.
 - Pin every version: a commit, a release tag, an image tag or a Hugging Face revision. Check a SHA-256 when the source gives one.
 - Put Jinja at the end of a task name (ansible-lint `name[template]`).
 - Write docs in ASD-STE100 Simplified Technical English: active voice, present tense, short sentences.
+- Use conventional commits. release-please makes the version from them: `fix:` is a patch, `feat:` is a minor
+  release, and `feat!:` or a `BREAKING CHANGE:` footer is a major release. An engine version bump is `feat:`.
 - Lint before you commit: `cd ansible && uvx ansible-lint --exclude .collections`.
 - Test on a machine: `ansible-playbook test.yml` (all installed engines) or `-e '{"engines": ["halogen"]}'`.

@@ -46,7 +46,7 @@ can do: the BIOS, the Ubuntu install and the sudo password.
 2. On your computer, get the repository, Ansible and the collections:
 
    ```sh
-   git clone https://github.com/jwmoss/owl && cd owl/ansible
+   git clone --branch v1.0.0 https://github.com/jwmoss/owl && cd owl/ansible # x-release-please-version
    uv tool install ansible-core
    ansible-galaxy collection install -r requirements.yml
    ```
@@ -91,6 +91,15 @@ gufo_abliterated: true   # gufo runs huihui-ai's abliterated Qwen3.8-Flash-Next
 1. [Ubuntu install](docs/01-ubuntu-install.md)
 2. [ROCm and GPU memory](docs/02-rocm.md)
 3. [Inference engines and models](docs/03-engines.md)
+
+## Versions
+
+Each release is a tag (`vX.Y.Z`) with notes in [CHANGELOG.md](CHANGELOG.md) and on the
+[releases page](https://github.com/jwmoss/owl/releases). The quick start clones the latest release.
+
+- **Major:** you must change something by hand, for example a renamed setting.
+- **Minor:** a new engine, a new setting or a new engine version. The next run downloads or runs something different.
+- **Patch:** a fix that does not change what gets installed.
 
 ## License
 
