@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400" role="img" aria-labelledby="t d">
+  <title id="t">owl</title>
+  <desc id="d">An owl perched on an AMD Ryzen AI Max+ 395 (Strix Halo) chip under a night sky, with the text: owl, local LLMs on AMD Strix Halo.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1026"/>
+      <stop offset="1" stop-color="#1c1240"/>
+    </linearGradient>
+    <radialGradient id="moon" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff7d6"/>
+      <stop offset="0.7" stop-color="#f6e7a8"/>
+      <stop offset="1" stop-color="#f6e7a8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a6a4f"/>
+      <stop offset="1" stop-color="#4e3a2b"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b2f3a"/>
+      <stop offset="1" stop-color="#15171d"/>
+    </linearGradient>
+    <radialGradient id="iris" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd166"/>
+      <stop offset="1" stop-color="#ef6c1a"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="400" fill="url(#sky)"/>
+
+  <!-- stars -->
+  <g fill="#ffffff">
+    <circle cx="80" cy="60" r="1.6" opacity="0.8"/><circle cx="190" cy="120" r="1.2" opacity="0.6"/>
+    <circle cx="300" cy="40" r="1.8" opacity="0.9"/><circle cx="520" cy="80" r="1.2" opacity="0.5"/>
+    <circle cx="640" cy="30" r="1.5" opacity="0.8"/><circle cx="760" cy="110" r="1.1" opacity="0.6"/>
+    <circle cx="880" cy="50" r="1.7" opacity="0.9"/><circle cx="1010" cy="140" r="1.2" opacity="0.5"/>
+    <circle cx="1220" cy="70" r="1.6" opacity="0.8"/><circle cx="1180" cy="330" r="1.2" opacity="0.5"/>
+    <circle cx="560" cy="350" r="1.3" opacity="0.5"/><circle cx="40" cy="300" r="1.4" opacity="0.6"/>
+  </g>
+
+  <!-- moon -->
+  <circle cx="300" cy="150" r="120" fill="url(#moon)" opacity="0.35"/>
+  <circle cx="300" cy="150" r="78" fill="#f6e7a8" opacity="0.9"/>
+
+  <!-- chip: Ryzen AI Max+ 395 (Strix Halo) package -->
+  <g>
+    <g fill="#c9a227">
+      <rect x="190" y="346" width="10" height="20" rx="2"/><rect x="220" y="346" width="10" height="20" rx="2"/>
+      <rect x="250" y="346" width="10" height="20" rx="2"/><rect x="280" y="346" width="10" height="20" rx="2"/>
+      <rect x="310" y="346" width="10" height="20" rx="2"/><rect x="340" y="346" width="10" height="20" rx="2"/>
+      <rect x="370" y="346" width="10" height="20" rx="2"/><rect x="400" y="346" width="10" height="20" rx="2"/>
+    </g>
+    <rect x="150" y="296" width="300" height="56" rx="8" fill="url(#chip)" stroke="#ed1c24" stroke-width="2.5"/>
+    <text x="300" y="318" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#ffffff" letter-spacing="1.5">RYZEN AI MAX+ 395</text>
+    <text x="300" y="340" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="13" fill="#ed1c24" letter-spacing="2.5">STRIX HALO · 128 GB</text>
+  </g>
+
+  <!-- owl -->
+  <g>
+    <!-- ear tufts -->
+    <path d="M232 128 L246 78 L270 118 Z" fill="#4e3a2b"/>
+    <path d="M368 128 L354 78 L330 118 Z" fill="#4e3a2b"/>
+    <!-- body -->
+    <ellipse cx="300" cy="200" rx="92" ry="96" fill="url(#body)"/>
+    <!-- belly -->
+    <ellipse cx="300" cy="232" rx="58" ry="58" fill="#c8a98a"/>
+    <g fill="none" stroke="#8a6a4f" stroke-width="3" stroke-linecap="round">
+      <path d="M272 220 q8 8 16 0"/><path d="M296 220 q8 8 16 0"/>
+      <path d="M284 244 q8 8 16 0"/><path d="M308 244 q8 8 16 0"/>
+      <path d="M272 268 q8 8 16 0"/><path d="M296 268 q8 8 16 0"/>
+    </g>
+    <!-- wings -->
+    <path d="M212 190 q-18 60 18 100 q-4 -50 10 -96 Z" fill="#3e2e22"/>
+    <path d="M388 190 q18 60 -18 100 q4 -50 -10 -96 Z" fill="#3e2e22"/>
+    <!-- face disc -->
+    <ellipse cx="268" cy="160" rx="40" ry="38" fill="#e9d7bf"/>
+    <ellipse cx="332" cy="160" rx="40" ry="38" fill="#e9d7bf"/>
+    <!-- eyes -->
+    <circle cx="268" cy="160" r="26" fill="url(#iris)"/>
+    <circle cx="332" cy="160" r="26" fill="url(#iris)"/>
+    <circle cx="268" cy="160" r="12" fill="#111"/>
+    <circle cx="332" cy="160" r="12" fill="#111"/>
+    <circle cx="263" cy="154" r="4" fill="#fff"/>
+    <circle cx="327" cy="154" r="4" fill="#fff"/>
+    <!-- beak -->
+    <path d="M290 182 L310 182 L300 204 Z" fill="#e0a12b"/>
+    <!-- feet -->
+    <g fill="#e0a12b">
+      <rect x="266" y="288" width="8" height="12" rx="3"/><rect x="278" y="288" width="8" height="12" rx="3"/>
+      <rect x="314" y="288" width="8" height="12" rx="3"/><rect x="326" y="288" width="8" height="12" rx="3"/>
+    </g>
+  </g>
+
+  <!-- text -->
+  <text x="520" y="190" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="120" font-weight="800" fill="#ffffff" letter-spacing="-2">owl</text>
+  <text x="526" y="240" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="30" fill="#d9d4f5">Local LLMs on AMD Strix Halo, set up by Ansible</text>
+  <g font-family="ui-monospace, Menlo, Consolas, monospace" font-size="18" fill="#ffd166">
+    <rect x="526" y="272" width="88" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
+    <text x="570" y="295" text-anchor="middle">ROCm</text>
+    <rect x="626" y="272" width="110" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
+    <text x="681" y="295" text-anchor="middle">halogen</text>
+    <rect x="748" y="272" width="80" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
+    <text x="788" y="295" text-anchor="middle">gufo</text>
+    <rect x="840" y="272" width="98" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
+    <text x="889" y="295" text-anchor="middle">Strata</text>
+    <rect x="950" y="272" width="120" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
+    <text x="1010" y="295" text-anchor="middle">libosmos</text>
+    <rect x="1082" y="272" width="80" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
+    <text x="1122" y="295" text-anchor="middle">Maya</text>
+  </g>
+</svg>

@@ -30,6 +30,8 @@ Expected: `AMD RYZEN AI MAX+ 395 w/ Radeon 8060S` and `gfx1151`.
 
 The CPU and the GPU share 128 GB. Two settings control how the GPU uses it.
 
+![The Ryzen AI Max+ 395: CPU, GPU and NPU share 128 GB of LPDDR5X](images/strix-halo.svg)
+
 ### 1. BIOS: UMA frame buffer
 
 Set it to the minimum (see [01-ubuntu-install.md](01-ubuntu-install.md#bios)). Ansible cannot set it. Check:

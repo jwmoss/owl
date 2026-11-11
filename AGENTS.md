@@ -3,8 +3,8 @@
 Ansible playbooks that set up an AMD Strix Halo machine (Ryzen AI Max+ 395, 128 GB, Ubuntu Server 26.04)
 with ROCm and local LLM engines. Read [README.md](README.md) first.
 
-**To set up a machine for the user, follow the `strix-halo-setup` skill:**
-[.agents/skills/strix-halo-setup/SKILL.md](.agents/skills/strix-halo-setup/SKILL.md).
+**To set up a machine for the user, follow the `owl-setup` skill:**
+[.agents/skills/owl-setup/SKILL.md](.agents/skills/owl-setup/SKILL.md).
 
 ## Layout
 
