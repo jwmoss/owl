@@ -14,7 +14,7 @@ strata_context: 128k
 strata_port: 8080
 
 # renovate: datasource=github-tags depName=mrsirg97-rgb/libosmos
-libosmos_commit: "94e274cf6058aa26901495a6e9f352b73dd82186" # v0.5.9
+libosmos_commit: "9142b2293c54af3d8de4d88ebff146e3f4b7d63d" # v0.6.1
 libosmos_pack: ud-iq1_m
 libosmos_abliterated: true
 libosmos_port: 8091
