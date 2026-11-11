@@ -43,10 +43,17 @@
         /home/{{ ansible_user }}/.local/bin/strata update --yes --json
         --feed https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}
       become: false
-      register: strata_update
       changed_when: true
       async: 3600
       poll: 15
+  always:
+    - name: Restore an installed default engine after the update attempt
+      ansible.builtin.systemd_service:
+        name: "{{ {'libosmos': 'osmos'}.get(default_engine, default_engine) }}"
+        state: started
+      when: >-
+        ({'libosmos': 'osmos'}.get(default_engine, default_engine) ~ '.service')
+        in (ansible_facts.services | default({}))
 
 # Downloads the engine and the model, writes the run config with a new API key, and starts serving.
 - name: Set up Qwen3.8-Flash-Next (about 86 GB)
@@ -93,9 +100,3 @@
     enabled: "{{ default_engine == 'strata' }}"
     state: "{{ ('restarted' if strata_unit is changed else 'started') if default_engine == 'strata' else omit }}"
     daemon_reload: true
-
-- name: Restore the default engine after a Strata update
-  ansible.builtin.systemd_service:
-    name: "{{ {'libosmos': 'osmos'}.get(default_engine, default_engine) }}"
-    state: started
-  when: strata_update is changed and default_engine != 'strata'
