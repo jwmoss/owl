@@ -15,6 +15,39 @@
     STRATA_FEED: "https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}"
   become: false
 
+- name: Check the pinned Strata engine and control versions
+  ansible.builtin.command: >-
+    /home/{{ ansible_user }}/.local/bin/strata update --check --json
+    --feed https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}
+  become: false
+  register: strata_update_check
+  changed_when: false
+
+- name: Apply the pinned Strata component update
+  when: >-
+    (strata_update_check.stdout | from_json).engine.status == 'available'
+    or (strata_update_check.stdout | from_json).control.status == 'available'
+  block:
+    - name: Read installed services before the Strata update
+      ansible.builtin.service_facts:
+
+    - name: Stop engines before the Strata update test
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        state: stopped
+      loop: [strata, osmos, maya, gufo, halogen]
+      when: (item ~ '.service') in ansible_facts.services
+
+    - name: Update Strata from the pinned signed feed
+      ansible.builtin.command: >-
+        /home/{{ ansible_user }}/.local/bin/strata update --yes --json
+        --feed https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}
+      become: false
+      register: strata_update
+      changed_when: true
+      async: 3600
+      poll: 15
+
 # Downloads the engine and the model, writes the run config with a new API key, and starts serving.
 - name: Set up Qwen3.8-Flash-Next (about 86 GB)
   ansible.builtin.command:
@@ -60,3 +93,9 @@
     enabled: "{{ default_engine == 'strata' }}"
     state: "{{ ('restarted' if strata_unit is changed else 'started') if default_engine == 'strata' else omit }}"
     daemon_reload: true
+
+- name: Restore the default engine after a Strata update
+  ansible.builtin.systemd_service:
+    name: "{{ {'libosmos': 'osmos'}.get(default_engine, default_engine) }}"
+    state: started
+  when: strata_update is changed and default_engine != 'strata'
