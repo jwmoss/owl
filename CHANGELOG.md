@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/jwmoss/owl/compare/v1.2.0...v1.3.0) (2026-11-11)
+
+
+### Features
+
+* **engines:** update Maya and test Halogen NPU models ([#35](https://github.com/jwmoss/owl/issues/35)) ([7353192](https://github.com/jwmoss/owl/commit/735319294268b40c216bb7e1aa74b9ce25143c11))
+
 ## [1.2.0](https://github.com/jwmoss/owl/compare/v1.1.3...v1.2.0) (2026-11-11)
 
 
