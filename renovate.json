@@ -1,19 +1,28 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Engine version pins in ansible/inventory/group_vars/all.yml. Dependabot updates the GitHub Actions.",
-  "enabledManagers": ["custom.regex"],
+  "enabledManagers": [
+    "custom.regex"
+  ],
   "semanticCommits": "enabled",
   "semanticCommitType": "feat",
   "semanticCommitScope": "engines",
-  "schedule": ["before 6am on monday"],
+  "schedule": [
+    "* 0-5 * * *"
+  ],
+  "prHourlyLimit": 0,
   "minimumReleaseAge": "3 days",
   "dependencyDashboard": false,
-  "prBodyNotes": ["Test on a Strix Halo before you merge: `ansible-playbook <engine>.yml test.yml -e '{\"engines\": [\"<engine>\"]}'`."],
+  "prBodyNotes": [
+    "Test on a Strix Halo before you merge: `ansible-playbook <engine>.yml test.yml -e '{\"engines\": [\"<engine>\"]}'`."
+  ],
   "customManagers": [
     {
       "customType": "regex",
       "description": "A tag or an image tag: the value ends the line",
-      "managerFilePatterns": ["/^ansible/inventory/group_vars/all\\.yml$/"],
+      "managerFilePatterns": [
+        "/^ansible/inventory/group_vars/all\\.yml$/"
+      ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n[a-z_]+: \"(?:[^\"]*:)?(?<currentValue>[^\"]+)\"\\n"
       ]
@@ -21,7 +30,9 @@
     {
       "customType": "regex",
       "description": "A commit pinned at a tag: the tag is in the comment after the commit",
-      "managerFilePatterns": ["/^ansible/inventory/group_vars/all\\.yml$/"],
+      "managerFilePatterns": [
+        "/^ansible/inventory/group_vars/all\\.yml$/"
+      ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n[a-z_]+: \"(?<currentDigest>[0-9a-f]{40})\" # (?<currentValue>\\S+)"
       ]
