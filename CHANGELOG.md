@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/jwmoss/owl/compare/v1.3.0...v1.4.0) (2026-11-11)
+
+
+### Features
+
+* add an optional Tailscale playbook ([#37](https://github.com/jwmoss/owl/issues/37)) ([ab2b41e](https://github.com/jwmoss/owl/commit/ab2b41e2cb47003ae764d98383b982f8bb66553a))
+
 ## [1.3.0](https://github.com/jwmoss/owl/compare/v1.2.0...v1.3.0) (2026-11-11)
 
 
