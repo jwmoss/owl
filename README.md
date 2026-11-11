@@ -91,6 +91,7 @@ gufo_abliterated: true   # gufo runs huihui-ai's abliterated Qwen3.8-Flash-Next
 1. [Ubuntu install](docs/01-ubuntu-install.md)
 2. [ROCm and GPU memory](docs/02-rocm.md)
 3. [Inference engines and models](docs/03-engines.md)
+4. [State transitions and recovery](docs/04-state-transitions.md)
 
 ## Versions
 
