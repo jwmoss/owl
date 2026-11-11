@@ -5,9 +5,6 @@
       "release-type": "simple",
       "include-v-in-tag": true,
       "changelog-path": "CHANGELOG.md",
-      "extra-files": [
-        "README.md"
-      ],
       "release-as": "1.0.0"
     }
   }
