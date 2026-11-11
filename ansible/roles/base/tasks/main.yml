@@ -1,4 +1,12 @@
 ---
+# A frame buffer left at its default (often 64 GB) hides that memory from Linux, and no engine fits.
+- name: Check that Linux sees about 128 GB of memory
+  ansible.builtin.assert:
+    that: ansible_facts.memtotal_mb >= 115000
+    fail_msg: >-
+      Linux sees {{ ansible_facts.memtotal_mb }} MB. The engines need a 128 GB machine with the BIOS
+      UMA frame buffer at its minimum (docs/01-ubuntu-install.md).
+
 - name: Install the build tools
   ansible.builtin.apt:
     name: [build-essential, cmake, ninja-build, git, pipx, python3-venv, libnuma1, libelf1t64, libdrm-amdgpu1]

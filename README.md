@@ -6,6 +6,13 @@ OpenAI-compatible API on your network.
 
 Tested on a GMKtec EVO-X2 with 128 GB.
 
+## Before you start
+
+- **Machine:** a Ryzen AI Max+ 395 with 128 GB. `ubuntu.yml` stops if Linux sees less than about 115 GB.
+- **Disk:** about 120 GB for halogen, about 900 GB for all engines.
+- **Security:** `ubuntu.yml` gives your user passwordless sudo. The engines, except Strata, serve
+  without an API key to all of your network. Use them only on a trusted network.
+
 ## Engines
 
 | Engine | Model | Port | Playbook |

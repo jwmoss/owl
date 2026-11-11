@@ -7,11 +7,18 @@
   become: false
 
 # The installer builds the engine and downloads about 348 GB at pinned commits, checked by SHA-256.
+# The marker names the commit and the settings, so a change runs the installer again.
 - name: Build libosmos and download the DeepSeek pack
-  ansible.builtin.command:
-    cmd: python3 tools/install/osmos_install.py {{ libosmos_pack }} {{ '--abliterated' if libosmos_abliterated else '' }}
+  ansible.builtin.shell:
+    cmd: >-
+      python3 tools/install/osmos_install.py {{ libosmos_pack }} {{ '--abliterated' if libosmos_abliterated else '' }}
+      && touch {{ libosmos_marker }}
     chdir: "/home/{{ ansible_user }}/src/libosmos"
-    creates: "/home/{{ ansible_user }}/Models/osmos/{{ libosmos_pack }}/osmos.json"
+    creates: "{{ libosmos_marker }}"
+  vars:
+    libosmos_marker: >-
+      /home/{{ ansible_user }}/Models/osmos/{{ libosmos_pack }}/.installed-{{ libosmos_commit
+      }}{{ '-abliterated' if libosmos_abliterated else '' }}
   environment:
     PATH: "/opt/rocm/bin:/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
   become: false

@@ -7,13 +7,15 @@
   become: false
 
 # Builds the HIP engine and downloads Maya-XS (about 277 GB), the 128 GB quant. Each shard is checked by SHA-256.
+# The marker names the commit, so a new maya_commit runs the setup again.
 - name: Set up Maya with DeepSeek-V4.1-Flash Maya-XS
-  ansible.builtin.command:
+  ansible.builtin.shell:
     cmd: >-
       ./maya.sh --backend hip --gpu 0 --model deepseek-maya-xs --no-vision
       --yes --download-model --no-start --port {{ maya_port }}
+      && touch .installed-{{ maya_commit }}
     chdir: "/home/{{ ansible_user }}/src/project-maya"
-    creates: "/home/{{ ansible_user }}/src/project-maya/maya-ds4-hip.json"
+    creates: "/home/{{ ansible_user }}/src/project-maya/.installed-{{ maya_commit }}"
   environment:
     ROCM_PATH: /opt/rocm
     PATH: "/opt/rocm/bin:/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
