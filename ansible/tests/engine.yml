@@ -40,3 +40,7 @@
     success_msg: >-
       {{ engine }} ({{ models.json.data[0].id }}) answered 51,
       {{ chat.json.usage.completion_tokens }} tokens in {{ chat.elapsed }} s
+
+- name: Test the configured halogen NPU models
+  ansible.builtin.include_tasks: halogen-npu.yml
+  when: engine == 'halogen' and halogen_npu_models | length > 0

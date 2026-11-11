@@ -1,0 +1,76 @@
+---
+- name: Check that the configured models use the NPU
+  ansible.builtin.assert:
+    that: configured_npu_models | difference(loaded_npu_models) | length == 0
+    fail_msg: "Configured NPU models are missing: {{ configured_npu_models | difference(loaded_npu_models) }}"
+  vars:
+    configured_npu_models: "{{ halogen_npu_models.split(',') | map('trim') | list }}"
+    loaded_npu_models: >-
+      {{ models.json.data | selectattr('backend', 'defined')
+      | selectattr('backend', 'equalto', 'npu') | map(attribute='id') | list }}
+
+- name: Send requests to the configured standard NPU models
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ halogen_port }}/v1/{{ item.endpoint }}"
+    method: POST
+    body_format: json
+    body: "{{ item.body | combine({'model': item.model}) }}"
+    timeout: 120
+  loop:
+    - model: decider-0.8b
+      endpoint: systemone
+      body:
+        state: "Customer: Please refund the duplicate payment for my subscription."
+        questions:
+          team:
+            type: choice
+            instructions: Which team handles this request?
+            criteria:
+              billing: Payments and refunds
+              technical: Software errors
+              other: Other requests
+    - model: qwen3-embedding-0.6b
+      endpoint: embeddings
+      body:
+        input: ["A cat sits on the mat.", "The weather is sunny."]
+    - model: qwen3-reranker-0.6b
+      endpoint: rerank
+      body:
+        query: How do I check that the NPU driver is loaded?
+        documents:
+          - List /dev/accel. If accel0 exists, the NPU driver is loaded.
+          - The GPU shares memory with the CPU.
+        top_n: 1
+    - model: qwen3guard-gen-0.6b
+      endpoint: moderations
+      body:
+        input: How do I bake bread?
+    - model: qwen3.5-2b
+      endpoint: chat/completions
+      body:
+        messages: [{role: user, content: "What is 17 times 3? Answer with the number only."}]
+        max_tokens: 128
+  loop_control:
+    label: "{{ item.model }}"
+  when: item.model in halogen_npu_models.split(',') | map('trim') | list
+  register: npu_requests
+
+- name: Check the NPU answers
+  ansible.builtin.assert:
+    that:
+      - item.model != 'decider-0.8b' or npu_response.json.answers.team.choice == 'billing'
+      - >-
+        item.model != 'qwen3-embedding-0.6b'
+        or (npu_response.json.data | length == 2 and npu_response.json.data[0].embedding | length == 1024
+        and npu_response.json.data[1].embedding | length == 1024)
+      - item.model != 'qwen3-reranker-0.6b' or npu_response.json.results[0].index == 0
+      - item.model != 'qwen3guard-gen-0.6b' or not npu_response.json.results[0].flagged
+      - item.model != 'qwen3.5-2b' or '51' in npu_response.json.choices[0].message.content
+    success_msg: "{{ item.model }} answers correctly on the NPU"
+  vars:
+    npu_response: "{{ npu_requests.results[npu_test_index] }}"
+  loop: "{{ npu_requests.results | map(attribute='item') | list }}"
+  loop_control:
+    label: "{{ item.model }}"
+    index_var: npu_test_index
+  when: not npu_response.skipped | default(false)
