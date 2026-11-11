@@ -89,6 +89,7 @@ can do: the BIOS, the Ubuntu install and the sudo password.
 | `ubuntu.yml` | Build tools, passwordless sudo, GPU groups, Hugging Face CLI, ROCm, GPU memory limit |
 | `<engine>.yml` | One engine, its model and its systemd service |
 | `site.yml` | `ubuntu.yml` and all engines (about 900 GB of downloads) |
+| `tailscale.yml` | Optional. Installs [Tailscale](https://tailscale.com) and joins your tailnet. `site.yml` does not run it |
 | `test.yml` | Starts each installed engine, sends one chat request and checks the answer |
 
 Settings, such as the engine that starts at boot (`default_engine`), are in
@@ -99,6 +100,21 @@ To change a setting for one machine, put it in `ansible/inventory/host_vars/<hos
 default_engine: gufo
 gufo_abliterated: true   # gufo runs huihui-ai's abliterated Qwen3.8-Flash-Next
 ```
+
+### Tailscale
+
+Tailscale lets you reach the engines from outside your home network. Run `ansible-playbook tailscale.yml`.
+It installs Tailscale, shows a login URL and waits up to 10 minutes. Open the URL to add the machine to your tailnet.
+
+To log in without a browser, use an auth key:
+
+1. Make an auth key in the [Tailscale admin console](https://login.tailscale.com/admin/settings/keys).
+   A one-off key with a tag is safest. A tagged device does not expire, and access controls can limit it.
+2. Put the key in `~/.config/tailscale/authkey` on your computer, outside the repo, and run `chmod 600` on it.
+3. Run `ansible-playbook tailscale.yml`.
+
+Every device on your tailnet can then reach the engines, and most engines have no API key.
+Use [Tailscale access controls](https://tailscale.com/kb/1018/acls) to limit which devices can.
 
 ## Documents
 

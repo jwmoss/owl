@@ -1,0 +1,6 @@
+---
+# Optional. site.yml does not run it.
+- name: Install Tailscale
+  hosts: all
+  become: true
+  roles: [tailscale]
