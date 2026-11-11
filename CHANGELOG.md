@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/jwmoss/owl/compare/v1.1.1...v1.1.2) (2026-11-11)
+
+
+### Bug Fixes
+
+* update installed Strata components from the pinned feed ([#29](https://github.com/jwmoss/owl/issues/29)) ([176e7fb](https://github.com/jwmoss/owl/commit/176e7fbd64b749311c85992665bc262299ecec05))
+
 ## [1.1.1](https://github.com/jwmoss/owl/compare/v1.1.0...v1.1.1) (2026-11-11)
 
 
