@@ -8,7 +8,7 @@ rocm_sha256: "c40e8f2bd6630a7d11557c762b99c6fa8afb04c9bd0e51ed1675ee1ca24afb00"
 ttm_pages_limit: 29637703 # about 113 GiB of 4 KiB pages
 
 # renovate: datasource=github-releases depName=Niko1221/Strata
-strata_release: "v0.2.12"
+strata_release: "v0.2.13"
 strata_model: iq3_s
 strata_context: 128k
 strata_port: 8080
