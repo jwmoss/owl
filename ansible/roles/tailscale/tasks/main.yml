@@ -1,0 +1,77 @@
+---
+- name: Add the Tailscale apt repository
+  ansible.builtin.deb822_repository:
+    name: tailscale
+    uris: https://pkgs.tailscale.com/stable/ubuntu
+    suites: "{{ ansible_facts.distribution_release }}"
+    components: [main]
+    signed_by: https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_facts.distribution_release }}.noarmor.gpg
+
+- name: Install Tailscale {{ tailscale_version }}
+  ansible.builtin.apt:
+    name: "tailscale={{ tailscale_version | regex_replace('^v', '') }}"
+    update_cache: true
+    allow_downgrade: true
+
+- name: Start the Tailscale daemon at boot
+  ansible.builtin.systemd_service:
+    name: tailscaled
+    enabled: true
+    state: started
+
+# Exits non-zero while the machine is not logged in to a tailnet.
+- name: Check if the machine is on a tailnet
+  ansible.builtin.command: tailscale status
+  register: tailscale_status
+  changed_when: false
+  failed_when: false
+
+# The key goes through a root-only file, not the command line, so it stays out of the process list.
+- name: Join the tailnet with the auth key
+  when: tailscale_status.rc != 0 and tailscale_authkey | length > 0
+  block:
+    - name: Write the auth key to a root-only file
+      ansible.builtin.copy:
+        dest: /root/.tailscale-authkey
+        content: "{{ tailscale_authkey }}"
+        mode: "0600"
+      no_log: true
+
+    - name: Log in to the tailnet
+      ansible.builtin.command: tailscale up --auth-key=file:/root/.tailscale-authkey
+      changed_when: true
+  always:
+    - name: Remove the auth key file
+      ansible.builtin.file:
+        path: /root/.tailscale-authkey
+        state: absent
+
+# No key: tailscale up waits in the background for a browser login, and the play waits for it too.
+- name: Log in through the browser
+  when: tailscale_status.rc != 0 and tailscale_authkey | length == 0
+  block:
+    - name: Start the login
+      ansible.builtin.command: tailscale up
+      async: 600
+      poll: 0
+      changed_when: true
+
+    - name: Get the login URL
+      ansible.builtin.command: tailscale status --json
+      register: tailscale_login
+      until: (tailscale_login.stdout | from_json).AuthURL | length > 0
+      retries: 15
+      delay: 2
+      changed_when: false
+
+    - name: Open this URL to add the machine to your tailnet
+      ansible.builtin.debug:
+        msg: "{{ (tailscale_login.stdout | from_json).AuthURL }}"
+
+    - name: Wait up to 10 minutes for the login
+      ansible.builtin.command: tailscale status --json
+      register: tailscale_login
+      until: (tailscale_login.stdout | from_json).BackendState == "Running"
+      retries: 120
+      delay: 5
+      changed_when: false

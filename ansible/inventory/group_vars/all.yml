@@ -64,3 +64,10 @@ halogen_npu_models: ""
 # Any other halogen setting, as environment variables. The list: https://peonist.ai/halogen/docs/FLAGS/
 # For example { HALOGEN_WEIGHTS_LOCK: "1" }
 halogen_env: {}
+
+# Tailscale is optional: only tailscale.yml installs it.
+# renovate: datasource=github-releases depName=tailscale/tailscale
+tailscale_version: "v1.104.6"
+# Ansible logs the machine in with the auth key in this file on your computer, outside the repo.
+# Make a one-off key in the Tailscale admin console. No file: the playbook shows a login URL and waits.
+tailscale_authkey: "{{ lookup('ansible.builtin.file', '~/.config/tailscale/authkey', errors='ignore') | default('', true) }}"
