@@ -5,11 +5,13 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 
 | Service | Engine | Model | Port | Access | Playbook |
 |---------|--------|-------|------|--------|----------|
-| `strata` | [Strata](https://github.com/Niko1221/Strata) 0.2.12 | Qwen3.8-Flash-Next IQ3_S, 128K context | 8080 | LAN, API key | `strata.yml` |
-| `gufo` | [gufo](https://github.com/gufo-org/gufo) 0.32.0 (Podman) | Qwen3.8-Flash-Next UD-Q4_K_XL + MTP, or the abliterated v2 (`gufo_abliterated`) | 8081 | LAN, no key | `gufo.yml` |
-| `halogen` | [halogen](https://github.com/peonist-ai/halogen-flash-server) 0.20.1 (Podman, closed-source EULA) | Qwen3.8-Flash-Next halogen v2 (4.16 bpw), or the abliterated r2 (`halogen_abliterated`) | 8731 | LAN, no key | `halogen.yml` |
+| `strata` | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next IQ3_S, 128K context | 8080 | LAN, API key | `strata.yml` |
+| `gufo` | [gufo](https://github.com/gufo-org/gufo) (Podman) | Qwen3.8-Flash-Next UD-Q4_K_XL + MTP, or the abliterated v2 (`gufo_abliterated`) | 8081 | LAN, no key | `gufo.yml` |
+| `halogen` | [halogen](https://github.com/peonist-ai/halogen-flash-server) (Podman, closed-source EULA) | Qwen3.8-Flash-Next halogen v2 (4.16 bpw), or the abliterated r2 (`halogen_abliterated`) | 8731 | LAN, no key | `halogen.yml` |
 | `osmos` | [libosmos](https://github.com/mrsirg97-rgb/libosmos) | DeepSeek-V4.1-Flash-1017 UD-IQ1_M, abliterated | 8091 | LAN, no key | `libosmos.yml` |
-| `maya` | [Project Maya](https://github.com/mw00/project-maya) 1.1.56 | DeepSeek-V4.1-Flash-1017 Maya-XS | 8099 | LAN, no key | `maya.yml` |
+| `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS | 8099 | LAN, no key | `maya.yml` |
+
+The table shows Owl's configured models. Read [group_vars/all.yml](../ansible/inventory/group_vars/all.yml) for the exact engine versions and model revisions.
 
 `halogen` starts at boot. To change that, set `default_engine` in `ansible/inventory/group_vars/all.yml`.
 
@@ -17,6 +19,41 @@ Only Strata has an API key. The other engines are open to your network without a
 
 Maya reserves 16 GiB of GPU memory on this machine. The 1 GiB upstream default can fail during model load.
 Set `maya_vram_reserve_mib` to change this reserve. Setup skips the optional speed calibration.
+
+## Other models and memory limits
+
+An engine can support more models than its Owl role configures. These are separate choices:
+
+- The engine version controls which model formats and features the software supports.
+- The model files control the base model, quantization and any abliteration.
+- The Ansible role controls which files to download and which model the service starts.
+
+These examples come from the upstream versions linked below. They do not list every supported model.
+
+| Engine | Additional upstream choices | Owl configuration |
+|--------|-----------------------------|-------------------|
+| [Strata](https://github.com/Niko1221/Strata/blob/v0.2.13/README.md#models) | Qwen3.6-35B-A3B; other Qwen Flash quants | The role fixes the family to Qwen Flash. `strata_model` selects its quant. |
+| [libosmos](https://github.com/mrsirg97-rgb/libosmos/blob/v0.6.1/README.md#the-packs) | Qwen3.8-Flash-Next packs | `libosmos_pack` selects the pack. Owl tests the default DeepSeek pack. |
+| [gufo](https://github.com/gufo-org/gufo/blob/v0.33.0/README.md#models) | Qwen3.8-27B, DeepSeek V4 Flash, embeddings, speech, images and video | The role configures Qwen Flash only. |
+| [Maya](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MODELS.md) | GLM-5.3-Flash, full GLM-5.3, MiniMax-M3.1-Flash and Qwen Flash | The role fixes the model to `deepseek-maya-xs`. |
+| [halogen](https://github.com/peonist-ai/halogen-flash-server/blob/v0.20.1/docs/NPU.md) | Small classifiers, embeddings, rerankers, moderation and other NPU models | `halogen_npu_models` selects the NPU models beside Qwen Flash. |
+
+Do not treat upstream support as a successful test on this machine. Additional model families need Ansible download, launch and test support.
+An engine update does not change Owl's selected model family. An environment override does not replace the role's download and launch configuration.
+
+Maya's [memory guide](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MEMORY.md) lists these options.
+The memory figures are upstream recommendations at the documented context, not results from Owl tests.
+
+| Model and quant | Download | Recommended memory | On a 128 GB Strix Halo |
+|-----------------|----------|--------------------|-----------------------|
+| GLM-5.3-Flash Maya-XS | 73 GB | 88 GB | Fits by the upstream guide; not tested by Owl |
+| GLM-5.3-Flash Maya-S | 97 GB | 128 GB | Upstream lists 128 GB; not tested by Owl |
+| MiniMax-M3.1-Flash Maya-XS | 93 GB | 128 GB | Upstream lists 128 GB; not tested by Owl |
+| Full GLM-5.3 Maya-XS | 170 GB | 192 GB | Some experts must come from SSD; not tested by Owl |
+
+Strix Halo shares memory between the CPU and GPU. Count that memory once.
+Download size is not the memory requirement. DeepSeek's download includes n-gram tables that stay on SSD.
+Longer contexts need more memory. Run only one large engine at a time.
 
 ## Switch engines
 
@@ -103,6 +140,9 @@ so a network share does not work.
 
 `ansible/test.yml` starts each installed engine, waits for its model, sends one chat request and checks the answer.
 It fails if no requested engine is installed. It starts the default engine again after a test failure.
+For halogen, it also checks that each configured NPU model appears with the NPU backend.
+It sends requests to configured `decider-0.8b`, `qwen3-embedding-0.6b`, `qwen3-reranker-0.6b`, `qwen3guard-gen-0.6b` and `qwen3.5-2b` models.
+Other NPU models get the backend check only.
 
 ```sh
 cd ansible

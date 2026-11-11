@@ -19,7 +19,9 @@ Tested on a GMKtec EVO-X2 with 128 GB.
 
 ## Engines
 
-| Engine | Model | Port | Playbook |
+The table shows the models that Owl's playbooks install. Each engine can support other models too.
+
+| Engine | Model installed by Owl | Port | Playbook |
 |--------|-------|------|----------|
 | [halogen](https://github.com/peonist-ai/halogen-flash-server) (default, closed source, free under an EULA) | Qwen3.8-Flash-Next, optional abliterated | 8731 | `halogen.yml` |
 | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next | 8080 | `strata.yml` |
@@ -28,6 +30,18 @@ Tested on a GMKtec EVO-X2 with 128 GB.
 | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash | 8099 | `maya.yml` |
 
 Each engine uses almost all of the memory, so only one runs at a time. See [docs/03-engines.md](docs/03-engines.md).
+
+### Other model options
+
+Some other models fit a 128 GB Strix Halo. Upstream support does not mean that Owl installs or tests that model.
+
+- Maya also supports GLM-5.3-Flash and MiniMax-M3.1-Flash. Its smaller quants are options for 128 GB machines.
+- Strata also supports Qwen3.6-35B-A3B. libosmos also supports Qwen3.8-Flash-Next.
+- gufo also supports Qwen3.8-27B, embeddings, speech, images and video.
+- halogen can serve small NPU models beside Qwen Flash. Set `halogen_npu_models` to select them.
+
+The full GLM-5.3 model needs more memory than GLM-5.3-Flash. On 128 GB, its Maya-XS quant must read some experts from SSD.
+See [other models and memory limits](docs/03-engines.md#other-models-and-memory-limits) before you choose a model.
 
 ## Set up with an AI agent
 
@@ -94,6 +108,9 @@ gufo_abliterated: true   # gufo runs huihui-ai's abliterated Qwen3.8-Flash-Next
 4. [State transitions and recovery](docs/04-state-transitions.md)
 
 ## Versions
+
+Renovate reads the annotated version pins in `ansible/inventory/group_vars/all.yml` and proposes updates through pull requests.
+It does not add new model choices or deploy updates. Run the relevant setup and test playbooks before you merge an update.
 
 Each release is a tag (`vX.Y.Z`) with notes in [CHANGELOG.md](CHANGELOG.md) and on the
 [releases page](https://github.com/jwmoss/owl/releases).
