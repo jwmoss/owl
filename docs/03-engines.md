@@ -15,6 +15,9 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 
 Only Strata has an API key. The other engines are open to your network without a key, so run them only on a trusted network.
 
+Maya reserves 16 GiB of GPU memory on this machine. The 1 GiB upstream default can fail during model load.
+Set `maya_vram_reserve_mib` to change this reserve. Setup skips the optional speed calibration.
+
 ## Switch engines
 
 ```sh
@@ -69,7 +72,8 @@ so a network share does not work.
 
 ## Test
 
-`ansible/test.yml` starts each engine, waits for its model, sends one chat request and checks the answer.
+`ansible/test.yml` starts each installed engine, waits for its model, sends one chat request and checks the answer.
+It fails if no requested engine is installed. It starts the default engine again after a test failure.
 
 ```sh
 cd ansible

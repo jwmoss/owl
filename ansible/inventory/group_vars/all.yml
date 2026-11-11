@@ -41,6 +41,8 @@ gufo_port: 8081
 # renovate: datasource=github-tags depName=mw00/project-maya
 maya_commit: "f4067232fa599494122508b55556c4dbaad945ba" # v1.1.58
 maya_port: 8099
+# Leave headroom below the shared GPU memory limit on a 128 GB Strix Halo.
+maya_vram_reserve_mib: 16384
 
 # renovate: datasource=docker depName=ghcr.io/peonist-ai/halogen-flash-server
 halogen_image: "ghcr.io/peonist-ai/halogen-flash-server:0.20.1"
