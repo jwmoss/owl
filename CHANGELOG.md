@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/jwmoss/owl/compare/v1.1.3...v1.2.0) (2026-11-11)
+
+
+### Features
+
+* **engines:** serve halogen NPU models and pass extra engine env ([#33](https://github.com/jwmoss/owl/issues/33)) ([ba300ae](https://github.com/jwmoss/owl/commit/ba300ae492e468157738d3f16f918d5f264d8652))
+
 ## [1.1.3](https://github.com/jwmoss/owl/compare/v1.1.2...v1.1.3) (2026-11-11)
 
 
