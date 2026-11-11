@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/jwmoss/owl/compare/v1.1.0...v1.1.1) (2026-11-11)
+
+
+### Bug Fixes
+
+* reserve Maya GPU memory and harden live engine tests ([#27](https://github.com/jwmoss/owl/issues/27)) ([238b6d5](https://github.com/jwmoss/owl/commit/238b6d5739bae961b45feb00013cab26c7734f80))
+
 ## [1.1.0](https://github.com/jwmoss/owl/compare/v1.0.0...v1.1.0) (2026-11-11)
 
 
