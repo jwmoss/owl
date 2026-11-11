@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/jwmoss/owl/compare/v1.1.2...v1.1.3) (2026-11-11)
+
+
+### Bug Fixes
+
+* restore the default engine after failed Strata updates ([#31](https://github.com/jwmoss/owl/issues/31)) ([22ce10f](https://github.com/jwmoss/owl/commit/22ce10fbf38a123b4d91d1439e58d33c03050dc4))
+
 ## [1.1.2](https://github.com/jwmoss/owl/compare/v1.1.1...v1.1.2) (2026-11-11)
 
 
