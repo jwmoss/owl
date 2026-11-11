@@ -30,7 +30,9 @@ gufo_qwen_revision: "d96201194f103c906994f283f504209dc8d2a10c" # main
 # true: huihui-ai's abliterated v2 of the same UD-Q4_K_XL quant (about 112 GB more). gufo keeps unsloth's MTP head.
 gufo_abliterated: false
 gufo_model_repo: "{{ 'huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF' if gufo_abliterated else 'unsloth/Qwen3.8-Flash-Next-GGUF' }}"
-gufo_model_revision: "{{ 'cbc7fba13f1939ac3fa42b18d77ccf43847d74ef' if gufo_abliterated else gufo_qwen_revision }}"
+# renovate: datasource=git-refs depName=https://huggingface.co/huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF
+gufo_abliterated_revision: "cbc7fba13f1939ac3fa42b18d77ccf43847d74ef" # main
+gufo_model_revision: "{{ gufo_abliterated_revision if gufo_abliterated else gufo_qwen_revision }}"
 gufo_model_file: "{{ 'unsloth-UD-Q4_K_XL-V2' if gufo_abliterated else 'UD-Q4_K_XL' }}/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf"
 gufo_model_dir: "/home/{{ ansible_user }}/Models/gufo/{{ gufo_model_repo | basename }}"
 gufo_hf_token: "{{ lookup('ansible.builtin.file', '~/.cache/huggingface/token', errors='ignore') | default('', true) }}"
