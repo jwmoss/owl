@@ -1,9 +1,9 @@
 ---
-name: strix-halo-setup
+name: owl-setup
 description: Set up an AMD Strix Halo machine (Ryzen AI Max+ 395, 128 GB) with ROCm and a local LLM engine from this repository, then test it and connect a client. Use when the user wants to install, configure, update or troubleshoot owl on their own machine, or asks to "set up my Strix Halo".
 ---
 
-# Strix Halo setup
+# owl setup
 
 You run Ansible from the user's computer (the controller) against their Strix Halo machine (the host) over SSH.
 The playbooks do the work. Your job: collect four values, check the preconditions, run the playbooks, and report.

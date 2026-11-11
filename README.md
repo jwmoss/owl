@@ -1,10 +1,14 @@
 # owl
 
+![owl: local LLMs on AMD Strix Halo, set up by Ansible](docs/images/owl-banner.svg)
+
 Ansible playbooks that set up an AMD Strix Halo machine (Ryzen AI Max+ 395, 128 GB) to run large language models.
 They install ROCm and one or more inference engines on Ubuntu Server 26.04 LTS. Each engine serves an
 OpenAI-compatible API on your network.
 
 Tested on a GMKtec EVO-X2 with 128 GB.
+
+![How owl uses an AMD Strix Halo machine: Ansible sets it up over SSH, one engine runs on the Radeon 8060S GPU from 128 GB of shared memory, and serves an OpenAI-compatible API](docs/images/strix-halo.svg)
 
 ## Before you start
 
@@ -27,20 +31,23 @@ Each engine uses almost all of the memory, so only one runs at a time. See [docs
 
 ## Set up with an AI agent
 
-Clone the repository, start your coding agent (Claude Code, Codex, pi or another agent that reads `AGENTS.md`)
-in it, and ask: "Set up my Strix Halo at `<host>` as user `<user>`." The agent follows
-[the setup skill](.agents/skills/strix-halo-setup/SKILL.md). It stops for the steps that only you can do:
-the BIOS, the Ubuntu install and the sudo password.
+Clone the repository and start your coding agent in it (Claude Code, Codex, pi or another agent that reads `AGENTS.md`).
+Then ask:
+
+> Use the owl-setup skill to set up my Strix Halo at `<host>` as user `<user>`.
+
+The agent follows the [owl-setup skill](.agents/skills/owl-setup/SKILL.md). It stops for the steps that only you
+can do: the BIOS, the Ubuntu install and the sudo password.
 
 ## Quick start
 
 1. Install Ubuntu Server 26.04 LTS, set the BIOS frame buffer to the minimum and allow passwordless sudo.
    See [docs/01-ubuntu-install.md](docs/01-ubuntu-install.md).
-2. On your computer, install Ansible and the collections:
+2. On your computer, get the repository, Ansible and the collections:
 
    ```sh
+   git clone https://github.com/jwmoss/owl && cd owl/ansible
    uv tool install ansible-core
-   cd ansible
    ansible-galaxy collection install -r requirements.yml
    ```
 
@@ -68,7 +75,7 @@ the BIOS, the Ubuntu install and the sudo password.
 | `ubuntu.yml` | Build tools, passwordless sudo, GPU groups, Hugging Face CLI, ROCm, GPU memory limit |
 | `<engine>.yml` | One engine, its model and its systemd service |
 | `site.yml` | `ubuntu.yml` and all engines (about 900 GB of downloads) |
-| `test.yml` | Starts each engine, sends one chat request and checks the answer |
+| `test.yml` | Starts each installed engine, sends one chat request and checks the answer |
 
 Settings, such as the engine that starts at boot (`default_engine`), are in
 [`ansible/inventory/group_vars/all.yml`](ansible/inventory/group_vars/all.yml).
@@ -84,3 +91,7 @@ gufo_abliterated: true   # gufo runs huihui-ai's abliterated Qwen3.8-Flash-Next
 1. [Ubuntu install](docs/01-ubuntu-install.md)
 2. [ROCm and GPU memory](docs/02-rocm.md)
 3. [Inference engines and models](docs/03-engines.md)
+
+## License
+
+[MIT](LICENSE). The engines and the models have their own licenses. halogen is closed source under its EULA.

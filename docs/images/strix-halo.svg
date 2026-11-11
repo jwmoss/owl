@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="520" viewBox="0 0 1280 520" role="img" aria-labelledby="t d">
+  <title id="t">How owl uses an AMD Strix Halo machine</title>
+  <desc id="d">Ansible on your computer sets up the Strix Halo over SSH. The Ryzen AI Max+ 395 has 16 Zen 5 CPU cores, a Radeon 8060S GPU and an XDNA 2 NPU that share 128 GB of memory. One engine at a time runs on the GPU and serves an OpenAI-compatible API to your network.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1026"/>
+      <stop offset="1" stop-color="#1c1240"/>
+    </linearGradient>
+    <linearGradient id="pkg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b2f3a"/>
+      <stop offset="1" stop-color="#15171d"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#ffd166"/>
+    </marker>
+  </defs>
+  <style>
+    .h { font: 700 20px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #ffffff; }
+    .t { font: 16px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #d9d4f5; }
+    .m { font: 14px ui-monospace, Menlo, Consolas, monospace; fill: #ffd166; }
+    .s { font: 13px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #a9a3cf; }
+    .box { fill: #ffffff; fill-opacity: 0.06; stroke: #ffffff; stroke-opacity: 0.25; }
+    .flow { stroke: #ffd166; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+  </style>
+
+  <rect width="1280" height="520" fill="url(#bg)"/>
+
+  <!-- your computer -->
+  <rect class="box" x="40" y="180" width="220" height="160" rx="14"/>
+  <text class="h" x="150" y="218" text-anchor="middle">Your computer</text>
+  <text class="t" x="150" y="252" text-anchor="middle">Ansible</text>
+  <text class="t" x="150" y="278" text-anchor="middle">or a coding agent</text>
+  <text class="m" x="150" y="314" text-anchor="middle">owl-setup skill</text>
+
+  <path class="flow" d="M262 260 L338 260"/>
+  <text class="s" x="300" y="248" text-anchor="middle">SSH</text>
+
+  <!-- Strix Halo package -->
+  <g fill="#c9a227">
+    <rect x="380" y="34" width="8" height="16" rx="2"/><rect x="420" y="34" width="8" height="16" rx="2"/>
+    <rect x="460" y="34" width="8" height="16" rx="2"/><rect x="500" y="34" width="8" height="16" rx="2"/>
+    <rect x="540" y="34" width="8" height="16" rx="2"/><rect x="580" y="34" width="8" height="16" rx="2"/>
+    <rect x="620" y="34" width="8" height="16" rx="2"/><rect x="660" y="34" width="8" height="16" rx="2"/>
+    <rect x="700" y="34" width="8" height="16" rx="2"/><rect x="740" y="34" width="8" height="16" rx="2"/>
+    <rect x="780" y="34" width="8" height="16" rx="2"/><rect x="820" y="34" width="8" height="16" rx="2"/>
+    <rect x="380" y="470" width="8" height="16" rx="2"/><rect x="420" y="470" width="8" height="16" rx="2"/>
+    <rect x="460" y="470" width="8" height="16" rx="2"/><rect x="500" y="470" width="8" height="16" rx="2"/>
+    <rect x="540" y="470" width="8" height="16" rx="2"/><rect x="580" y="470" width="8" height="16" rx="2"/>
+    <rect x="620" y="470" width="8" height="16" rx="2"/><rect x="660" y="470" width="8" height="16" rx="2"/>
+    <rect x="700" y="470" width="8" height="16" rx="2"/><rect x="740" y="470" width="8" height="16" rx="2"/>
+    <rect x="780" y="470" width="8" height="16" rx="2"/><rect x="820" y="470" width="8" height="16" rx="2"/>
+  </g>
+  <rect x="340" y="48" width="530" height="424" rx="18" fill="url(#pkg)" stroke="#ed1c24" stroke-width="3"/>
+  <text x="605" y="84" text-anchor="middle" style="font: 700 22px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #ffffff; letter-spacing: 1px">AMD RYZEN AI MAX+ 395</text>
+  <text x="605" y="106" text-anchor="middle" style="font: 14px ui-monospace, Menlo, Consolas, monospace; fill: #ff5a60; letter-spacing: 3px">STRIX HALO</text>
+
+  <!-- engines on the GPU -->
+  <rect x="364" y="126" width="482" height="62" rx="10" fill="#ffd166" fill-opacity="0.12" stroke="#ffd166" stroke-opacity="0.6"/>
+  <text class="t" x="605" y="150" text-anchor="middle">One engine at a time (systemd, Conflicts=)</text>
+  <text class="m" x="605" y="174" text-anchor="middle">halogen · gufo · Strata · libosmos · Maya</text>
+
+  <!-- CPU / GPU / NPU tiles -->
+  <rect x="364" y="204" width="140" height="132" rx="10" fill="#3a3f4d" stroke="#8b93a7" stroke-opacity="0.6"/>
+  <text class="h" x="434" y="240" text-anchor="middle">CPU</text>
+  <text class="t" x="434" y="270" text-anchor="middle">16 Zen 5</text>
+  <text class="t" x="434" y="292" text-anchor="middle">cores</text>
+
+  <rect x="516" y="204" width="178" height="132" rx="10" fill="#4a1d22" stroke="#ed1c24" stroke-opacity="0.8"/>
+  <text class="h" x="605" y="240" text-anchor="middle">GPU</text>
+  <text class="t" x="605" y="270" text-anchor="middle">Radeon 8060S</text>
+  <text class="m" x="605" y="294" text-anchor="middle">gfx1151 · ROCm</text>
+  <text class="s" x="605" y="318" text-anchor="middle">runs the model</text>
+
+  <rect x="706" y="204" width="140" height="132" rx="10" fill="#3a3f4d" stroke="#8b93a7" stroke-opacity="0.6"/>
+  <text class="h" x="776" y="240" text-anchor="middle">NPU</text>
+  <text class="t" x="776" y="270" text-anchor="middle">XDNA 2</text>
+  <text class="s" x="776" y="294" text-anchor="middle">small models</text>
+  <text class="s" x="776" y="314" text-anchor="middle">(halogen)</text>
+
+  <!-- unified memory -->
+  <rect x="364" y="352" width="482" height="96" rx="10" fill="#1f6f78" fill-opacity="0.35" stroke="#5fd3dc" stroke-opacity="0.7"/>
+  <text class="h" x="605" y="386" text-anchor="middle">128 GB unified LPDDR5X</text>
+  <text class="t" x="605" y="412" text-anchor="middle">CPU, GPU and NPU share it. The GPU can map about 113 GiB.</text>
+  <text class="s" x="605" y="434" text-anchor="middle">BIOS frame buffer at its minimum · ttm pages_limit</text>
+
+  <!-- API -->
+  <path class="flow" d="M872 260 L948 260"/>
+  <rect class="box" x="950" y="150" width="290" height="220" rx="14"/>
+  <text class="h" x="1095" y="188" text-anchor="middle">Your network</text>
+  <text class="m" x="1095" y="222" text-anchor="middle">OpenAI-compatible API</text>
+  <text class="m" x="1095" y="246" text-anchor="middle">http://host:8731/v1</text>
+  <text class="t" x="1095" y="284" text-anchor="middle">pi, curl and other clients</text>
+  <text class="s" x="1095" y="318" text-anchor="middle">No API key (except Strata):</text>
+  <text class="s" x="1095" y="338" text-anchor="middle">use a trusted network</text>
+</svg>
