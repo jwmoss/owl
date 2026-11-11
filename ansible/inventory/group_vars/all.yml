@@ -23,7 +23,7 @@ libosmos_port: 8091
 default_engine: halogen
 
 # renovate: datasource=docker depName=ghcr.io/gufo-org/toolboxes/gufo-runtime
-gufo_image: "ghcr.io/gufo-org/toolboxes/gufo-runtime:0.32.0"
+gufo_image: "ghcr.io/gufo-org/toolboxes/gufo-runtime:0.33.0"
 # unsloth: the model, the MTP head and the picture reader. Most new revisions change only the README.
 # renovate: datasource=git-refs depName=https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF
 gufo_qwen_revision: "d96201194f103c906994f283f504209dc8d2a10c" # main
