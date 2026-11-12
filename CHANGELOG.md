@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.5.0](https://github.com/jwmoss/owl/compare/v1.4.0...v1.5.0) (2026-11-12)
+
+
+### Features
+
+* **engines:** update dependency mrsirg97-rgb/libosmos to v0.6.7 ([#41](https://github.com/jwmoss/owl/issues/41)) ([0a5dc3a](https://github.com/jwmoss/owl/commit/0a5dc3a1e55af38f062adc964ea25746f93671ca))
+* **engines:** update dependency mw00/project-maya to v1.1.61 ([#42](https://github.com/jwmoss/owl/issues/42)) ([dae4936](https://github.com/jwmoss/owl/commit/dae49369c9ce5e998026a694cd4cb2bb8d076a43))
+* **engines:** update ghcr.io/gufo-org/toolboxes/gufo-runtime docker tag to v0.34.0 ([#44](https://github.com/jwmoss/owl/issues/44)) ([0a1b849](https://github.com/jwmoss/owl/commit/0a1b84962bfe7b31583acc1b79cf74fc705d4963))
+* **engines:** update ghcr.io/peonist-ai/halogen-flash-server docker tag to v0.20.4 ([#43](https://github.com/jwmoss/owl/issues/43)) ([493ac61](https://github.com/jwmoss/owl/commit/493ac616fd902f2a0e4fea1255909b5c6b5fb7d4))
+* **engines:** update https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next digest to f5a151c ([#40](https://github.com/jwmoss/owl/issues/40)) ([5d0d98a](https://github.com/jwmoss/owl/commit/5d0d98a53c3318e8964672f8b04cb23b0d4effef))
+
 ## [1.4.0](https://github.com/jwmoss/owl/compare/v1.3.0...v1.4.0) (2026-11-11)
 
 
