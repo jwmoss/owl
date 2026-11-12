@@ -25,7 +25,7 @@ libosmos_env: {} # extra environment variables for the engine, for example { NAM
 default_engine: halogen
 
 # renovate: datasource=docker depName=ghcr.io/gufo-org/toolboxes/gufo-runtime
-gufo_image: "ghcr.io/gufo-org/toolboxes/gufo-runtime:0.33.0"
+gufo_image: "ghcr.io/gufo-org/toolboxes/gufo-runtime:0.34.0"
 # unsloth: the model, the MTP head and the picture reader. Most new revisions change only the README.
 # renovate: datasource=git-refs depName=https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF
 gufo_qwen_revision: "084c631ac221016019d6e0a863afe92d90edd3b0" # main
