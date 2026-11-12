@@ -7,9 +7,6 @@
   "semanticCommits": "enabled",
   "semanticCommitType": "feat",
   "semanticCommitScope": "engines",
-  "schedule": [
-    "* 0-5 * * *"
-  ],
   "prHourlyLimit": 0,
   "dependencyDashboard": false,
   "prBodyNotes": [
