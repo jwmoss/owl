@@ -96,6 +96,7 @@ estimate at 256K context, not a measurement. Owl tests only `deepseek-maya-xs`.
 |-------|---------|--------|
 | DeepSeek-V4.1-Flash-1017 | `deepseek-maya-xs` (`deepseek`, the default) | Runs from memory |
 | DeepSeek-V4.1-Flash-1017 | `deepseek-maya-s`, `deepseek-maya-m` | Reads experts from SSD |
+| DeepSeek-V4.1-Flash-1017, orcarouter's abliterated build (gated: accept its terms on Hugging Face) | `DeepSeek-V4.1-Flash-1017 --ds4-quant abliterated-128g` | Runs from memory |
 | GLM-5.3-Flash | `glm-maya-xs`, `glm-maya-s` (`glm`), `glm-maya-s24` | Runs from memory |
 | GLM-5.3-Flash | `glm-maya-m`, `glm-maya-m-derisked`, `glm-maya-l`, `EXL3-3.05bpw`, `EXL3-4.05bpw`, `EXL3-sc_4.10bpw` | Reads experts from SSD |
 | GLM-5.3 (744B) | `GLM-5.3-Maya-XS`, `GLM-5.3-UD-IQ2_M` | Reads experts from SSD |

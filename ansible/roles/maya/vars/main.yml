@@ -10,6 +10,6 @@ maya_setup: >-
 maya_marker: .installed-{{ maya_commit }}-{{ maya_setup | hash('sha1') }}.sh
 # With a store: pull merges a model's files into the SSD, push saves them and marks the copy complete (.done),
 # and mirror makes the SSD hold only the served model.
-maya_pull: rsync -rlt {{ maya_store }}/{{ maya_item }}/ {{ maya_models_dir }}/
-maya_push: rsync -rlt {{ maya_models_dir }}/ {{ maya_store }}/{{ maya_item }}/ && touch {{ maya_store }}/{{ maya_item }}/.done
-maya_mirror: rsync -rlt --delete {{ maya_store }}/{{ maya_model }}/ {{ maya_models_dir }}/
+maya_pull: rsync -rlt --exclude='.*.??????' {{ maya_store }}/{{ maya_item }}/ {{ maya_models_dir }}/
+maya_push: rsync -rlt --exclude='.*.??????' {{ maya_models_dir }}/ {{ maya_store }}/{{ maya_item }}/ && touch {{ maya_store }}/{{ maya_item }}/.done
+maya_mirror: rsync -rlt --exclude='.*.??????' --delete {{ maya_store }}/{{ maya_model }}/ {{ maya_models_dir }}/

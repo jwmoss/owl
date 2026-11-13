@@ -55,7 +55,7 @@
     # Each model writes its own start script (run-maya-ds4-hip.sh, run-maya-glm-...). The marker is a link to it,
     # named by the commit and the setup command. With a store, the setup takes the files the store has, saves the
     # model to the store, and then leaves only the served model on the SSD.
-    - name: Set up the Maya model {{ item }}
+    - name: Set up the Maya models
       vars:
         maya_item: "{{ item }}"
       ansible.builtin.shell:

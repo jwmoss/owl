@@ -77,7 +77,7 @@
     # Downloads the model, writes the run config with an API key, starts serving, then stops so systemd can start it.
     # With a store, the setup takes the files the store has, saves the preset to the store, and then leaves only
     # the served preset on the SSD.
-    - name: Set up the Strata preset {{ item }}
+    - name: Set up the Strata presets
       vars:
         strata_item: "{{ item }}"
       ansible.builtin.shell:
