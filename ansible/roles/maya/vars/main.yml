@@ -1,6 +1,7 @@
 ---
 maya_dir: /home/{{ ansible_user }}/src/project-maya
-maya_models_dir: "{{ models_dir }}/maya" # maya.sh --models-dir
+maya_root: "{{ models_dir }}/maya" # one folder for each model
+maya_models_dir: "{{ maya_root }}/{{ maya_item }}" # maya.sh --models-dir
 maya_store: "{{ model_cache_dir }}/owl/maya"
 maya_item: "{{ maya_model }}" # the model a task works on; the setup loop sets it to each name in maya_models
 maya_setup: >-
@@ -8,8 +9,12 @@ maya_setup: >-
   --no-vision --yes --download-model --no-start --no-speed-calibration
   --vram-reserve-mib {{ maya_vram_reserve_mib }} --port {{ maya_port }}
 maya_marker: .installed-{{ maya_commit }}-{{ maya_setup | hash('sha1') }}.sh
-# With a store: pull merges a model's files into the SSD, push saves them and marks the copy complete (.done),
-# and mirror makes the SSD hold only the served model.
+# With a store: pull copies a model's folder to the SSD, push saves it and marks the copy complete (.done),
+# and mirror leaves only the served model's folder on the SSD.
 maya_pull: rsync -rlt --exclude='.*.??????' {{ maya_store }}/{{ maya_item }}/ {{ maya_models_dir }}/
-maya_push: rsync -rlt --exclude='.*.??????' {{ maya_models_dir }}/ {{ maya_store }}/{{ maya_item }}/ && touch {{ maya_store }}/{{ maya_item }}/.done
-maya_mirror: rsync -rlt --exclude='.*.??????' --delete {{ maya_store }}/{{ maya_model }}/ {{ maya_models_dir }}/
+maya_push: >-
+  rsync -rlt --exclude='.*.??????' {{ maya_models_dir }}/ {{ maya_store }}/{{ maya_item }}/
+  && touch {{ maya_store }}/{{ maya_item }}/.done
+maya_mirror: >-
+  rsync -rlt --delete --delete-excluded --exclude='.*.??????' --include='/{{ maya_model }}/***' --exclude='*'
+  {{ maya_store }}/ {{ maya_root }}/

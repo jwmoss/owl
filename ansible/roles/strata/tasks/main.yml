@@ -75,8 +75,8 @@
       when: strata_update
 
     # Downloads the model, writes the run config with an API key, starts serving, then stops so systemd can start it.
-    # With a store, the setup takes the files the store has, saves the preset to the store, and then leaves only
-    # the served preset on the SSD.
+    # With a store, the setup takes the files the store has and saves the preset to the store. Each preset has its own
+    # folder, so a setup never saves another preset's files.
     - name: Set up the Strata presets
       vars:
         strata_item: "{{ item }}"
@@ -87,7 +87,7 @@
           --context {{ strata_presets[item].context | default(strata_context) }} --access lan --port {{ strata_port }}
           --save-preset {{ item }} --yes --no-tui
           && {{ strata_bin }} launch --stop --preset {{ item }}
-          {% if model_cache_nfs %}&& {{ strata_push }}{% if item != strata_preset %} && {{ strata_mirror }}{% endif %}{% endif %}
+          {% if model_cache_nfs %}&& {{ strata_push }}{% endif %}
       environment:
         STRATA_DATA_DIR: "{{ strata_data_dir }}"
       become: false
