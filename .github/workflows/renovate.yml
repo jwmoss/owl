@@ -1,0 +1,34 @@
+# Self-hosted Renovate: Mend's hosted app never ran a job here. Every 6 hours it reads renovate.json and
+# opens one PR per engine update. Nothing deploys: test each PR on the machine first.
+# shortcut: GITHUB_TOKEN needs no setup, but its PRs do not start CI; use a GitHub App token if CI on PRs matters.
+name: Renovate
+"on":
+  schedule:
+    - cron: "23 */6 * * *" # every 6 hours
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: renovate
+  cancel-in-progress: false
+
+jobs:
+  renovate:
+    name: Renovate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push the update branches
+      pull-requests: write # open and update the PRs
+      issues: write # Renovate reports config problems in an issue
+    steps:
+      - name: Run Renovate
+        uses: renovatebot/github-action@266fef21329c44765ad42f9dea1f01f5d2d91084 # v46.3.13
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          RENOVATE_ONBOARDING: "false"
+          RENOVATE_REQUIRE_CONFIG: required
+          RENOVATE_PLATFORM_COMMIT: enabled # commits through the API, so GitHub signs them
+          RENOVATE_GIT_AUTHOR: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
