@@ -5,11 +5,11 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 
 | Service | Engine | Model | Port | Access | Playbook |
 |---------|--------|-------|------|--------|----------|
-| `strata` | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next IQ3_S, 128K context | 8080 | LAN, API key | `strata.yml` |
+| `strata` | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next IQ3_S, 128K context, or another preset (`strata_preset`) | 8080 | LAN, API key | `strata.yml` |
 | `gufo` | [gufo](https://github.com/gufo-org/gufo) (Podman) | Qwen3.8-Flash-Next UD-Q4_K_XL + MTP, or the abliterated v2 (`gufo_abliterated`) | 8081 | LAN, no key | `gufo.yml` |
 | `halogen` | [halogen](https://github.com/peonist-ai/halogen-flash-server) (Podman, closed-source EULA) | Qwen3.8-Flash-Next halogen v2 (4.16 bpw), or the abliterated r2 (`halogen_abliterated`) | 8731 | LAN, no key | `halogen.yml` |
 | `osmos` | [libosmos](https://github.com/mrsirg97-rgb/libosmos) | DeepSeek-V4.1-Flash-1017 UD-IQ1_M, abliterated | 8091 | LAN, no key | `libosmos.yml` |
-| `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS | 8099 | LAN, no key | `maya.yml` |
+| `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS, or another model (`maya_model`) | 8099 | LAN, no key | `maya.yml` |
 
 The table shows Owl's configured models. Read [group_vars/all.yml](../ansible/inventory/group_vars/all.yml) for the exact engine versions and model revisions.
 
@@ -32,14 +32,91 @@ These examples come from the upstream versions linked below. They do not list ev
 
 | Engine | Additional upstream choices | Owl configuration |
 |--------|-----------------------------|-------------------|
-| [Strata](https://github.com/Niko1221/Strata/blob/v0.2.13/README.md#models) | Qwen3.6-35B-A3B; other Qwen Flash quants | The role fixes the family to Qwen Flash. `strata_model` selects its quant. |
+| [Strata](https://github.com/Niko1221/Strata/blob/v0.2.13/README.md#models) | Qwen3.6-35B-A3B; other Qwen Flash quants; DeepSeek-V4.1-Flash | `strata_presets` lists the models to set up. Read [Swap models](#swap-models). |
 | [libosmos](https://github.com/mrsirg97-rgb/libosmos/blob/v0.6.1/README.md#the-packs) | Qwen3.8-Flash-Next packs | `libosmos_pack` selects the pack. Owl tests the default DeepSeek pack. |
 | [gufo](https://github.com/gufo-org/gufo/blob/v0.33.0/README.md#models) | Qwen3.8-27B, DeepSeek V4 Flash, embeddings, speech, images and video | The role configures Qwen Flash only. |
-| [Maya](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MODELS.md) | GLM-5.3-Flash, full GLM-5.3, MiniMax-M3.1-Flash and Qwen Flash | The role fixes the model to `deepseek-maya-xs`. |
+| [Maya](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MODELS.md) | GLM-5.3-Flash, full GLM-5.3, MiniMax-M3.1-Flash and Qwen Flash | `maya_models` lists the models to set up. Read [Swap models](#swap-models). |
 | [halogen](https://github.com/peonist-ai/halogen-flash-server/blob/v0.20.1/docs/NPU.md) | Small classifiers, embeddings, rerankers, moderation and other NPU models | `halogen_npu_models` selects the NPU models beside Qwen Flash. |
 
 Do not treat upstream support as a successful test on this machine. Additional model families need Ansible download, launch and test support.
 An engine update does not change Owl's selected model family. An environment override does not replace the role's download and launch configuration.
+
+## Swap models
+
+Maya and Strata set up every model in their list and serve one of them.
+Set the lists and the served model in `ansible/inventory/group_vars/all.yml`:
+
+| Engine | Models, by name | Model it serves | Model files |
+|--------|-----------------|-----------------|-------------|
+| Maya | `maya_models` | `maya_model` | `~/models/maya`, passed as `--models-dir` |
+| Strata | `strata_presets` | `strata_preset` | `~/models/strata`, passed as `STRATA_DATA_DIR` |
+
+Swap the served model with one command. If the engine runs, the playbook restarts it with the new model.
+
+```sh
+ansible-playbook maya.yml -e maya_model=glm
+ansible-playbook strata.yml -e strata_preset=qwen36
+```
+
+Each model can have an `env` map. The service gets `maya_env` or `strata_env`, then the served model's `env`:
+
+```yaml
+maya_models:
+  glm: { model: glm-maya-s, env: { NAME: "value" } }
+```
+
+To keep a swap, change `maya_model` or `strata_preset` in `all.yml`.
+The Strata API key is per preset: `~/.local/bin/strata launch --show-key --preset <preset>`.
+
+### Model files and the model store
+
+Every engine keeps its files in `models_dir/<engine>` (`~/models/halogen`, `~/models/maya` ...), set with the engine's
+own option: `--local-dir`, `--models-dir`, `--models` or `STRATA_DATA_DIR`. Hugging Face's own cache
+(`~/.cache/huggingface/hub`) is not used: each engine downloads into its own layout and builds index files beside it.
+
+The model store is optional. Set `model_cache_nfs` to an NFS share in your host_vars, for example
+`<nas-ip>:/mnt/user/huggingface`, or a Tailscale name such as `tower:/mnt/user/huggingface` after `tailscale.yml`.
+The playbooks mount it at `/mnt/model-cache` and keep the files in `owl/<engine>` on the share.
+Each file then downloads from Hugging Face once, and a fresh machine gets its models from the share.
+
+- halogen, gufo and libosmos copy their files from the share before the download, and save them to the share after.
+- Maya and Strata keep each model in `owl/maya/<name>` and `owl/strata/<name>`, and only the served one on the SSD.
+  A swap stops the engine, makes the SSD match the new model's folder on the share, and starts the engine.
+- The `.done` file marks a complete copy. A Maya or Strata model without it is set up again: the engine downloads
+  only missing files.
+- The engines always run from the SSD: over 1 Gbps a model loads too slowly to run from the share.
+  A copy of 100 GB takes about 15 minutes on the LAN and about 30 minutes over Tailscale.
+
+### Maya models
+
+"On owl" is the [VRAM Calculator](https://vramcalculator.com/project-maya-calculator/?fam=glm&unified=strix-halo-395-128&ram=128&ctx=262144&os=linux)'s
+estimate at 256K context, not a measurement. Owl tests only `deepseek-maya-xs`.
+
+| Model | `model` | On owl |
+|-------|---------|--------|
+| DeepSeek-V4.1-Flash-1017 | `deepseek-maya-xs` (`deepseek`, the default) | Runs from memory |
+| DeepSeek-V4.1-Flash-1017 | `deepseek-maya-s`, `deepseek-maya-m` | Reads experts from SSD |
+| GLM-5.3-Flash | `glm-maya-xs`, `glm-maya-s` (`glm`), `glm-maya-s24` | Runs from memory |
+| GLM-5.3-Flash | `glm-maya-m`, `glm-maya-m-derisked`, `glm-maya-l`, `EXL3-3.05bpw`, `EXL3-4.05bpw`, `EXL3-sc_4.10bpw` | Reads experts from SSD |
+| GLM-5.3 (744B) | `GLM-5.3-Maya-XS`, `GLM-5.3-UD-IQ2_M` | Reads experts from SSD |
+| MiniMax-M3.1-Flash (non-commercial license) | `minimax-maya-xs` (`minimax`) | Runs from memory |
+| MiniMax-M3.1-Flash (non-commercial license) | `minimax-maya-s` | Reads experts from SSD |
+| Qwen-3.8-Flash-Next | `cyber-frost`, `qwen-ud-iq2_xs` | Runs from memory |
+
+A model's `model` holds all the `--model` options of `maya.sh`. For DeepSeek's unsloth and EXL3 files, set `model` to a value such as
+`DeepSeek-V4.1-Flash-1017 --ds4-quant gguf-iq1_s`. `./maya.sh --help` lists the `--ds4-quant`, `--mm3-quant` and `--qwen-quant` values.
+
+### Strata presets
+
+Each `strata_presets` item names a `--family` and a `--model` of `strata launch`, and optionally a `context` and an `env`.
+Run `~/.local/bin/strata launch --model x --plan` on the machine to list the model names.
+
+| Preset | Model | Download |
+|--------|-------|----------|
+| `qwen` (default) | Qwen3.8-Flash-Next IQ3_S | 84 GB |
+| `qwen36` | Qwen3.6-35B-A3B UD-Q4_K_XL, reads pictures | 24 GB |
+| `coder` | Qwen3.8-Flash-Next Coder IQ1_M | 64 GB |
+| `swift` | Swift 1.5 IQ3_S, shorter thinking; [Swift Open License](https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF/blob/main/LICENSE) | 89 GB |
 
 Maya's [memory guide](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MEMORY.md) lists these options.
 The memory figures are upstream recommendations at the documented context, not results from Owl tests.
@@ -74,7 +151,7 @@ All engines have an OpenAI-compatible `/v1/chat/completions`. Strata also has an
 Show the Strata API key on the server:
 
 ```sh
-~/.local/bin/strata launch --show-key --preset qwen
+~/.local/bin/strata launch --show-key --preset qwen  # or another preset
 ```
 
 ## Model sources
@@ -111,7 +188,7 @@ The playbook then does three things:
 - It installs halogen's `halogen-fabric-clock` unit. GPU and NPU work at once can hang Strix Halo unless the GPU
   fabric clock is held ([ROCm/TheRock#8709](https://github.com/ROCm/TheRock/issues/8709)).
   The hold costs about 1 W. Install your vendor's newest BIOS too.
-- It lets halogen fetch the NPU models (a few GB) into `~/Models/halogen/npu` on its first start.
+- It lets halogen fetch the NPU models (a few GB) into `~/models/halogen/npu` on its first start.
 
 The NPU models use about 8 GiB of memory more, and the Flash model is a little slower while the NPU works.
 

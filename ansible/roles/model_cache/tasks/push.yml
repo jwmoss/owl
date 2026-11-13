@@ -1,0 +1,12 @@
+---
+# Saves an engine's model files to the store after its download; .done marks a complete copy.
+- name: Save the model files to the store, {{ model_cache_engine }}
+  ansible.builtin.shell: >-
+    mkdir -p {{ model_cache_dir }}/owl/{{ model_cache_engine }}
+    && rsync -rlt --itemize-changes {{ models_dir }}/{{ model_cache_engine }}/ {{ model_cache_dir }}/owl/{{ model_cache_engine }}/
+    && touch {{ model_cache_dir }}/owl/{{ model_cache_engine }}/.done
+  register: model_cache_push
+  changed_when: model_cache_push.stdout | length > 0
+  become: false
+  async: 21600
+  poll: 30

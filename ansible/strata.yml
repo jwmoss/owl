@@ -1,5 +1,7 @@
 ---
-- name: Set up Strata with Qwen3.8-Flash-Next
+- name: Set up Strata with strata_presets
   hosts: all
   become: true
-  roles: [strata]
+  roles:
+    - { role: model_cache, when: model_cache_nfs | length > 0 }
+    - strata

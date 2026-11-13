@@ -1,0 +1,11 @@
+---
+strata_bin: /home/{{ ansible_user }}/.local/bin/strata
+strata_state: /home/{{ ansible_user }}/.local/state/strata/launch
+strata_data_dir: "{{ models_dir }}/strata" # STRATA_DATA_DIR
+strata_store: "{{ model_cache_dir }}/owl/strata"
+# With a store: pull merges a preset's files into the SSD, push saves them and marks the copy complete (.done),
+# and mirror makes the SSD hold only the served preset.
+strata_pull: rsync -rlt {{ strata_store }}/{{ strata_item }}/ {{ strata_data_dir }}/
+strata_push: rsync -rlt {{ strata_data_dir }}/ {{ strata_store }}/{{ strata_item }}/ && touch {{ strata_store }}/{{ strata_item }}/.done
+strata_mirror: rsync -rlt --delete {{ strata_store }}/{{ strata_preset }}/ {{ strata_data_dir }}/
+strata_item: "{{ strata_preset }}" # the preset a task works on; the setup loop sets it to each new preset

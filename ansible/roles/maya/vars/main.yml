@@ -1,0 +1,15 @@
+---
+maya_dir: /home/{{ ansible_user }}/src/project-maya
+maya_models_dir: "{{ models_dir }}/maya" # maya.sh --models-dir
+maya_store: "{{ model_cache_dir }}/owl/maya"
+maya_item: "{{ maya_model }}" # the model a task works on; the setup loop sets it to each name in maya_models
+maya_setup: >-
+  ./maya.sh --backend hip --gpu 0 --model {{ maya_models[maya_item].model }} --models-dir {{ maya_models_dir }}
+  --no-vision --yes --download-model --no-start --no-speed-calibration
+  --vram-reserve-mib {{ maya_vram_reserve_mib }} --port {{ maya_port }}
+maya_marker: .installed-{{ maya_commit }}-{{ maya_setup | hash('sha1') }}.sh
+# With a store: pull merges a model's files into the SSD, push saves them and marks the copy complete (.done),
+# and mirror makes the SSD hold only the served model.
+maya_pull: rsync -rlt {{ maya_store }}/{{ maya_item }}/ {{ maya_models_dir }}/
+maya_push: rsync -rlt {{ maya_models_dir }}/ {{ maya_store }}/{{ maya_item }}/ && touch {{ maya_store }}/{{ maya_item }}/.done
+maya_mirror: rsync -rlt --delete {{ maya_store }}/{{ maya_model }}/ {{ maya_models_dir }}/

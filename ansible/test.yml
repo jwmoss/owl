@@ -25,7 +25,7 @@
         fail_msg: No requested engine is installed. Install an engine before this test.
 
     - name: Read the Strata API key
-      ansible.builtin.command: /home/{{ ansible_user }}/.local/bin/strata launch --show-key --preset qwen
+      ansible.builtin.command: /home/{{ ansible_user }}/.local/bin/strata launch --show-key --preset {{ strata_preset }}
       become: false
       register: strata_key
       no_log: true

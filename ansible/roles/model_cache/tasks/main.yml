@@ -1,0 +1,14 @@
+---
+# The model store: every model on the share, only the served one on the SSD. Over 1 Gbps a model loads too slowly to run from NFS.
+- name: Install the NFS client and rsync
+  ansible.builtin.apt:
+    name: [nfs-common, rsync]
+
+# automount waits for the network and Tailscale names at first use, so a missing share never stops a boot.
+- name: Mount the model cache from {{ model_cache_nfs }}
+  ansible.posix.mount:
+    src: "{{ model_cache_nfs }}"
+    path: "{{ model_cache_dir }}"
+    fstype: nfs
+    opts: rw,hard,noatime,_netdev,nofail,x-systemd.automount
+    state: mounted

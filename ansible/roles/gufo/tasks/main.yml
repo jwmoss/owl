@@ -3,12 +3,20 @@
   ansible.builtin.apt:
     name: [podman, crun, aria2]
 
+- name: Copy gufo from the model store
+  ansible.builtin.include_role:
+    name: model_cache
+    tasks_from: pull
+  vars:
+    model_cache_engine: gufo
+  when: model_cache_nfs | length > 0
+
 - name: Download the MTP head and the picture reader (about 4 GB)
   ansible.builtin.command:
     cmd: >-
       hf download unsloth/Qwen3.8-Flash-Next-GGUF --revision {{ gufo_qwen_revision }}
       --include "MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf" --include "mmproj-BF16.gguf"
-      --local-dir /home/{{ ansible_user }}/Models/gufo/qwen3.8-flash-next
+      --local-dir {{ models_dir }}/gufo/qwen3.8-flash-next
   environment:
     PATH: "/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
     HF_HUB_DISABLE_XET: "1" # Xet downloads stalled in testing; plain HTTP does not
@@ -51,6 +59,14 @@
   async: 43200
   poll: 60
 
+- name: Save gufo to the model store
+  ansible.builtin.include_role:
+    name: model_cache
+    tasks_from: push
+  vars:
+    model_cache_engine: gufo
+  when: model_cache_nfs | length > 0
+
 - name: Install the gufo service
   register: gufo_unit
   ansible.builtin.copy:
@@ -70,7 +86,7 @@
       {% for k, v in gufo_env.items() %}
         -e "{{ k }}={{ v }}" \
       {% endfor %}
-        -p {{ gufo_port }}:8080 -v /home/{{ ansible_user }}/Models/gufo:/models:ro {{ gufo_image }} \
+        -p {{ gufo_port }}:8080 -v {{ models_dir }}/gufo:/models:ro {{ gufo_image }} \
         gufo serve --host 0.0.0.0 --port 8080 llm --context 131072 --sessions 2 \
         --model /models/{{ gufo_model_repo | basename }}/{{ gufo_model_file }} \
         --speculative mtp --mtp-model /models/qwen3.8-flash-next/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf

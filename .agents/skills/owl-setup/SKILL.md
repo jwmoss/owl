@@ -97,4 +97,4 @@ Give them:
 | A rootless Podman engine fails after logout | `loginctl show-user <user> -p Linger` must be `yes`. Run `ubuntu.yml` again. |
 | The first answer in a long chat is slow after a restart | Expected: the engine reads the whole history again (about 1,900 tokens/s). |
 
-Never delete `~/Models` on the host to fix a problem. Ask the user first.
+Never delete `~/models` on the host to fix a problem. Ask the user first.
