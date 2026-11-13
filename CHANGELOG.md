@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.6.0](https://github.com/jwmoss/owl/compare/v1.5.0...v1.6.0) (2026-11-13)
+
+
+### Features
+
+* **engines:** update dependency mrsirg97-rgb/libosmos to v0.7.0 ([#49](https://github.com/jwmoss/owl/issues/49)) ([e55c566](https://github.com/jwmoss/owl/commit/e55c566048bb5223ad54beb14dd814cc70d31058))
+* **engines:** update dependency tailscale/tailscale to v1.104.7 ([#48](https://github.com/jwmoss/owl/issues/48)) ([e82d57b](https://github.com/jwmoss/owl/commit/e82d57bcd4ba8cfa5aa58a000c69ece73b9af801))
+* **engines:** update https://huggingface.co/unsloth/qwen3.8-flash-next-gguf digest to f5d175d ([#47](https://github.com/jwmoss/owl/issues/47)) ([8cdebb4](https://github.com/jwmoss/owl/commit/8cdebb4ec8f306c2016ebaeae4895b4e3e1a5b53))
+
 ## [1.5.0](https://github.com/jwmoss/owl/compare/v1.4.0...v1.5.0) (2026-11-12)
 
 
