@@ -126,7 +126,8 @@ Use [Tailscale access controls](https://tailscale.com/kb/1018/acls) to limit whi
 ## Versions
 
 Renovate reads the annotated version pins in `ansible/inventory/group_vars/all.yml` and proposes updates through pull requests.
-It runs every 6 hours from GitHub Actions (`.github/workflows/renovate.yml`) with a `RENOVATE_TOKEN` repository secret.
+It runs every 6 hours from GitHub Actions (`.github/workflows/renovate.yml`) as your own GitHub App,
+with the `RENOVATE_APP_CLIENT_ID` repository variable and the `RENOVATE_APP_PRIVATE_KEY` secret.
 It does not add new model choices or deploy updates. Run the relevant setup and test playbooks before you merge an update.
 
 Each release is a tag (`vX.Y.Z`) with notes in [CHANGELOG.md](CHANGELOG.md) and on the
