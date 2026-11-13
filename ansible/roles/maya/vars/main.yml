@@ -6,7 +6,7 @@ maya_store: "{{ model_cache_dir }}/owl/maya"
 maya_item: "{{ maya_model }}" # the model a task works on; the setup loop sets it to each name in maya_models
 maya_setup: >-
   ./maya.sh --backend hip --gpu 0 --model {{ maya_models[maya_item].model }} --models-dir {{ maya_models_dir }}
-  --no-vision --yes --download-model --no-start --no-speed-calibration
+  --yes --download-model --no-start --no-speed-calibration
   --vram-reserve-mib {{ maya_vram_reserve_mib }} --port {{ maya_port }}
 maya_marker: .installed-{{ maya_commit }}-{{ maya_setup | hash('sha1') }}.sh
 # With a store: pull copies a model's folder to the SSD, push saves it and marks the copy complete (.done),

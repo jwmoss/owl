@@ -91,6 +91,7 @@ Each file then downloads from Hugging Face once, and a fresh machine gets its mo
 
 "On owl" is the [VRAM Calculator](https://vramcalculator.com/project-maya-calculator/?fam=glm&unified=strix-halo-395-128&ram=128&ctx=262144&os=linux)'s
 estimate at 256K context, not a measurement. Owl tests only `deepseek-maya-xs`.
+Every model reads pictures: the setup gets the model's vision encoder (about 1.1 GB).
 
 | Model | `model` | On owl |
 |-------|---------|--------|
