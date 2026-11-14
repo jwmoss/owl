@@ -42,7 +42,7 @@ gufo_port: 8081
 gufo_env: {} # extra environment variables for the engine, for example { NAME: "value" }
 
 # renovate: datasource=github-tags depName=mw00/project-maya
-maya_commit: "30145b8b97b2414e2ea91d9f53acbec58a82caf3" # v1.1.62
+maya_commit: "6651b5b1a3bf6fdff61f24ee2e5b331b1fd5b793" # v1.1.63
 maya_port: 8099
 maya_env: {} # extra environment variables for the engine, for example { NAME: "value" }
 # Leave headroom below the shared GPU memory limit on a 128 GB Strix Halo.
