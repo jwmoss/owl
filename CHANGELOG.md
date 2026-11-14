@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.0](https://github.com/jwmoss/owl/compare/v1.6.0...v2.0.0) (2026-11-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* libosmos.yml, gufo.yml, their services and the minimax Maya model are gone. strata_model is replaced by strata_presets and strata_preset. Model files move from ~/Models to ~/models.
+
+### Features
+
+* **engines:** update dependency mw00/project-maya to v1.1.62 ([#53](https://github.com/jwmoss/owl/issues/53)) ([3cfdd44](https://github.com/jwmoss/owl/commit/3cfdd4436de745c58c05a501425924bf4b74c7c0))
+* **engines:** update dependency mw00/project-maya to v1.1.63 ([#56](https://github.com/jwmoss/owl/issues/56)) ([40f92ac](https://github.com/jwmoss/owl/commit/40f92ac0caaf0834ff771d7c2ae604d9de5d94e9))
+* serve GLM and DeepSeek on Maya, add an NFS model store, remove libosmos and gufo ([#51](https://github.com/jwmoss/owl/issues/51)) ([b2b0b17](https://github.com/jwmoss/owl/commit/b2b0b17c1f436283ee39b7b3b83f7f7fa5b0447f))
+
 ## [1.6.0](https://github.com/jwmoss/owl/compare/v1.5.0...v1.6.0) (2026-11-13)
 
 
