@@ -1,5 +1,7 @@
 ---
-- name: Set up Project Maya with DeepSeek-V4.1-Flash
+- name: Set up Project Maya with maya_model
   hosts: all
   become: true
-  roles: [maya]
+  roles:
+    - { role: model_cache, when: model_cache_nfs | length > 0 }
+    - maya

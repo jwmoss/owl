@@ -10,65 +10,109 @@
 - name: Install the Strata Terminal
   ansible.builtin.command: sh /tmp/strata-install.sh
   args:
-    creates: "/home/{{ ansible_user }}/.local/bin/strata"
+    creates: "{{ strata_bin }}"
   environment:
     STRATA_FEED: "https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}"
   become: false
 
 - name: Check the pinned Strata engine and control versions
   ansible.builtin.command: >-
-    /home/{{ ansible_user }}/.local/bin/strata update --check --json
+    {{ strata_bin }} update --check --json
     --feed https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}
   become: false
   register: strata_update_check
   changed_when: false
 
-- name: Apply the pinned Strata component update
-  when: >-
-    (strata_update_check.stdout | from_json).engine.status == 'available'
-    or (strata_update_check.stdout | from_json).control.status == 'available'
-  block:
-    - name: Read installed services before the Strata update
-      ansible.builtin.service_facts:
+- name: Find the Strata presets set up on this machine
+  ansible.builtin.stat:
+    path: "{{ strata_state }}/{{ item }}.json"
+  loop: "{{ strata_presets.keys() | list }}"
+  register: strata_preset_files
 
-    - name: Stop engines before the Strata update test
+- name: Find the Strata presets with a complete copy in the store
+  ansible.builtin.stat:
+    path: "{{ strata_store }}/{{ item }}/.done"
+  loop: "{{ strata_presets.keys() | list }}"
+  register: strata_stored
+  when: model_cache_nfs | length > 0
+
+# Every listed preset stays on the SSD: a preset the store has comes back when its files are missing or old.
+- name: Copy the Strata presets from the store
+  ansible.builtin.shell: mkdir -p {{ strata_data_dir }} && {{ strata_pull }} --itemize-changes
+  vars:
+    strata_item: "{{ item }}"
+  loop: "{{ strata_stored.results | default([]) | selectattr('stat.exists', 'defined') | selectattr('stat.exists') | map(attribute='item') | list }}"
+  register: strata_copied
+  changed_when: strata_copied.stdout | length > 0
+  become: false
+  async: 21600
+  poll: 30
+
+- name: Read the services before the Strata changes
+  ansible.builtin.service_facts:
+
+- name: Note whether strata runs
+  ansible.builtin.set_fact:
+    strata_was_running: "{{ ansible_facts.services['strata.service'].state | default('') == 'running' }}"
+
+# An update test and a preset setup both start a Strata server, so the other engines stop first.
+- name: Update Strata and set up new presets
+  vars:
+    strata_update: >-
+      {{ (strata_update_check.stdout | from_json).engine.status == 'available'
+      or (strata_update_check.stdout | from_json).control.status == 'available' }}
+    # A preset without its setup here, or without a complete copy in the store, is set up; the served one goes first.
+    strata_new: >-
+      {{ (strata_preset_files.results | rejectattr('stat.exists') | map(attribute='item') | list
+      + strata_stored.results | default([]) | rejectattr('skipped', 'defined') | rejectattr('stat.exists')
+      | map(attribute='item') | list) | unique }}
+    strata_order: "{{ strata_new | select('equalto', strata_preset) | list + strata_new | reject('equalto', strata_preset) | list }}"
+  when: strata_update or strata_new | length > 0
+  block:
+    - name: Stop engines before the Strata changes
       ansible.builtin.systemd_service:
         name: "{{ item }}"
         state: stopped
-      loop: [strata, osmos, maya, gufo, halogen]
+      loop: [strata, maya, halogen]
       when: (item ~ '.service') in ansible_facts.services
 
     - name: Update Strata from the pinned signed feed
       ansible.builtin.command: >-
-        /home/{{ ansible_user }}/.local/bin/strata update --yes --json
+        {{ strata_bin }} update --yes --json
         --feed https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}
       become: false
       changed_when: true
       async: 3600
       poll: 15
+      when: strata_update
+
+    # Downloads the model, writes the run config with an API key, starts serving, then stops so systemd can start it.
+    # With a store, the setup takes the files the store has and saves the preset to the store. Each preset has its own
+    # folder, so a setup never saves another preset's files.
+    - name: Set up the Strata presets
+      vars:
+        strata_item: "{{ item }}"
+      ansible.builtin.shell:
+        cmd: >-
+          {% if model_cache_nfs %}mkdir -p {{ strata_store }}/{{ item }} {{ strata_data_dir }} && {{ strata_pull }} && {% endif %}
+          {{ strata_bin }} launch --family {{ strata_presets[item].family }} --model {{ strata_presets[item].model }}
+          --context {{ strata_presets[item].context | default(strata_context) }} --vision gpu --access lan --port {{ strata_port }}
+          --save-preset {{ item }} --yes --no-tui
+          && {{ strata_bin }} launch --stop --preset {{ item }}
+          {% if model_cache_nfs %}&& {{ strata_push }}{% endif %}
+      environment:
+        STRATA_DATA_DIR: "{{ strata_data_dir }}"
+      become: false
+      changed_when: true
+      async: 43200
+      poll: 60
+      loop: "{{ strata_order }}"
   always:
-    - name: Restore an installed default engine after the update attempt
+    - name: Restore an installed default engine after the Strata changes
       ansible.builtin.systemd_service:
-        name: "{{ {'libosmos': 'osmos'}.get(default_engine, default_engine) }}"
+        name: "{{ default_engine }}"
         state: started
-      when: >-
-        ({'libosmos': 'osmos'}.get(default_engine, default_engine) ~ '.service')
-        in (ansible_facts.services | default({}))
-
-# Downloads the engine and the model, writes the run config with a new API key, and starts serving.
-- name: Set up Qwen3.8-Flash-Next (about 86 GB)
-  ansible.builtin.command:
-    cmd: >-
-      /home/{{ ansible_user }}/.local/bin/strata launch --family qwen --model {{ strata_model }}
-      --context {{ strata_context }} --access lan --port {{ strata_port }} --save-preset qwen --yes --no-tui
-    creates: "/home/{{ ansible_user }}/.local/state/strata/launch/qwen.json"
-  become: false
-  async: 43200
-  poll: 60
-  notify: Stop the setup server
-
-- name: Stop the setup server before systemd starts it
-  ansible.builtin.meta: flush_handlers
+      when: (default_engine ~ '.service') in (ansible_facts.services | default({}))
 
 - name: Install the strata service
   register: strata_unit
@@ -77,18 +121,19 @@
     mode: "0644"
     content: |
       [Unit]
-      Description=Strata Qwen3.8-Flash-Next API (port {{ strata_port }}, API key required)
+      Description=Strata {{ strata_preset }} API (port {{ strata_port }}, API key required)
       After=network-online.target
       Wants=network-online.target
-      Conflicts=osmos.service maya.service gufo.service halogen.service
+      Conflicts=maya.service halogen.service
 
       [Service]
       User={{ ansible_user }}
-      {% for k, v in strata_env.items() %}
+      Environment="STRATA_DATA_DIR={{ strata_data_dir }}"
+      {% for k, v in (strata_env | combine(strata_presets[strata_preset].env | default({}))).items() %}
       Environment="{{ k }}={{ v }}"
       {% endfor %}
-      ExecStart=/home/{{ ansible_user }}/.local/bin/strata serve --host 0.0.0.0 --port {{ strata_port }} \
-        --profile /home/{{ ansible_user }}/.local/state/strata/launch/qwen.json
+      ExecStart={{ strata_bin }} serve --host 0.0.0.0 --port {{ strata_port }} \
+        --profile {{ strata_state }}/{{ strata_preset }}.json
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
       RestartSec=30
@@ -103,3 +148,10 @@
     enabled: "{{ default_engine == 'strata' }}"
     state: "{{ ('restarted' if strata_unit is changed else 'started') if default_engine == 'strata' else omit }}"
     daemon_reload: true
+
+# A strata that ran before the playbook runs again, on the new preset when it changed.
+- name: Start strata again if it ran before
+  ansible.builtin.systemd_service:
+    name: strata
+    state: "{{ 'restarted' if strata_unit is changed else 'started' }}"
+  when: default_engine != 'strata' and strata_was_running

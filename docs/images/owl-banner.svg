@@ -98,13 +98,9 @@
     <text x="570" y="295" text-anchor="middle">ROCm</text>
     <rect x="626" y="272" width="110" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
     <text x="681" y="295" text-anchor="middle">halogen</text>
-    <rect x="748" y="272" width="80" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
-    <text x="788" y="295" text-anchor="middle">gufo</text>
-    <rect x="840" y="272" width="98" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
-    <text x="889" y="295" text-anchor="middle">Strata</text>
-    <rect x="950" y="272" width="120" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
-    <text x="1010" y="295" text-anchor="middle">libosmos</text>
-    <rect x="1082" y="272" width="80" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
-    <text x="1122" y="295" text-anchor="middle">Maya</text>
+    <rect x="748" y="272" width="98" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
+    <text x="797" y="295" text-anchor="middle">Strata</text>
+    <rect x="858" y="272" width="80" height="34" rx="17" fill="#ffffff" fill-opacity="0.08" stroke="#ffd166" stroke-opacity="0.5"/>
+    <text x="898" y="295" text-anchor="middle">Maya</text>
   </g>
 </svg>

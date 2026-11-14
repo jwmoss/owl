@@ -5,8 +5,8 @@
   hosts: all
   become: true
   vars:
-    engines: [strata, gufo, halogen, osmos, maya]
-    ports: {strata: "{{ strata_port }}", gufo: "{{ gufo_port }}", osmos: "{{ libosmos_port }}", maya: "{{ maya_port }}", halogen: "{{ halogen_port }}"}
+    engines: [strata, halogen, maya]
+    ports: {strata: "{{ strata_port }}", maya: "{{ maya_port }}", halogen: "{{ halogen_port }}"}
     auth: "{{ {'Authorization': 'Bearer ' ~ (strata_key.stdout | regex_search('sk-strata-\\S+'))} if engine == 'strata' else {} }}"
   tasks:
     - name: Find the installed engines
@@ -25,7 +25,7 @@
         fail_msg: No requested engine is installed. Install an engine before this test.
 
     - name: Read the Strata API key
-      ansible.builtin.command: /home/{{ ansible_user }}/.local/bin/strata launch --show-key --preset qwen
+      ansible.builtin.command: /home/{{ ansible_user }}/.local/bin/strata launch --show-key --preset {{ strata_preset }}
       become: false
       register: strata_key
       no_log: true
@@ -42,5 +42,5 @@
       always:
         - name: Start the default engine again
           ansible.builtin.systemd_service:
-            name: "{{ {'libosmos': 'osmos'}.get(default_engine, default_engine) }}"
+            name: "{{ default_engine }}"
             state: started

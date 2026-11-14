@@ -1,5 +1,0 @@
----
-- name: Set up gufo with Qwen3.8-Flash-Next
-  hosts: all
-  become: true
-  roles: [gufo]

@@ -1,0 +1,19 @@
+---
+maya_dir: /home/{{ ansible_user }}/src/project-maya
+maya_models_dir: "{{ models_dir }}/maya/{{ maya_item }}" # maya.sh --models-dir, one folder for each model
+maya_store: "{{ model_cache_dir }}/owl/maya"
+maya_item: "{{ maya_model }}" # the model a task works on; the setup loop sets it to each name in maya_models
+maya_setup: >-
+  ./maya.sh --backend hip --gpu 0 --model {{ maya_models[maya_item].model }} --models-dir {{ maya_models_dir }}
+  --yes --download-model --no-start --no-speed-calibration
+  --vram-reserve-mib {{ maya_vram_reserve_mib }} --port {{ maya_port }}{% if maya_models[maya_item].context is defined %}
+  --context {{ maya_models[maya_item].context }}{% endif %}
+# The model's own copy of the config the setup writes: models on one engine (deepseek, deepseek-abl) share its name.
+maya_marker: .installed-{{ maya_commit }}-{{ maya_setup | hash('sha1') }}.json
+# With a store: pull copies a model's folder to the SSD before its setup, push saves it after and marks it complete.
+# Copies skip Maya's saved conversations (pack/slots), which it keeps in the model folder.
+maya_rsync: rsync -rlt --exclude='.*.??????' --exclude=.done --exclude=slots/
+maya_pull: "{{ maya_rsync }} {{ maya_store }}/{{ maya_item }}/ {{ maya_models_dir }}/"
+maya_push: >-
+  {{ maya_rsync }} {{ maya_models_dir }}/ {{ maya_store }}/{{ maya_item }}/
+  && touch {{ maya_store }}/{{ maya_item }}/.done

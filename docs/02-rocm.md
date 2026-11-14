@@ -14,7 +14,7 @@ The `rocm` role installs the AMD TheRock build for `gfx1151` instead. The Strata
 | Environment | `/etc/profile.d/rocm.sh` |
 | Library path | `/etc/ld.so.conf.d/rocm.conf` |
 
-libosmos expects `hipcc` and `rocminfo` in `/opt/rocm/bin`. The symlink gives that path.
+Maya builds with `hipcc` from `/opt/rocm/bin`. The symlink gives that path.
 
 The `base` role adds your user to the `render` and `video` groups, so it can open `/dev/kfd` and `/dev/dri`.
 
@@ -50,7 +50,7 @@ options ttm pages_limit=29637703 page_pool_size=29637703
 ```
 
 This lets the GPU map about 113 GiB (29637703 pages of 4 KiB) on a 128 GB machine with a 2 GB frame buffer.
-libosmos checks for this value. Set `ttm_pages_limit` in `ansible/inventory/group_vars/all.yml`.
+Set `ttm_pages_limit` in `ansible/inventory/group_vars/all.yml`.
 The `rocm` role rebuilds the initramfs and reboots one time, so the setting is active.
 
 Check:

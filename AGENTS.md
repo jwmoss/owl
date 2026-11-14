@@ -22,8 +22,10 @@ Run all Ansible commands from `ansible/`.
 
 ## Rules
 
-- Never delete anything under `~/Models` on the machine. The models are hundreds of GB.
+- Never delete anything under `~/models` on the machine by hand. The models are hundreds of GB.
   A download that stops resumes when you run the playbook again.
+- With a model store, check that the store has a model (its `.done` file) before you remove the model from a list,
+  the SSD or the repo. The user keeps every model they used on the store.
 - Only one engine runs at a time. Switch with `sudo systemctl start <service>`; the units conflict.
 - Do not use `pkill -f <pattern>` over SSH. The pattern matches your own SSH command and kills it.
   Use `systemctl stop`, or a bracket pattern such as `pkill -f "[a]ria2c"`.

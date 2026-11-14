@@ -35,7 +35,7 @@ To boot from the network with [netboot.xyz](https://netboot.xyz):
 ## Install
 
 1. Storage: use the entire disk. Turn off LVM, or set `ubuntu-lv` to the full size.
-   The default LVM layout makes a root volume of only about 100 GB. All engines together need about 900 GB.
+   The default LVM layout makes a root volume of only about 100 GB. All engines together need about 600 GB.
 2. Profile: set the server name and your user.
 3. Ubuntu Pro: skip.
 4. SSH: install OpenSSH server and import your keys from GitHub. Turn off password login over SSH.

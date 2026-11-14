@@ -2,27 +2,81 @@
 - name: Clone Project Maya
   ansible.builtin.git:
     repo: https://github.com/mw00/project-maya
-    dest: "/home/{{ ansible_user }}/src/project-maya"
+    dest: "{{ maya_dir }}"
     version: "{{ maya_commit }}"
   become: false
 
-# Builds the HIP engine and downloads Maya-XS (about 277 GB), the 128 GB quant. Each shard is checked by SHA-256.
-# The marker names the commit, so a new maya_commit runs the setup again.
-- name: Set up Maya with DeepSeek-V4.1-Flash Maya-XS
-  ansible.builtin.shell:
-    cmd: >-
-      ./maya.sh --backend hip --gpu 0 --model deepseek-maya-xs --no-vision
-      --yes --download-model --no-start --no-speed-calibration
-      --vram-reserve-mib {{ maya_vram_reserve_mib }} --port {{ maya_port }}
-      && touch .installed-{{ maya_commit }}-reserve-{{ maya_vram_reserve_mib }}
-    chdir: "/home/{{ ansible_user }}/src/project-maya"
-    creates: "/home/{{ ansible_user }}/src/project-maya/.installed-{{ maya_commit }}-reserve-{{ maya_vram_reserve_mib }}"
-  environment:
-    ROCM_PATH: /opt/rocm
-    PATH: "/opt/rocm/bin:/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
+- name: Find the Maya models set up on this machine
+  ansible.builtin.stat:
+    path: "{{ maya_dir }}/{{ maya_marker }}"
+  vars:
+    maya_item: "{{ item }}"
+  loop: "{{ maya_models.keys() | list }}"
+  register: maya_markers
+
+- name: Find the Maya models with a complete copy in the store
+  ansible.builtin.stat:
+    path: "{{ maya_store }}/{{ item }}/.done"
+  loop: "{{ maya_models.keys() | list }}"
+  register: maya_stored
+  when: model_cache_nfs | length > 0
+
+- name: Read the maya service state
+  ansible.builtin.systemd_service:
+    name: maya
+  register: maya_service
+
+# Every listed model stays on the SSD: a model the store has comes back when its files are missing or old.
+- name: Copy the Maya models from the store
+  ansible.builtin.shell: mkdir -p {{ maya_models_dir }} && {{ maya_pull }} --itemize-changes
+  vars:
+    maya_item: "{{ item }}"
+  loop: "{{ maya_stored.results | default([]) | selectattr('stat.exists', 'defined') | selectattr('stat.exists') | map(attribute='item') | list }}"
+  register: maya_copied
+  changed_when: maya_copied.stdout | length > 0
   become: false
-  async: 86400
-  poll: 60
+  async: 21600
+  poll: 30
+
+# A setup uses the GPU, so maya stops first. It starts again at the end if it ran.
+# A model without its setup here, or without a complete copy in the store, is set up; the served model goes first.
+- name: Set up the new Maya models
+  vars:
+    maya_new: >-
+      {{ (maya_markers.results | rejectattr('stat.exists') | map(attribute='item') | list
+      + maya_stored.results | default([]) | rejectattr('skipped', 'defined') | rejectattr('stat.exists')
+      | map(attribute='item') | list) | unique }}
+    maya_order: "{{ maya_new | select('equalto', maya_model) | list + maya_new | reject('equalto', maya_model) | list }}"
+  when: maya_new | length > 0
+  block:
+    - name: Stop maya before the setup
+      ansible.builtin.systemd_service:
+        name: maya
+        state: stopped
+      when: maya_service.status.ActiveState == 'active'
+
+    # Builds the HIP engine and downloads the model; Maya checks each shard by SHA-256 and skips files it has.
+    # The setup writes a config named by the engine (maya-ds4-hip.json), so models on one engine overwrite it:
+    # the marker is the model's own copy. With a store, the setup takes the store's files first and saves after.
+    - name: Set up the Maya models
+      vars:
+        maya_item: "{{ item }}"
+      ansible.builtin.shell:
+        cmd: >-
+          {% if model_cache_nfs %}mkdir -p {{ maya_store }}/{{ item }} {{ maya_models_dir }} && {{ maya_pull }} && {% endif %}
+          {{ maya_setup }}
+          && for f in $(ls -t maya-*.json); do grep -q '{{ maya_models_dir }}/' "$f" && cp "$f" {{ maya_marker }} && break; done
+          && test -f {{ maya_marker }}
+          {% if model_cache_nfs %}&& {{ maya_push }}{% endif %}
+        chdir: "{{ maya_dir }}"
+      environment:
+        ROCM_PATH: /opt/rocm
+        PATH: "/opt/rocm/bin:/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
+      become: false
+      changed_when: true
+      async: 86400
+      poll: 60
+      loop: "{{ maya_order }}"
 
 - name: Install the maya service
   register: maya_unit
@@ -31,17 +85,19 @@
     mode: "0644"
     content: |
       [Unit]
-      Description=Project Maya DeepSeek-V4.1-Flash API (port {{ maya_port }}, LAN, no key)
+      Description=Project Maya {{ maya_model }} API (port {{ maya_port }}, LAN, no key)
       After=network-online.target
       Wants=network-online.target
-      Conflicts=strata.service osmos.service gufo.service halogen.service
+      Conflicts=strata.service halogen.service
 
       [Service]
       User={{ ansible_user }}
-      {% for k, v in maya_env.items() %}
+      {% for k, v in (maya_env | combine(maya_models[maya_model].env | default({}))).items() %}
       Environment="{{ k }}={{ v }}"
       {% endfor %}
-      ExecStart=/home/{{ ansible_user }}/src/project-maya/run-maya-ds4-hip.sh --host 0.0.0.0
+      WorkingDirectory={{ maya_dir }}
+      ExecStart={{ maya_dir }}/.venv/bin/python {{ maya_dir }}/maya.py --config {{ maya_dir }}/{{ maya_marker }} \
+        --port {{ maya_port }} --host 0.0.0.0
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
       RestartSec=30
@@ -56,3 +112,10 @@
     enabled: "{{ default_engine == 'maya' }}"
     state: "{{ ('restarted' if maya_unit is changed else 'started') if default_engine == 'maya' else omit }}"
     daemon_reload: true
+
+# A maya that ran before the playbook runs again, on the new model when it changed.
+- name: Start maya again if it ran before
+  ansible.builtin.systemd_service:
+    name: maya
+    state: "{{ 'restarted' if maya_unit is changed else 'started' }}"
+  when: default_engine != 'maya' and maya_service.status.ActiveState == 'active'

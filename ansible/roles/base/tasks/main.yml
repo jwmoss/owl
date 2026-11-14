@@ -25,13 +25,13 @@
     groups: [render, video]
     append: true
 
-# Rootless Podman (gufo, halogen) needs /run/user/<uid>. Without linger, systemd removes it at the last logout.
+# Rootless Podman (halogen) needs /run/user/<uid>. Without linger, systemd removes it at the last logout.
 - name: Keep the user session when nobody is logged in
   ansible.builtin.command: loginctl enable-linger {{ ansible_user }}
   args:
     creates: /var/lib/systemd/linger/{{ ansible_user }}
 
-- name: Install the Hugging Face CLI (libosmos downloads with it)
+- name: Install the Hugging Face CLI (halogen downloads with it)
   community.general.pipx:
     name: huggingface-hub
   become: false
