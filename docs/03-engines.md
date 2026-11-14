@@ -55,7 +55,7 @@ Swap the served model with one command. If the engine runs, the playbook restart
 
 ```sh
 ansible-playbook maya.yml -e maya_model=glm
-ansible-playbook strata.yml -e strata_preset=qwen36
+ansible-playbook strata.yml -e strata_preset=<name>
 ```
 
 Each model can have an `env` map. The service gets `maya_env` or `strata_env`, then the served model's `env`:
@@ -117,9 +117,6 @@ Every preset reads pictures: the setup passes `--vision gpu`, so Strata gets eac
 | Preset | Model | Download |
 |--------|-------|----------|
 | `qwen` (default) | Qwen3.8-Flash-Next IQ3_S | 84 GB |
-| `qwen36` | Qwen3.6-35B-A3B UD-Q4_K_XL, reads pictures | 24 GB |
-| `coder` | Qwen3.8-Flash-Next Coder IQ1_M | 65 GB |
-| `swift` | Swift 1.5 IQ3_S, shorter thinking; [Swift Open License](https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF/blob/main/LICENSE) | 89 GB |
 
 Maya's [memory guide](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MEMORY.md) lists these options.
 The memory figures are upstream recommendations at the documented context, not results from Owl tests.

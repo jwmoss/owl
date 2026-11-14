@@ -10,12 +10,9 @@ ttm_pages_limit: 29637703 # about 113 GiB of 4 KiB pages
 # renovate: datasource=github-releases depName=Niko1221/Strata
 strata_release: "v0.2.13"
 # The Strata models, by preset name: a --family and --model of strata launch, and optional context and env.
-# strata_preset is the one the strata service serves. Swap: ansible-playbook strata.yml -e strata_preset=qwen36.
+# strata_preset is the one the strata service serves. Swap: ansible-playbook strata.yml -e strata_preset=<name>.
 strata_presets:
   qwen: { family: qwen, model: iq3_s } # Qwen3.8-Flash-Next, the ISTA-DAS quant
-  qwen36: { family: qwen36, model: ud-q4_k_xl } # Qwen3.6-35B-A3B: small and fast, reads pictures
-  coder: { family: coder, model: iq1_m } # Qwen3.8-Flash-Next Coder
-  swift: { family: swift, model: iq3_s } # Swift 1.5: Qwen3.8-Flash-Next that thinks shorter (own license)
 strata_preset: qwen
 strata_context: 128k
 strata_port: 8080
