@@ -3,7 +3,8 @@
 - name: Save the model files to the store, {{ model_cache_engine }}
   ansible.builtin.shell: >-
     mkdir -p {{ model_cache_dir }}/owl/{{ model_cache_engine }}
-    && rsync -rlt --exclude='.*.??????' --itemize-changes {{ models_dir }}/{{ model_cache_engine }}/ {{ model_cache_dir }}/owl/{{ model_cache_engine }}/
+    && rsync -rlt --exclude='.*.??????' --exclude=.done --itemize-changes
+    {{ models_dir }}/{{ model_cache_engine }}/ {{ model_cache_dir }}/owl/{{ model_cache_engine }}/
     && touch {{ model_cache_dir }}/owl/{{ model_cache_engine }}/.done
   register: model_cache_push
   changed_when: model_cache_push.stdout | length > 0

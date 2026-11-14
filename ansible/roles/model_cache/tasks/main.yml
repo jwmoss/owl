@@ -1,6 +1,7 @@
 ---
 # The model store: every model on the share, only the served one on the SSD. Over 1 Gbps a model loads too slowly to run from NFS.
-# Every copy skips rsync's temporary files (.<name>.XXXXXX), which a killed copy can leave behind.
+# Every copy skips rsync's temporary files (.<name>.XXXXXX), which a killed copy can leave behind,
+# and the store's .done marker.
 - name: Install the NFS client and rsync
   ansible.builtin.apt:
     name: [nfs-common, rsync]

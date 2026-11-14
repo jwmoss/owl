@@ -3,7 +3,8 @@
 - name: Copy the model files from the store, {{ model_cache_engine }}
   ansible.builtin.shell: >-
     mkdir -p {{ model_cache_dir }}/owl/{{ model_cache_engine }} {{ models_dir }}/{{ model_cache_engine }}
-    && rsync -rlt --exclude='.*.??????' --itemize-changes {{ model_cache_dir }}/owl/{{ model_cache_engine }}/ {{ models_dir }}/{{ model_cache_engine }}/
+    && rsync -rlt --exclude='.*.??????' --exclude=.done --itemize-changes
+    {{ model_cache_dir }}/owl/{{ model_cache_engine }}/ {{ models_dir }}/{{ model_cache_engine }}/
   register: model_cache_pull
   changed_when: model_cache_pull.stdout | length > 0
   become: false
