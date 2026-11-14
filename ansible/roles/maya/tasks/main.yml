@@ -34,7 +34,8 @@
   become: false
   when: model_cache_nfs | length > 0
 
-# A setup or a swap changes the model files, so maya stops first. It starts again at the end if it ran.
+# A setup, or a copy that changes the served model's files, stops maya first. It starts again at the end if it ran.
+# A copy of only the other models in model_cache_keep leaves maya running.
 # A model without its setup here, or without a complete copy in the store, is set up; the served model goes first.
 - name: Set up and swap the Maya models
   vars:
@@ -49,7 +50,9 @@
       ansible.builtin.systemd_service:
         name: maya
         state: stopped
-      when: maya_service.status.ActiveState == 'active'
+      when: >-
+        maya_service.status.ActiveState == 'active' and (maya_new | length > 0
+        or maya_diff.stdout | default('') is search('^\S+\s+' ~ maya_model ~ '/', multiline=True))
 
     # Builds the HIP engine and downloads the model; Maya checks each shard by SHA-256 and skips files it has.
     # The setup writes a config named by the engine (maya-ds4-hip.json), so models on one engine overwrite it.
