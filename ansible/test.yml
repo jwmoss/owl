@@ -5,8 +5,8 @@
   hosts: all
   become: true
   vars:
-    engines: [strata, gufo, halogen, osmos, maya]
-    ports: {strata: "{{ strata_port }}", gufo: "{{ gufo_port }}", osmos: "{{ libosmos_port }}", maya: "{{ maya_port }}", halogen: "{{ halogen_port }}"}
+    engines: [strata, gufo, halogen, maya]
+    ports: {strata: "{{ strata_port }}", gufo: "{{ gufo_port }}", maya: "{{ maya_port }}", halogen: "{{ halogen_port }}"}
     auth: "{{ {'Authorization': 'Bearer ' ~ (strata_key.stdout | regex_search('sk-strata-\\S+'))} if engine == 'strata' else {} }}"
   tasks:
     - name: Find the installed engines
@@ -42,5 +42,5 @@
       always:
         - name: Start the default engine again
           ansible.builtin.systemd_service:
-            name: "{{ {'libosmos': 'osmos'}.get(default_engine, default_engine) }}"
+            name: "{{ default_engine }}"
             state: started

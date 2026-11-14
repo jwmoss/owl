@@ -8,7 +8,6 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 | `strata` | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next IQ3_S, 128K context, or another preset (`strata_preset`) | 8080 | LAN, API key | `strata.yml` |
 | `gufo` | [gufo](https://github.com/gufo-org/gufo) (Podman) | Qwen3.8-Flash-Next UD-Q4_K_XL + MTP, or the abliterated v2 (`gufo_abliterated`) | 8081 | LAN, no key | `gufo.yml` |
 | `halogen` | [halogen](https://github.com/peonist-ai/halogen-flash-server) (Podman, closed-source EULA) | Qwen3.8-Flash-Next halogen v2 (4.16 bpw), or the abliterated r2 (`halogen_abliterated`) | 8731 | LAN, no key | `halogen.yml` |
-| `osmos` | [libosmos](https://github.com/mrsirg97-rgb/libosmos) | DeepSeek-V4.1-Flash-1017 UD-IQ1_M, abliterated | 8091 | LAN, no key | `libosmos.yml` |
 | `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS, or another model (`maya_model`) | 8099 | LAN, no key | `maya.yml` |
 
 The table shows Owl's configured models. Read [group_vars/all.yml](../ansible/inventory/group_vars/all.yml) for the exact engine versions and model revisions.
@@ -33,7 +32,6 @@ These examples come from the upstream versions linked below. They do not list ev
 | Engine | Additional upstream choices | Owl configuration |
 |--------|-----------------------------|-------------------|
 | [Strata](https://github.com/Niko1221/Strata/blob/v0.2.13/README.md#models) | Qwen3.6-35B-A3B; other Qwen Flash quants; DeepSeek-V4.1-Flash | `strata_presets` lists the models to set up. Read [Swap models](#swap-models). |
-| [libosmos](https://github.com/mrsirg97-rgb/libosmos/blob/v0.6.1/README.md#the-packs) | Qwen3.8-Flash-Next packs | `libosmos_pack` selects the pack. Owl tests the default DeepSeek pack. |
 | [gufo](https://github.com/gufo-org/gufo/blob/v0.33.0/README.md#models) | Qwen3.8-27B, DeepSeek V4 Flash, embeddings, speech, images and video | The role configures Qwen Flash only. |
 | [Maya](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MODELS.md) | GLM-5.3-Flash, full GLM-5.3, MiniMax-M3.1-Flash and Qwen Flash | `maya_models` lists the models to set up. Read [Swap models](#swap-models). |
 | [halogen](https://github.com/peonist-ai/halogen-flash-server/blob/v0.20.1/docs/NPU.md) | Small classifiers, embeddings, rerankers, moderation and other NPU models | `halogen_npu_models` selects the NPU models beside Qwen Flash. |
@@ -79,9 +77,11 @@ The model store is optional. Set `model_cache_nfs` to an NFS share in your host_
 The playbooks mount it at `/mnt/model-cache` and keep the files in `owl/<engine>` on the share.
 Each file then downloads from Hugging Face once, and a fresh machine gets its models from the share.
 
-- halogen, gufo and libosmos copy their files from the share before the download, and save them to the share after.
+- halogen and gufo copy their files from the share before the download, and save them to the share after.
 - Maya and Strata keep each model in `owl/maya/<name>` and `owl/strata/<name>`, and only the served one on the SSD.
   A swap stops the engine, makes the SSD match the new model's folder on the share, and starts the engine.
+- To keep more models on the SSD for fast swaps, name them in `model_cache_keep`, for example
+  `model_cache_keep: [deepseek, glm-derisked]`. Set `model_cache_keep: true` to keep every model on the SSD.
 - The `.done` file marks a complete copy. A Maya or Strata model without it is set up again: the engine downloads
   only missing files.
 - The engines always run from the SSD: over 1 Gbps a model loads too slowly to run from the share.
@@ -135,7 +135,7 @@ Longer contexts need more memory. Run only one large engine at a time.
 ## Switch engines
 
 ```sh
-ssh <user>@<host> sudo systemctl start osmos     # stops the running engine, starts DeepSeek
+ssh <user>@<host> sudo systemctl start maya      # stops the running engine, starts the Maya model
 ssh <user>@<host> sudo systemctl start halogen   # back to Qwen
 ```
 
@@ -156,16 +156,13 @@ Show the Strata API key on the server:
 
 ## Model sources
 
-All files come from Hugging Face. The engines pin the revisions, and Strata and libosmos check each file's SHA-256.
+All files come from Hugging Face. The engines pin the revisions, and Strata and Maya check each file's SHA-256.
 
 | Engine | Files | Repository |
 |--------|-------|------------|
 | Strata | Qwen3.8-Flash-Next IQ3_S (84 GB) | [ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF) |
 | gufo | UD-Q4_K_XL, MTP head, picture reader (113 GB) | [unsloth/Qwen3.8-Flash-Next-GGUF](https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF) |
 | gufo (`gufo_abliterated: true`) | Abliterated UD-Q4_K_XL v2 (112 GB) | [huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF](https://huggingface.co/huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF) |
-| libosmos | UD-IQ1_M and the Engram table (343 GB) | [unsloth/DeepSeek-V4.1-Flash-1017-GGUF](https://huggingface.co/unsloth/DeepSeek-V4.1-Flash-1017-GGUF) |
-| libosmos | DSpark drafter, expert picks | [mrsirg97-rgb/osmos-evo-1017](https://huggingface.co/mrsirg97-rgb/osmos-evo-1017) |
-| libosmos | Abliteration patch | [huihui-ai/Huihui-DeepSeek-V4.1-Flash-1017-abliterated-GGUF](https://huggingface.co/huihui-ai/Huihui-DeepSeek-V4.1-Flash-1017-abliterated-GGUF) |
 | halogen | v2 checkpoint and lookup table (about 120 GB) | [peonist-ai/halogen-qwen3.8-flash-next](https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next) |
 | halogen (`halogen_abliterated: true`) | Abliterated r2 checkpoint (about 89 GB) | [Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated](https://huggingface.co/Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated) |
 | Maya | Maya-XS (about 277 GB) | [peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF](https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF) |
@@ -203,9 +200,6 @@ as environment variables, with `-e` for a container and `Environment=` for a hos
 halogen_env:
   HALOGEN_WEIGHTS_LOCK: "1" # keep the Flash model in memory while NPU models work
 ```
-
-The files stay on the local NVMe disk. libosmos reads experts from the disk for each token with `O_DIRECT`,
-so a network share does not work.
 
 ## Measured on a GMKtec EVO-X2 (128 GB)
 

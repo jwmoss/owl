@@ -18,12 +18,6 @@ strata_context: 128k
 strata_port: 8080
 strata_env: {} # environment variables for every Strata preset, for example { NAME: "value" }; a preset's env adds to them
 
-# renovate: datasource=github-tags depName=mrsirg97-rgb/libosmos
-libosmos_commit: "9fd4ad669c817f53b59c823802709badf024dc9d" # v0.7.0
-libosmos_pack: ud-iq1_m
-libosmos_abliterated: true
-libosmos_port: 8091
-libosmos_env: {} # extra environment variables for the engine, for example { NAME: "value" }
 
 # Every engine keeps its model files in <models_dir>/<engine>, set by the engine's own option.
 models_dir: /home/{{ ansible_user }}/models
@@ -33,8 +27,11 @@ models_dir: /home/{{ ansible_user }}/models
 # A swap saves the old model to the store and copies the new one down, so each model downloads from Hugging Face once.
 model_cache_nfs: ""
 model_cache_dir: /mnt/model-cache
+# The Maya models and Strata presets that stay on the SSD beside the served one, by name, for fast swaps.
+# true keeps all of them. Empty: only the served model stays on the SSD.
+model_cache_keep: []
 
-# The engine that starts at boot: strata, libosmos, gufo, maya or halogen. Each one uses almost all memory, so only one runs.
+# The engine that starts at boot: strata, gufo, maya or halogen. Each one uses almost all memory, so only one runs.
 default_engine: halogen
 
 # renovate: datasource=docker depName=ghcr.io/gufo-org/toolboxes/gufo-runtime

@@ -22,7 +22,7 @@ Report each state separately. A marker file records an earlier completed task; i
 | GPU configuration: `roles/rocm` handlers | File unchanged → no reboot; file changed → initramfs update → reboot → reconnect → GPU check. | An interrupted run after the file write can lose its pending handler notification. |
 | Model downloads: `roles/gufo`, `roles/halogen` | Missing/partial → download/resume → checksum verification → usable files. | Retry resumes downloads. Never delete models as a recovery step. |
 | Download markers: `roles/gufo` | Revision marker absent → verify/download → marker present → later task skipped. | A marker does not detect later file damage or deletion. |
-| Native builds: `roles/libosmos`, `roles/maya` | Commit/settings marker absent → build/setup → marker present. | Failed commands do not create the marker. Files may exist after partial setup. |
+| Native builds: `roles/maya` | Commit/settings marker absent → build/setup → marker present. | Failed commands do not create the marker. Files may exist after partial setup. |
 | Strata bootstrap: `roles/strata` | Executable absent → signed installer; executable present → skip bootstrap. | Existence is only the bootstrap guard. The signed-feed check handles upgrades. |
 | Strata upgrade: `roles/strata` | Feed current → no action; update available → stop installed engines → update/test → restore default. | The `always` block attempts restoration on success and task failure. The original failure still propagates. |
 | Strata profile: `roles/strata` | Profile absent → launch/download/save → stop temporary server → install service. | An existing profile skips setup even if model, context, or port settings change. |

@@ -31,7 +31,7 @@
   args:
     creates: /var/lib/systemd/linger/{{ ansible_user }}
 
-- name: Install the Hugging Face CLI (libosmos downloads with it)
+- name: Install the Hugging Face CLI (halogen and gufo download with it)
   community.general.pipx:
     name: huggingface-hub
   become: false

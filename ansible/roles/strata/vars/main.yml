@@ -6,11 +6,15 @@ strata_data_dir: "{{ strata_root }}/{{ strata_item }}" # STRATA_DATA_DIR
 strata_store: "{{ model_cache_dir }}/owl/strata"
 strata_item: "{{ strata_preset }}" # the preset a task works on; the setup loop sets it to each new preset
 # With a store: pull copies a preset's folder to the SSD, push saves it and marks the copy complete (.done),
-# and mirror leaves only the served preset's folder on the SSD.
+# and mirror leaves only the served preset's folder and those in model_cache_keep on the SSD.
 strata_pull: rsync -rlt --exclude='.*.??????' {{ strata_store }}/{{ strata_item }}/ {{ strata_data_dir }}/
 strata_push: >-
   rsync -rlt --exclude='.*.??????' {{ strata_data_dir }}/ {{ strata_store }}/{{ strata_item }}/
   && touch {{ strata_store }}/{{ strata_item }}/.done
 strata_mirror: >-
-  rsync -rlt --delete --delete-excluded --exclude='.*.??????' --include='/{{ strata_preset }}/***' --exclude='*'
+  rsync -rlt --delete --delete-excluded --exclude='.*.??????' {% for n in strata_keep %}--include='/{{ n }}/***' {% endfor %}--exclude='*'
   {{ strata_store }}/ {{ strata_root }}/
+# The folders mirror keeps: the served one and those in model_cache_keep (true: all of them).
+strata_keep: >-
+  {{ strata_presets.keys() | list if model_cache_keep is sameas true
+  else [strata_preset] + model_cache_keep | select('in', strata_presets) | list }}

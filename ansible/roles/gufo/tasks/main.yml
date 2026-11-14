@@ -77,7 +77,7 @@
       Description=gufo {{ gufo_model_repo | basename }} API (port {{ gufo_port }})
       After=network-online.target
       Wants=network-online.target
-      Conflicts=strata.service osmos.service maya.service halogen.service
+      Conflicts=strata.service maya.service halogen.service
 
       [Service]
       User={{ ansible_user }}

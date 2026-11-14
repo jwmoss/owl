@@ -93,7 +93,7 @@
       Description=Project Maya {{ maya_model }} API (port {{ maya_port }}, LAN, no key)
       After=network-online.target
       Wants=network-online.target
-      Conflicts=strata.service osmos.service gufo.service halogen.service
+      Conflicts=strata.service gufo.service halogen.service
 
       [Service]
       User={{ ansible_user }}

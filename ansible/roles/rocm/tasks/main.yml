@@ -50,7 +50,7 @@
   notify: Run ldconfig
 
 # The BIOS UMA frame buffer must also be at its minimum (2 GB on the GMKtec EVO-X2). Ansible cannot set it.
-- name: Let the GPU map about 113 GiB (libosmos checks this)
+- name: Let the GPU map about 113 GiB
   ansible.builtin.copy:
     dest: /etc/modprobe.d/ttm.conf
     mode: "0644"

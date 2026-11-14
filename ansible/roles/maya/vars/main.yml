@@ -11,11 +11,15 @@ maya_setup: >-
 # The model's own copy of the config the setup writes: models on one engine (deepseek, deepseek-abl) share its name.
 maya_marker: .installed-{{ maya_commit }}-{{ maya_setup | hash('sha1') }}.json
 # With a store: pull copies a model's folder to the SSD, push saves it and marks the copy complete (.done),
-# and mirror leaves only the served model's folder on the SSD.
+# and mirror leaves only the served model's folder and those in model_cache_keep on the SSD.
 maya_pull: rsync -rlt --exclude='.*.??????' {{ maya_store }}/{{ maya_item }}/ {{ maya_models_dir }}/
 maya_push: >-
   rsync -rlt --exclude='.*.??????' {{ maya_models_dir }}/ {{ maya_store }}/{{ maya_item }}/
   && touch {{ maya_store }}/{{ maya_item }}/.done
 maya_mirror: >-
-  rsync -rlt --delete --delete-excluded --exclude='.*.??????' --include='/{{ maya_model }}/***' --exclude='*'
+  rsync -rlt --delete --delete-excluded --exclude='.*.??????' {% for n in maya_keep %}--include='/{{ n }}/***' {% endfor %}--exclude='*'
   {{ maya_store }}/ {{ maya_root }}/
+# The folders mirror keeps: the served one and those in model_cache_keep (true: all of them).
+maya_keep: >-
+  {{ maya_models.keys() | list if model_cache_keep is sameas true
+  else [maya_model] + model_cache_keep | select('in', maya_models) | list }}

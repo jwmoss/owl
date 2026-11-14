@@ -57,7 +57,7 @@
   <!-- engines on the GPU -->
   <rect x="364" y="126" width="482" height="62" rx="10" fill="#ffd166" fill-opacity="0.12" stroke="#ffd166" stroke-opacity="0.6"/>
   <text class="t" x="605" y="150" text-anchor="middle">One engine at a time (systemd, Conflicts=)</text>
-  <text class="m" x="605" y="174" text-anchor="middle">halogen · gufo · Strata · libosmos · Maya</text>
+  <text class="m" x="605" y="174" text-anchor="middle">halogen · gufo · Strata · Maya</text>
 
   <!-- CPU / GPU / NPU tiles -->
   <rect x="364" y="204" width="140" height="132" rx="10" fill="#3a3f4d" stroke="#8b93a7" stroke-opacity="0.6"/>

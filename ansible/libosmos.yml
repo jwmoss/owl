@@ -1,7 +1,0 @@
----
-- name: Set up libosmos with DeepSeek-V4.1-Flash
-  hosts: all
-  become: true
-  roles:
-    - { role: model_cache, when: model_cache_nfs | length > 0 }
-    - libosmos

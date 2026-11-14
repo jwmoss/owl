@@ -61,7 +61,7 @@
       ansible.builtin.systemd_service:
         name: "{{ item }}"
         state: stopped
-      loop: [strata, osmos, maya, gufo, halogen]
+      loop: [strata, maya, gufo, halogen]
       when: (item ~ '.service') in ansible_facts.services
 
     - name: Update Strata from the pinned signed feed
@@ -98,10 +98,10 @@
   always:
     - name: Restore an installed default engine after the Strata changes
       ansible.builtin.systemd_service:
-        name: "{{ {'libosmos': 'osmos'}.get(default_engine, default_engine) }}"
+        name: "{{ default_engine }}"
         state: started
       when: >-
-        ({'libosmos': 'osmos'}.get(default_engine, default_engine) ~ '.service')
+        (default_engine ~ '.service')
         in (ansible_facts.services | default({}))
 
 - name: Copy the served preset to the SSD from the store
@@ -137,7 +137,7 @@
       Description=Strata {{ strata_preset }} API (port {{ strata_port }}, API key required)
       After=network-online.target
       Wants=network-online.target
-      Conflicts=osmos.service maya.service gufo.service halogen.service
+      Conflicts=maya.service gufo.service halogen.service
 
       [Service]
       User={{ ansible_user }}

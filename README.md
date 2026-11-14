@@ -26,7 +26,6 @@ The table shows the models that Owl's playbooks install. Each engine can support
 | [halogen](https://github.com/peonist-ai/halogen-flash-server) (default, closed source, free under an EULA) | Qwen3.8-Flash-Next, optional abliterated | 8731 | `halogen.yml` |
 | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next | 8080 | `strata.yml` |
 | [gufo](https://github.com/gufo-org/gufo) | Qwen3.8-Flash-Next, optional abliterated | 8081 | `gufo.yml` |
-| [libosmos](https://github.com/mrsirg97-rgb/libosmos) | DeepSeek-V4.1-Flash, abliterated | 8091 | `libosmos.yml` |
 | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash | 8099 | `maya.yml` |
 
 Each engine uses almost all of the memory, so only one runs at a time. See [docs/03-engines.md](docs/03-engines.md).
@@ -36,7 +35,7 @@ Each engine uses almost all of the memory, so only one runs at a time. See [docs
 Some other models fit a 128 GB Strix Halo. Upstream support does not mean that Owl installs or tests that model.
 
 - Maya also supports GLM-5.3-Flash and MiniMax-M3.1-Flash. Its smaller quants are options for 128 GB machines.
-- Strata also supports Qwen3.6-35B-A3B. libosmos also supports Qwen3.8-Flash-Next.
+- Strata also supports Qwen3.6-35B-A3B and DeepSeek-V4.1-Flash.
 - gufo also supports Qwen3.8-27B, embeddings, speech, images and video.
 - halogen can serve small NPU models beside Qwen Flash. Set `halogen_npu_models` to select them.
 
