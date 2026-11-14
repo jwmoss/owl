@@ -15,7 +15,7 @@ strata_port: 8080
 strata_env: {} # extra environment variables for the engine, for example { NAME: "value" }
 
 # renovate: datasource=github-tags depName=mrsirg97-rgb/libosmos
-libosmos_commit: "9fd4ad669c817f53b59c823802709badf024dc9d" # v0.7.0
+libosmos_commit: "9fb205a60ddf5c41393764458d86b3a8cb02c7ae" # v0.7.3
 libosmos_pack: ud-iq1_m
 libosmos_abliterated: true
 libosmos_port: 8091
