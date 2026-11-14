@@ -13,7 +13,7 @@ Tested on a GMKtec EVO-X2 with 128 GB.
 ## Before you start
 
 - **Machine:** a Ryzen AI Max+ 395 with 128 GB. `ubuntu.yml` stops if Linux sees less than about 115 GB.
-- **Disk:** about 120 GB for halogen, about 900 GB for all engines.
+- **Disk:** about 120 GB for halogen, about 600 GB for all engines and their default models.
 - **Security:** `ubuntu.yml` gives your user passwordless sudo. The engines, except Strata, serve
   without an API key to all of your network. Use them only on a trusted network.
 
@@ -25,7 +25,7 @@ The table shows the models that Owl's playbooks install. Each engine can support
 |--------|-------|------|----------|
 | [halogen](https://github.com/peonist-ai/halogen-flash-server) (default, closed source, free under an EULA) | Qwen3.8-Flash-Next, optional abliterated | 8731 | `halogen.yml` |
 | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next | 8080 | `strata.yml` |
-| [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash | 8099 | `maya.yml` |
+| [Project Maya](https://github.com/mw00/project-maya) | GLM-5.3-Flash and DeepSeek-V4.1-Flash, one at a time | 8099 | `maya.yml` |
 
 Each engine uses almost all of the memory, so only one runs at a time. See [docs/03-engines.md](docs/03-engines.md).
 
@@ -33,7 +33,7 @@ Each engine uses almost all of the memory, so only one runs at a time. See [docs
 
 Some other models fit a 128 GB Strix Halo. Upstream support does not mean that Owl installs or tests that model.
 
-- Maya also supports GLM-5.3-Flash and MiniMax-M3.1-Flash. Its smaller quants are options for 128 GB machines.
+- Maya also supports MiniMax-M3.1-Flash, the full GLM-5.3, and other GLM and DeepSeek quants, uncensored builds too.
 - Strata also supports Qwen3.6-35B-A3B and DeepSeek-V4.1-Flash.
 - halogen can serve small NPU models beside Qwen Flash. Set `halogen_npu_models` to select them.
 
@@ -85,7 +85,7 @@ can do: the BIOS, the Ubuntu install and the sudo password.
 |----------|------|
 | `ubuntu.yml` | Build tools, passwordless sudo, GPU groups, Hugging Face CLI, ROCm, GPU memory limit |
 | `<engine>.yml` | One engine, its model and its systemd service |
-| `site.yml` | `ubuntu.yml` and all engines (about 900 GB of downloads) |
+| `site.yml` | `ubuntu.yml` and all engines (about 600 GB of downloads) |
 | `tailscale.yml` | Optional. Installs [Tailscale](https://tailscale.com) and joins your tailnet. `site.yml` does not run it |
 | `test.yml` | Starts each installed engine, sends one chat request and checks the answer |
 
@@ -97,6 +97,12 @@ To change a setting for one machine, put it in `ansible/inventory/host_vars/<hos
 default_engine: maya
 halogen_abliterated: true   # halogen runs the abliterated Qwen3.8-Flash-Next
 ```
+
+### Model store
+
+Optional: set `model_cache_nfs` to an NFS share, for example a NAS. The playbooks save every model there after
+its download and restore it from there on a fresh machine, so each model downloads from Hugging Face once.
+See [model files and the model store](docs/03-engines.md#model-files-and-the-model-store).
 
 ### Tailscale
 

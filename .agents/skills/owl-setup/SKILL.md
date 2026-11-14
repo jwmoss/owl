@@ -19,7 +19,7 @@ Ask only for what you cannot find. Use these defaults when the user has no prefe
 | Engine | `halogen` (fastest Qwen3.8-Flash-Next; about 120 GB of downloads) |
 | Abliterated model (`halogen_abliterated`) | `false` |
 
-The other engines are in [docs/03-engines.md](../../../docs/03-engines.md). `site.yml` installs all of them (about 900 GB).
+The other engines are in [docs/03-engines.md](../../../docs/03-engines.md). `site.yml` installs all of them (about 600 GB).
 
 ## 2. Steps only the user can do
 

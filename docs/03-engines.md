@@ -7,7 +7,7 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 |---------|--------|-------|------|--------|----------|
 | `strata` | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next IQ3_S, 128K context, or another preset (`strata_preset`) | 8080 | LAN, API key | `strata.yml` |
 | `halogen` | [halogen](https://github.com/peonist-ai/halogen-flash-server) (Podman, closed-source EULA) | Qwen3.8-Flash-Next halogen v2 (4.16 bpw), or the abliterated r2 (`halogen_abliterated`) | 8731 | LAN, no key | `halogen.yml` |
-| `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS, or another model (`maya_model`) | 8099 | LAN, no key | `maya.yml` |
+| `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS or GLM-5.3-Flash Maya-S; `maya_model` picks one | 8099 | LAN, no key | `maya.yml` |
 
 The table shows Owl's configured models. Read [group_vars/all.yml](../ansible/inventory/group_vars/all.yml) for the exact engine versions and model revisions.
 
@@ -31,7 +31,7 @@ These examples come from the upstream versions linked below. They do not list ev
 | Engine | Additional upstream choices | Owl configuration |
 |--------|-----------------------------|-------------------|
 | [Strata](https://github.com/Niko1221/Strata/blob/v0.2.13/README.md#models) | Qwen3.6-35B-A3B; other Qwen Flash quants; DeepSeek-V4.1-Flash | `strata_presets` lists the models to set up. Read [Swap models](#swap-models). |
-| [Maya](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MODELS.md) | GLM-5.3-Flash, full GLM-5.3, MiniMax-M3.1-Flash and Qwen Flash | `maya_models` lists the models to set up. Read [Swap models](#swap-models). |
+| [Maya](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MODELS.md) | Other GLM-5.3-Flash and DeepSeek quants, full GLM-5.3, MiniMax-M3.1-Flash and Qwen Flash | `maya_models` lists the models to set up. Read [Swap models](#swap-models). |
 | [halogen](https://github.com/peonist-ai/halogen-flash-server/blob/v0.20.1/docs/NPU.md) | Small classifiers, embeddings, rerankers, moderation and other NPU models | `halogen_npu_models` selects the NPU models beside Qwen Flash. |
 
 Do not treat upstream support as a successful test on this machine. Additional model families need Ansible download, launch and test support.
@@ -67,7 +67,7 @@ The Strata API key is per preset: `~/.local/bin/strata launch --show-key --prese
 ### Model files and the model store
 
 Every engine keeps its files in `models_dir/<engine>` (`~/models/halogen`, `~/models/maya` ...), set with the engine's
-own option: `--local-dir`, `--models-dir`, `--models` or `STRATA_DATA_DIR`. Hugging Face's own cache
+own option: `--local-dir`, `--models-dir` or `STRATA_DATA_DIR`. Hugging Face's own cache
 (`~/.cache/huggingface/hub`) is not used: each engine downloads into its own layout and builds index files beside it.
 
 The model store is optional. Set `model_cache_nfs` to an NFS share in your host_vars, for example
@@ -87,7 +87,7 @@ Each file then downloads from Hugging Face once, and a fresh machine gets its mo
 ### Maya models
 
 "On owl" is the [VRAM Calculator](https://vramcalculator.com/project-maya-calculator/?fam=glm&unified=strix-halo-395-128&ram=128&ctx=262144&os=linux)'s
-estimate at 256K context, not a measurement. Owl tests only `deepseek-maya-xs`.
+estimate at 256K context, not a measurement. Owl tests `deepseek-maya-xs`, `glm-maya-s` and `glm-maya-m-derisked`.
 Every model reads pictures: the setup gets the model's vision encoder (about 1.1 GB).
 Set a model's context in tokens with `context`, for example
 `glm: { model: glm-maya-s, context: 524288 }`. Without it, Maya uses 32K.
@@ -162,7 +162,8 @@ All files come from Hugging Face. The engines pin the revisions, and Strata and 
 | Strata | Qwen3.8-Flash-Next IQ3_S (84 GB) | [ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF) |
 | halogen | v2 checkpoint and lookup table (about 120 GB) | [peonist-ai/halogen-qwen3.8-flash-next](https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next) |
 | halogen (`halogen_abliterated: true`) | Abliterated r2 checkpoint (about 89 GB) | [Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated](https://huggingface.co/Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated) |
-| Maya | Maya-XS (about 277 GB) | [peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF](https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF) |
+| Maya | DeepSeek Maya-XS (about 277 GB) | [peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF](https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF) |
+| Maya | GLM-5.3-Flash Maya-S (about 97 GB) | [peasantsmith/GLM-5.3-Flash-Maya-GGUF](https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-GGUF) |
 
 Set `halogen_abliterated: true` to serve the uncensored build from halogen: the stock v2 checkpoint
 with the refusal direction from orcarouter's uncensored fine-tune transplanted into 149 tensors.
@@ -203,6 +204,9 @@ halogen_env:
 | Engine | Model | Decode | Date |
 |--------|-------|--------|------|
 | Strata | Qwen3.8-Flash-Next IQ3_S | 51.5 tok/s | 2026-11-08 |
+| Maya | DeepSeek-V4.1-Flash Maya-XS, 256K context | 22-27 tok/s | 2026-11-13 |
+| Maya | GLM-5.3-Flash Maya-S, 32K context | 23 tok/s | 2026-11-13 |
+| Maya | GLM-5.3-Flash Maya-M-Derisked, 512K context | 14-17 tok/s | 2026-11-14 |
 
 ## Test
 
@@ -220,36 +224,35 @@ ansible-playbook test.yml -e '{"engines": ["halogen"]}'
 
 ## Use with pi
 
-[pi](https://github.com/earendil-works/pi) can use each engine as a provider. Add the engine to `~/.pi/agent/models.json`.
-This example is for halogen. The `id` must match the engine's `GET /v1/models`:
+[pi](https://github.com/earendil-works/pi) can use all engines through one `owl` provider in `~/.pi/agent/models.json`.
+Each model sets the `baseUrl` of its engine. Strata needs its API key; the other engines ignore it.
+Maya serves one model at a time and ignores the request's `id`, so the ids only tell its models apart in pi.
 
 ```json
 {
   "providers": {
-    "owl-halogen": {
+    "owl": {
       "baseUrl": "http://<host>:8731/v1",
       "api": "openai-completions",
-      "apiKey": "none",
+      "apiKey": "<Strata API key>",
       "models": [
-        {
-          "id": "halogen-qwen3.8-flash-next",
-          "name": "owl-halogen-qwen3.8-flash-next-4.16bpw",
-          "reasoning": true,
-          "input": ["text"],
-          "contextWindow": 262144,
-          "maxTokens": 32768
-        }
+        { "id": "halogen-qwen3.8-flash-next", "name": "halogen-qwen3.8-flash-next",
+          "reasoning": true, "contextWindow": 262144, "maxTokens": 32768 },
+        { "id": "qwen3.8-flash-next-iq3_s", "name": "strata-qwen3.8-flash-next", "baseUrl": "http://<host>:8080/v1",
+          "reasoning": true, "contextWindow": 131072, "maxTokens": 32768 },
+        { "id": "glm-5.3-flash", "name": "owl-maya-glm-5.3-flash", "baseUrl": "http://<host>:8099/v1",
+          "reasoning": true, "contextWindow": 32768, "maxTokens": 16384 }
       ]
     }
   }
 }
 ```
 
-Start pi with `<provider>/<model id>`. Add `:low` for less thinking (halogen defaults to `xhigh`):
+Start pi with a model's name. Add `:low` for less thinking (halogen defaults to `xhigh`):
 
 ```sh
-pi --model owl-halogen/halogen-qwen3.8-flash-next
-pi --model owl-halogen/halogen-qwen3.8-flash-next -p "What is 17 times 3?"   # one answer, then exit
+pi --model halogen-qwen3.8-flash-next
+pi --model owl-maya-glm-5.3-flash -p "What is 17 times 3?"   # one answer, then exit
 ```
 
 A shorter system prompt makes the first answer faster. These flags remove parts of it:
@@ -264,5 +267,5 @@ A shorter system prompt makes the first answer faster. These flags remove parts 
 | `-nt` | all tools (plain chat) |
 
 ```sh
-pi --model owl-halogen/halogen-qwen3.8-flash-next -ns -nc -ne --no-mcp -np
+pi --model halogen-qwen3.8-flash-next -ns -nc -ne --no-mcp -np
 ```
