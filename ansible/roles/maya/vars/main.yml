@@ -19,7 +19,5 @@ maya_push: >-
 maya_mirror: >-
   rsync -rlt --delete --delete-excluded --exclude='.*.??????' {% for n in maya_keep %}--include='/{{ n }}/***' {% endfor %}--exclude='*'
   {{ maya_store }}/ {{ maya_root }}/
-# The folders mirror keeps: the served one and those in model_cache_keep (true: all of them).
-maya_keep: >-
-  {{ maya_models.keys() | list if model_cache_keep is sameas true
-  else [maya_model] + model_cache_keep | select('in', maya_models) | list }}
+# The folders mirror keeps: the served one and those in model_cache_keep.
+maya_keep: "{{ [maya_model] + model_cache_keep | select('in', maya_models) | list }}"

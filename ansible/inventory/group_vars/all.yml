@@ -28,7 +28,7 @@ models_dir: /home/{{ ansible_user }}/models
 model_cache_nfs: ""
 model_cache_dir: /mnt/model-cache
 # The Maya models and Strata presets that stay on the SSD beside the served one, by name, for fast swaps.
-# true keeps all of them. Empty: only the served model stays on the SSD.
+# Empty: only the served model stays on the SSD.
 model_cache_keep: []
 
 # The engine that starts at boot: strata, gufo, maya or halogen. Each one uses almost all memory, so only one runs.

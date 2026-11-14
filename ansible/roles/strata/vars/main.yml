@@ -14,7 +14,5 @@ strata_push: >-
 strata_mirror: >-
   rsync -rlt --delete --delete-excluded --exclude='.*.??????' {% for n in strata_keep %}--include='/{{ n }}/***' {% endfor %}--exclude='*'
   {{ strata_store }}/ {{ strata_root }}/
-# The folders mirror keeps: the served one and those in model_cache_keep (true: all of them).
-strata_keep: >-
-  {{ strata_presets.keys() | list if model_cache_keep is sameas true
-  else [strata_preset] + model_cache_keep | select('in', strata_presets) | list }}
+# The folders mirror keeps: the served one and those in model_cache_keep.
+strata_keep: "{{ [strata_preset] + model_cache_keep | select('in', strata_presets) | list }}"
