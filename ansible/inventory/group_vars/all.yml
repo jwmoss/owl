@@ -54,7 +54,7 @@ gufo_env: {} # extra environment variables for the engine, for example { NAME: "
 # renovate: datasource=github-tags depName=mw00/project-maya
 maya_commit: "f66a913c628c6672795088a56ad85de0efc827e4" # v1.1.61
 maya_port: 8099
-# The Maya models, by name: the --model options of maya.sh, and optional env for that model only.
+# The Maya models, by name: the --model options of maya.sh, and optional context (tokens) and env for that model only.
 # maya_model is the one the maya service serves. Swap: ansible-playbook maya.yml -e maya_model=glm.
 maya_models:
   deepseek: { model: deepseek-maya-xs } # DeepSeek-V4.1-Flash-1017
