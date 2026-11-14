@@ -11,14 +11,15 @@ maya_setup: >-
   --context {{ maya_models[maya_item].context }}{% endif %}
 # The model's own copy of the config the setup writes: models on one engine (deepseek, deepseek-abl) share its name.
 maya_marker: .installed-{{ maya_commit }}-{{ maya_setup | hash('sha1') }}.json
+# Maya keeps its saved conversations in the model folder (pack/slots); copies skip them and leave the SSD's in place.
+maya_rsync: rsync -rlt --exclude='.*.??????' --exclude=.done --filter='H slots/' --filter='P slots/'
 # With a store: pull copies a model's folder to the SSD, push saves it and marks the copy complete (.done),
-# and mirror leaves only the served model's folder and those in model_cache_keep on the SSD.
-maya_pull: rsync -rlt --exclude='.*.??????' --exclude=.done {{ maya_store }}/{{ maya_item }}/ {{ maya_models_dir }}/
+# and mirror leaves only the served model's folder on the SSD (all of them with model_cache_keep_all).
+maya_pull: "{{ maya_rsync }} {{ maya_store }}/{{ maya_item }}/ {{ maya_models_dir }}/"
 maya_push: >-
-  rsync -rlt --exclude='.*.??????' --exclude=.done {{ maya_models_dir }}/ {{ maya_store }}/{{ maya_item }}/
+  {{ maya_rsync }} {{ maya_models_dir }}/ {{ maya_store }}/{{ maya_item }}/
   && touch {{ maya_store }}/{{ maya_item }}/.done
 maya_mirror: >-
-  rsync -rlt --delete --delete-excluded --exclude='.*.??????' --exclude=.done {% for n in maya_keep %}--include='/{{ n }}/***' {% endfor %}--exclude='*'
+  {{ maya_rsync }} --delete --delete-excluded {% for n in maya_keep %}--include='/{{ n }}/***' {% endfor %}--exclude='*'
   {{ maya_store }}/ {{ maya_root }}/
-# The folders mirror keeps: the served one and those in model_cache_keep.
-maya_keep: "{{ [maya_model] + model_cache_keep | select('in', maya_models) | list }}"
+maya_keep: "{{ maya_models.keys() | list if model_cache_keep_all else [maya_model] }}"

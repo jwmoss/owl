@@ -35,7 +35,7 @@
   when: model_cache_nfs | length > 0
 
 # A setup, or a copy that changes the served model's files, stops maya first. It starts again at the end if it ran.
-# A copy of only the other models in model_cache_keep leaves maya running.
+# A copy of only the other models (model_cache_keep_all) leaves maya running.
 # A model without its setup here, or without a complete copy in the store, is set up; the served model goes first.
 - name: Set up and swap the Maya models
   vars:

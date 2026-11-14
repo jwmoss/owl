@@ -80,8 +80,8 @@ Each file then downloads from Hugging Face once, and a fresh machine gets its mo
 - halogen and gufo copy their files from the share before the download, and save them to the share after.
 - Maya and Strata keep each model in `owl/maya/<name>` and `owl/strata/<name>`, and only the served one on the SSD.
   A swap stops the engine, makes the SSD match the new model's folder on the share, and starts the engine.
-- To keep more models on the SSD for fast swaps, name them in `model_cache_keep`, for example
-  `model_cache_keep: [deepseek, glm-derisked]`.
+- Set `model_cache_keep_all: true` to keep every Maya model and Strata preset on the SSD. A swap then copies
+  nothing. Check the SSD space first: Owl's Maya models alone take about 820 GB.
 - The `.done` file marks a complete copy. A Maya or Strata model without it is set up again: the engine downloads
   only missing files.
 - The engines always run from the SSD: over 1 Gbps a model loads too slowly to run from the share.
