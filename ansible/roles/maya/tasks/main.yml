@@ -52,8 +52,8 @@
       when: maya_service.status.ActiveState == 'active'
 
     # Builds the HIP engine and downloads the model; Maya checks each shard by SHA-256 and skips files it has.
-    # Each model writes its own start script (run-maya-ds4-hip.sh, run-maya-glm-...). The marker is a link to it,
-    # named by the commit and the setup command. With a store, the setup takes the files the store has and saves the
+    # The setup writes a config named by the engine (maya-ds4-hip.json), so models on one engine overwrite it.
+    # The marker is the model's own copy, named by the commit and the setup command. With a store, the setup takes the files the store has and saves the
     # model to the store. Each model has its own folder, so a setup never saves another model's files.
     - name: Set up the Maya models
       vars:
@@ -62,7 +62,8 @@
         cmd: >-
           {% if model_cache_nfs %}mkdir -p {{ maya_store }}/{{ item }} {{ maya_models_dir }} && {{ maya_pull }} && {% endif %}
           {{ maya_setup }}
-          && for f in $(ls -t run-maya-*.sh); do ln -sfn "$f" {{ maya_marker }}; break; done
+          && for f in $(ls -t maya-*.json); do grep -q '{{ maya_models_dir }}/' "$f" && cp "$f" {{ maya_marker }} && break; done
+          && test -f {{ maya_marker }}
           {% if model_cache_nfs %}&& {{ maya_push }}{% endif %}
         chdir: "{{ maya_dir }}"
       environment:
@@ -99,7 +100,9 @@
       {% for k, v in (maya_env | combine(maya_models[maya_model].env | default({}))).items() %}
       Environment="{{ k }}={{ v }}"
       {% endfor %}
-      ExecStart={{ maya_dir }}/{{ maya_marker }} --host 0.0.0.0
+      WorkingDirectory={{ maya_dir }}
+      ExecStart={{ maya_dir }}/.venv/bin/python {{ maya_dir }}/maya.py --config {{ maya_dir }}/{{ maya_marker }} \
+        --port {{ maya_port }} --host 0.0.0.0
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
       RestartSec=30

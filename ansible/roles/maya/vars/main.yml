@@ -8,7 +8,8 @@ maya_setup: >-
   ./maya.sh --backend hip --gpu 0 --model {{ maya_models[maya_item].model }} --models-dir {{ maya_models_dir }}
   --yes --download-model --no-start --no-speed-calibration
   --vram-reserve-mib {{ maya_vram_reserve_mib }} --port {{ maya_port }}
-maya_marker: .installed-{{ maya_commit }}-{{ maya_setup | hash('sha1') }}.sh
+# The model's own copy of the config the setup writes: models on one engine (deepseek, deepseek-abl) share its name.
+maya_marker: .installed-{{ maya_commit }}-{{ maya_setup | hash('sha1') }}.json
 # With a store: pull copies a model's folder to the SSD, push saves it and marks the copy complete (.done),
 # and mirror leaves only the served model's folder on the SSD.
 maya_pull: rsync -rlt --exclude='.*.??????' {{ maya_store }}/{{ maya_item }}/ {{ maya_models_dir }}/
