@@ -28,25 +28,9 @@ models_dir: /home/{{ ansible_user }}/models
 model_cache_nfs: ""
 model_cache_dir: /mnt/model-cache
 
-# The engine that starts at boot: strata, gufo, maya or halogen. Each one uses almost all memory, so only one runs.
+# The engine that starts at boot: strata, maya or halogen. Each one uses almost all memory, so only one runs.
 default_engine: halogen
 
-# renovate: datasource=docker depName=ghcr.io/gufo-org/toolboxes/gufo-runtime
-gufo_image: "ghcr.io/gufo-org/toolboxes/gufo-runtime:0.34.0"
-# unsloth: the model, the MTP head and the picture reader. Most new revisions change only the README.
-# renovate: datasource=git-refs depName=https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF
-gufo_qwen_revision: "f5d175de2cf7f720d45d6064019a81fcf056e986" # main
-# true: huihui-ai's abliterated v2 of the same UD-Q4_K_XL quant (about 112 GB more). gufo keeps unsloth's MTP head.
-gufo_abliterated: false
-gufo_model_repo: "{{ 'huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF' if gufo_abliterated else 'unsloth/Qwen3.8-Flash-Next-GGUF' }}"
-# renovate: datasource=git-refs depName=https://huggingface.co/huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF
-gufo_abliterated_revision: "cbc7fba13f1939ac3fa42b18d77ccf43847d74ef" # main
-gufo_model_revision: "{{ gufo_abliterated_revision if gufo_abliterated else gufo_qwen_revision }}"
-gufo_model_file: "{{ 'unsloth-UD-Q4_K_XL-V2' if gufo_abliterated else 'UD-Q4_K_XL' }}/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf"
-gufo_model_dir: "{{ models_dir }}/gufo/{{ gufo_model_repo | basename }}"
-gufo_hf_token: "{{ lookup('ansible.builtin.file', '~/.cache/huggingface/token', errors='ignore') | default('', true) }}"
-gufo_port: 8081
-gufo_env: {} # extra environment variables for the engine, for example { NAME: "value" }
 
 # renovate: datasource=github-tags depName=mw00/project-maya
 maya_commit: "f66a913c628c6672795088a56ad85de0efc827e4" # v1.1.61
@@ -56,7 +40,6 @@ maya_port: 8099
 maya_models:
   deepseek: { model: deepseek-maya-xs } # DeepSeek-V4.1-Flash-1017
   glm: { model: glm-maya-s } # GLM-5.3-Flash
-  minimax: { model: minimax-maya-xs } # MiniMax-M3.1-Flash (non-commercial license)
 maya_model: deepseek
 maya_env: {} # environment variables for every Maya model, for example { NAME: "value" }; a model's env adds to them
 # Leave headroom below the shared GPU memory limit on a 128 GB Strix Halo.

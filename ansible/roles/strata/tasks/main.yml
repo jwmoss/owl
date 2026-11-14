@@ -36,6 +36,18 @@
   register: strata_stored
   when: model_cache_nfs | length > 0
 
+# Every listed preset stays on the SSD: a preset the store has comes back when its files are missing or old.
+- name: Copy the Strata presets from the store
+  ansible.builtin.shell: mkdir -p {{ strata_data_dir }} && {{ strata_pull }} --itemize-changes
+  vars:
+    strata_item: "{{ item }}"
+  loop: "{{ strata_stored.results | default([]) | selectattr('stat.exists', 'defined') | selectattr('stat.exists') | map(attribute='item') | list }}"
+  register: strata_copied
+  changed_when: strata_copied.stdout | length > 0
+  become: false
+  async: 21600
+  poll: 30
+
 - name: Read the services before the Strata changes
   ansible.builtin.service_facts:
 
@@ -61,7 +73,7 @@
       ansible.builtin.systemd_service:
         name: "{{ item }}"
         state: stopped
-      loop: [strata, maya, gufo, halogen]
+      loop: [strata, maya, halogen]
       when: (item ~ '.service') in ansible_facts.services
 
     - name: Update Strata from the pinned signed feed
@@ -112,7 +124,7 @@
       Description=Strata {{ strata_preset }} API (port {{ strata_port }}, API key required)
       After=network-online.target
       Wants=network-online.target
-      Conflicts=maya.service gufo.service halogen.service
+      Conflicts=maya.service halogen.service
 
       [Service]
       User={{ ansible_user }}

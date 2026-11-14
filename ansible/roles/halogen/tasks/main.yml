@@ -86,7 +86,7 @@
       {% if halogen_npu_models %}
       After=halogen-fabric-clock.service
       {% endif %}
-      Conflicts=strata.service maya.service gufo.service
+      Conflicts=strata.service maya.service
 
       [Service]
       User={{ ansible_user }}

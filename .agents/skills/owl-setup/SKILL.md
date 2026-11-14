@@ -17,7 +17,7 @@ Ask only for what you cannot find. Use these defaults when the user has no prefe
 | Host address (IP or DNS name) | none: ask |
 | SSH user on the host | none: ask |
 | Engine | `halogen` (fastest Qwen3.8-Flash-Next; about 120 GB of downloads) |
-| Abliterated model (`halogen_abliterated` or `gufo_abliterated`) | `false` |
+| Abliterated model (`halogen_abliterated`) | `false` |
 
 The other engines are in [docs/03-engines.md](../../../docs/03-engines.md). `site.yml` installs all of them (about 900 GB).
 
@@ -59,7 +59,7 @@ all:
 ```
 
 Write settings that differ from `group_vars/all.yml` to `ansible/inventory/host_vars/strix.yml` (gitignored),
-for example `default_engine: gufo` or `halogen_abliterated: true`. Do not edit `group_vars/all.yml` for one machine.
+for example `default_engine: maya` or `halogen_abliterated: true`. Do not edit `group_vars/all.yml` for one machine.
 
 Check: `uvx --from ansible-core ansible all -m ping` answers `pong`.
 
@@ -80,7 +80,7 @@ A second run of any playbook must show `changed=0` (or only the download checks)
 
 Give them:
 
-- The API: `http://<host>:<port>/v1` (ports: halogen 8731, Strata 8080, gufo 8081, Maya 8099).
+- The API: `http://<host>:<port>/v1` (ports: halogen 8731, Strata 8080, Maya 8099).
 - The model id from `curl http://<host>:<port>/v1/models`.
 - How to switch engines: `ssh <user>@<host> sudo systemctl start <service>`.
 - The pi client example in [docs/03-engines.md](../../../docs/03-engines.md#use-with-pi), if they use pi.

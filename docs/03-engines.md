@@ -6,7 +6,6 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 | Service | Engine | Model | Port | Access | Playbook |
 |---------|--------|-------|------|--------|----------|
 | `strata` | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next IQ3_S, 128K context, or another preset (`strata_preset`) | 8080 | LAN, API key | `strata.yml` |
-| `gufo` | [gufo](https://github.com/gufo-org/gufo) (Podman) | Qwen3.8-Flash-Next UD-Q4_K_XL + MTP, or the abliterated v2 (`gufo_abliterated`) | 8081 | LAN, no key | `gufo.yml` |
 | `halogen` | [halogen](https://github.com/peonist-ai/halogen-flash-server) (Podman, closed-source EULA) | Qwen3.8-Flash-Next halogen v2 (4.16 bpw), or the abliterated r2 (`halogen_abliterated`) | 8731 | LAN, no key | `halogen.yml` |
 | `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS, or another model (`maya_model`) | 8099 | LAN, no key | `maya.yml` |
 
@@ -32,7 +31,6 @@ These examples come from the upstream versions linked below. They do not list ev
 | Engine | Additional upstream choices | Owl configuration |
 |--------|-----------------------------|-------------------|
 | [Strata](https://github.com/Niko1221/Strata/blob/v0.2.13/README.md#models) | Qwen3.6-35B-A3B; other Qwen Flash quants; DeepSeek-V4.1-Flash | `strata_presets` lists the models to set up. Read [Swap models](#swap-models). |
-| [gufo](https://github.com/gufo-org/gufo/blob/v0.33.0/README.md#models) | Qwen3.8-27B, DeepSeek V4 Flash, embeddings, speech, images and video | The role configures Qwen Flash only. |
 | [Maya](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MODELS.md) | GLM-5.3-Flash, full GLM-5.3, MiniMax-M3.1-Flash and Qwen Flash | `maya_models` lists the models to set up. Read [Swap models](#swap-models). |
 | [halogen](https://github.com/peonist-ai/halogen-flash-server/blob/v0.20.1/docs/NPU.md) | Small classifiers, embeddings, rerankers, moderation and other NPU models | `halogen_npu_models` selects the NPU models beside Qwen Flash. |
 
@@ -102,7 +100,7 @@ Set a model's context in tokens with `context`, for example
 | GLM-5.3-Flash | `glm-maya-xs`, `glm-maya-s` (`glm`), `glm-maya-s24` | Runs from memory |
 | GLM-5.3-Flash | `glm-maya-m`, `glm-maya-m-derisked`, `glm-maya-l`, `EXL3-3.05bpw`, `EXL3-4.05bpw`, `EXL3-sc_4.10bpw` | Reads experts from SSD |
 | GLM-5.3 (744B) | `GLM-5.3-Maya-XS`, `GLM-5.3-UD-IQ2_M` | Reads experts from SSD |
-| MiniMax-M3.1-Flash (non-commercial license) | `minimax-maya-xs` (`minimax`) | Runs from memory |
+| MiniMax-M3.1-Flash (non-commercial license) | `minimax-maya-xs` | Runs from memory |
 | MiniMax-M3.1-Flash (non-commercial license) | `minimax-maya-s` | Reads experts from SSD |
 | Qwen-3.8-Flash-Next | `cyber-frost`, `qwen-ud-iq2_xs` | Runs from memory |
 
@@ -162,8 +160,6 @@ All files come from Hugging Face. The engines pin the revisions, and Strata and 
 | Engine | Files | Repository |
 |--------|-------|------------|
 | Strata | Qwen3.8-Flash-Next IQ3_S (84 GB) | [ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF) |
-| gufo | UD-Q4_K_XL, MTP head, picture reader (113 GB) | [unsloth/Qwen3.8-Flash-Next-GGUF](https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF) |
-| gufo (`gufo_abliterated: true`) | Abliterated UD-Q4_K_XL v2 (112 GB) | [huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF](https://huggingface.co/huihui-ai/Huihui-Qwen3.8-Flash-Next-abliterated-v2-GGUF) |
 | halogen | v2 checkpoint and lookup table (about 120 GB) | [peonist-ai/halogen-qwen3.8-flash-next](https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next) |
 | halogen (`halogen_abliterated: true`) | Abliterated r2 checkpoint (about 89 GB) | [Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated](https://huggingface.co/Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated) |
 | Maya | Maya-XS (about 277 GB) | [peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF](https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF) |
@@ -192,7 +188,7 @@ The NPU models use about 8 GiB of memory more, and the Flash model is a little s
 
 ### Engine settings
 
-Each engine has an `<engine>_env` setting, for example `halogen_env` or `gufo_env`. Its entries go to the engine
+Each engine has an `<engine>_env` setting, for example `halogen_env` or `maya_env`. Its entries go to the engine
 as environment variables, with `-e` for a container and `Environment=` for a host service. For halogen, use the names in
 [halogen's flags](https://peonist.ai/halogen/docs/FLAGS/):
 

@@ -26,6 +26,18 @@
     name: maya
   register: maya_service
 
+# Every listed model stays on the SSD: a model the store has comes back when its files are missing or old.
+- name: Copy the Maya models from the store
+  ansible.builtin.shell: mkdir -p {{ maya_models_dir }} && {{ maya_pull }} --itemize-changes
+  vars:
+    maya_item: "{{ item }}"
+  loop: "{{ maya_stored.results | default([]) | selectattr('stat.exists', 'defined') | selectattr('stat.exists') | map(attribute='item') | list }}"
+  register: maya_copied
+  changed_when: maya_copied.stdout | length > 0
+  become: false
+  async: 21600
+  poll: 30
+
 # A setup uses the GPU, so maya stops first. It starts again at the end if it ran.
 # A model without its setup here, or without a complete copy in the store, is set up; the served model goes first.
 - name: Set up the new Maya models
@@ -76,7 +88,7 @@
       Description=Project Maya {{ maya_model }} API (port {{ maya_port }}, LAN, no key)
       After=network-online.target
       Wants=network-online.target
-      Conflicts=strata.service gufo.service halogen.service
+      Conflicts=strata.service halogen.service
 
       [Service]
       User={{ ansible_user }}

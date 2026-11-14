@@ -3,8 +3,6 @@
   ansible.builtin.import_playbook: ubuntu.yml
 - name: Set up Strata
   ansible.builtin.import_playbook: strata.yml
-- name: Set up gufo
-  ansible.builtin.import_playbook: gufo.yml
 - name: Set up Project Maya
   ansible.builtin.import_playbook: maya.yml
 - name: Set up halogen
