@@ -23,8 +23,7 @@ Run all Ansible commands from `ansible/`.
 ## Rules
 
 - Never delete anything under `~/models` on the machine by hand. The models are hundreds of GB.
-  A download that stops resumes when you run the playbook again. With a model store, the playbooks keep only the
-  served Maya and Strata models on the SSD, unless `model_cache_keep_all` is true.
+  A download that stops resumes when you run the playbook again.
 - Only one engine runs at a time. Switch with `sudo systemctl start <service>`; the units conflict.
 - Do not use `pkill -f <pattern>` over SSH. The pattern matches your own SSH command and kills it.
   Use `systemctl stop`, or a bracket pattern such as `pkill -f "[a]ria2c"`.

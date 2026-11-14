@@ -77,11 +77,10 @@ The model store is optional. Set `model_cache_nfs` to an NFS share in your host_
 The playbooks mount it at `/mnt/model-cache` and keep the files in `owl/<engine>` on the share.
 Each file then downloads from Hugging Face once, and a fresh machine gets its models from the share.
 
-- halogen and gufo copy their files from the share before the download, and save them to the share after.
-- Maya and Strata keep each model in `owl/maya/<name>` and `owl/strata/<name>`, and only the served one on the SSD.
-  A swap stops the engine, makes the SSD match the new model's folder on the share, and starts the engine.
-- Set `model_cache_keep_all: true` to keep every Maya model and Strata preset on the SSD. A swap then copies
-  nothing. Check the SSD space first: Owl's Maya models alone take about 820 GB.
+- Every model in your lists stays on the SSD, and the share is its backup. To use less SSD space, list fewer models.
+- Each engine copies its files from the share before the download or setup, and saves them to the share after.
+  Maya and Strata keep each model in its own folder, `owl/maya/<name>` and `owl/strata/<name>`.
+- A swap only restarts the engine on another model. It copies nothing.
 - The `.done` file marks a complete copy. A Maya or Strata model without it is set up again: the engine downloads
   only missing files.
 - The engines always run from the SSD: over 1 Gbps a model loads too slowly to run from the share.

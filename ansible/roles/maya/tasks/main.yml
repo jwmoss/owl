@@ -26,33 +26,22 @@
     name: maya
   register: maya_service
 
-- name: Compare the SSD with the served model in the store
-  ansible.builtin.command: "{{ maya_mirror }} --dry-run --itemize-changes"
-  register: maya_diff
-  changed_when: maya_diff.rc != 0 or maya_diff.stdout | length > 0
-  failed_when: false # a model not in the store yet: its setup below saves it
-  become: false
-  when: model_cache_nfs | length > 0
-
-# A setup, or a copy that changes the served model's files, stops maya first. It starts again at the end if it ran.
-# A copy of only the other models (model_cache_keep_all) leaves maya running.
+# A setup uses the GPU, so maya stops first. It starts again at the end if it ran.
 # A model without its setup here, or without a complete copy in the store, is set up; the served model goes first.
-- name: Set up and swap the Maya models
+- name: Set up the new Maya models
   vars:
     maya_new: >-
       {{ (maya_markers.results | rejectattr('stat.exists') | map(attribute='item') | list
       + maya_stored.results | default([]) | rejectattr('skipped', 'defined') | rejectattr('stat.exists')
       | map(attribute='item') | list) | unique }}
     maya_order: "{{ maya_new | select('equalto', maya_model) | list + maya_new | reject('equalto', maya_model) | list }}"
-  when: maya_new | length > 0 or maya_diff is changed
+  when: maya_new | length > 0
   block:
-    - name: Stop maya before the model files change
+    - name: Stop maya before the setup
       ansible.builtin.systemd_service:
         name: maya
         state: stopped
-      when: >-
-        maya_service.status.ActiveState == 'active' and (maya_new | length > 0
-        or maya_diff.stdout | default('') is search('^\S+\s+' ~ maya_model ~ '/', multiline=True))
+      when: maya_service.status.ActiveState == 'active'
 
     # Builds the HIP engine and downloads the model; Maya checks each shard by SHA-256 and skips files it has.
     # The setup writes a config named by the engine (maya-ds4-hip.json), so models on one engine overwrite it:
@@ -76,14 +65,6 @@
       async: 86400
       poll: 60
       loop: "{{ maya_order }}"
-
-    - name: Copy the served model to the SSD from the store
-      ansible.builtin.command: "{{ maya_mirror }}"
-      become: false
-      changed_when: true
-      async: 21600
-      poll: 30
-      when: model_cache_nfs | length > 0
 
 - name: Install the maya service
   register: maya_unit

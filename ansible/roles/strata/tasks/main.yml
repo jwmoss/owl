@@ -102,29 +102,6 @@
         state: started
       when: (default_engine ~ '.service') in (ansible_facts.services | default({}))
 
-- name: Copy the served preset to the SSD from the store
-  when: model_cache_nfs | length > 0
-  block:
-    - name: Compare the SSD with the served preset in the store
-      ansible.builtin.command: "{{ strata_mirror }} --dry-run --itemize-changes"
-      register: strata_diff
-      changed_when: strata_diff.stdout | length > 0
-      become: false
-
-    - name: Stop strata before its files change
-      ansible.builtin.systemd_service:
-        name: strata
-        state: stopped
-      when: strata_diff.stdout | length > 0 and 'strata.service' in ansible_facts.services
-
-    - name: Copy the served preset to the SSD, {{ strata_preset }}
-      ansible.builtin.command: "{{ strata_mirror }}"
-      become: false
-      changed_when: true
-      async: 21600
-      poll: 30
-      when: strata_diff.stdout | length > 0
-
 - name: Install the strata service
   register: strata_unit
   ansible.builtin.copy:
