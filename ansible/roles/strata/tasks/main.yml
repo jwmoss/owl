@@ -84,7 +84,7 @@
         cmd: >-
           {% if model_cache_nfs %}mkdir -p {{ strata_store }}/{{ item }} {{ strata_data_dir }} && {{ strata_pull }} && {% endif %}
           {{ strata_bin }} launch --family {{ strata_presets[item].family }} --model {{ strata_presets[item].model }}
-          --context {{ strata_presets[item].context | default(strata_context) }} --access lan --port {{ strata_port }}
+          --context {{ strata_presets[item].context | default(strata_context) }} --vision gpu --access lan --port {{ strata_port }}
           --save-preset {{ item }} --yes --no-tui
           && {{ strata_bin }} launch --stop --preset {{ item }}
           {% if model_cache_nfs %}&& {{ strata_push }}{% endif %}

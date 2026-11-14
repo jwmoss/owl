@@ -112,12 +112,13 @@ A model's `model` holds all the `--model` options of `maya.sh`. For DeepSeek's u
 
 Each `strata_presets` item names a `--family` and a `--model` of `strata launch`, and optionally a `context` and an `env`.
 Run `~/.local/bin/strata launch --model x --plan` on the machine to list the model names.
+Every preset reads pictures: the setup passes `--vision gpu`, so Strata gets each model's picture reader.
 
 | Preset | Model | Download |
 |--------|-------|----------|
 | `qwen` (default) | Qwen3.8-Flash-Next IQ3_S | 84 GB |
 | `qwen36` | Qwen3.6-35B-A3B UD-Q4_K_XL, reads pictures | 24 GB |
-| `coder` | Qwen3.8-Flash-Next Coder IQ1_M | 64 GB |
+| `coder` | Qwen3.8-Flash-Next Coder IQ1_M | 65 GB |
 | `swift` | Swift 1.5 IQ3_S, shorter thinking; [Swift Open License](https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF/blob/main/LICENSE) | 89 GB |
 
 Maya's [memory guide](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MEMORY.md) lists these options.
