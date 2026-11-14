@@ -55,9 +55,8 @@
         or maya_diff.stdout | default('') is search('^\S+\s+' ~ maya_model ~ '/', multiline=True))
 
     # Builds the HIP engine and downloads the model; Maya checks each shard by SHA-256 and skips files it has.
-    # The setup writes a config named by the engine (maya-ds4-hip.json), so models on one engine overwrite it.
-    # The marker is the model's own copy, named by the commit and the setup command. With a store, the setup takes the files the store has and saves the
-    # model to the store. Each model has its own folder, so a setup never saves another model's files.
+    # The setup writes a config named by the engine (maya-ds4-hip.json), so models on one engine overwrite it:
+    # the marker is the model's own copy. With a store, the setup takes the store's files first and saves after.
     - name: Set up the Maya models
       vars:
         maya_item: "{{ item }}"

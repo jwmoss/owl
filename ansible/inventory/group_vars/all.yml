@@ -24,7 +24,7 @@ models_dir: /home/{{ ansible_user }}/models
 
 # Optional model store on an NFS share, for example "tower:/mnt/user/huggingface". Set it in host_vars. Empty: no store.
 # With a store, Maya and Strata keep every model there, one folder each, and only the served model on the SSD.
-# A swap saves the old model to the store and copies the new one down, so each model downloads from Hugging Face once.
+# Each model is saved there after its setup, and a swap copies the new one down, so it downloads from Hugging Face once.
 model_cache_nfs: ""
 model_cache_dir: /mnt/model-cache
 # true: every Maya model and Strata preset stays on the SSD, so a swap copies nothing. false: only the served one.

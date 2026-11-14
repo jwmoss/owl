@@ -10,14 +10,14 @@
 - name: Install the Strata Terminal
   ansible.builtin.command: sh /tmp/strata-install.sh
   args:
-    creates: "/home/{{ ansible_user }}/.local/bin/strata"
+    creates: "{{ strata_bin }}"
   environment:
     STRATA_FEED: "https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}"
   become: false
 
 - name: Check the pinned Strata engine and control versions
   ansible.builtin.command: >-
-    /home/{{ ansible_user }}/.local/bin/strata update --check --json
+    {{ strata_bin }} update --check --json
     --feed https://github.com/Niko1221/Strata/releases/download/{{ strata_release }}
   become: false
   register: strata_update_check
@@ -100,9 +100,7 @@
       ansible.builtin.systemd_service:
         name: "{{ default_engine }}"
         state: started
-      when: >-
-        (default_engine ~ '.service')
-        in (ansible_facts.services | default({}))
+      when: (default_engine ~ '.service') in (ansible_facts.services | default({}))
 
 - name: Copy the served preset to the SSD from the store
   when: model_cache_nfs | length > 0
