@@ -33,7 +33,7 @@ default_engine: halogen
 
 
 # renovate: datasource=github-tags depName=mw00/project-maya
-maya_commit: "6651b5b1a3bf6fdff61f24ee2e5b331b1fd5b793" # v1.1.63
+maya_commit: "d93d1499021b98a39bede20d33368907f1ea4ad8" # v1.1.64
 maya_port: 8099
 # The Maya models, by name: the --model options of maya.sh, and optional context (tokens) and env for that model only.
 # maya_model is the one the maya service serves. Swap: ansible-playbook maya.yml -e maya_model=glm.
