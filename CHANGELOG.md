@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.0](https://github.com/jwmoss/owl/compare/v2.2.0...v2.3.0) (2026-11-16)
+
+
+### Features
+
+* **engines:** update dependency mw00/project-maya to v1.1.65 ([#65](https://github.com/jwmoss/owl/issues/65)) ([b244800](https://github.com/jwmoss/owl/commit/b244800ccfea8adf31617a59463c5874fbb30923))
+* **engines:** update https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next digest to e3b33d6 ([#64](https://github.com/jwmoss/owl/issues/64)) ([040575e](https://github.com/jwmoss/owl/commit/040575e34d46a56c35c44b714523de69a10637bc))
+
 ## [2.2.0](https://github.com/jwmoss/owl/compare/v2.1.0...v2.2.0) (2026-11-16)
 
 
