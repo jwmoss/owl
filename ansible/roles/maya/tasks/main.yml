@@ -104,7 +104,8 @@
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
       RestartSec=30
-      SuccessExitStatus=241 # maya.py stopped while it loads the model
+      # maya.py exits with 241 when it stops while it loads the model.
+      SuccessExitStatus=241
 
       [Install]
       WantedBy=multi-user.target

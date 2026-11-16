@@ -140,6 +140,8 @@
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
       RestartSec=30
+      # strata serve exits with 130 when it stops while it loads the model.
+      SuccessExitStatus=130
 
       [Install]
       WantedBy=multi-user.target

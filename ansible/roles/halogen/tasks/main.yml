@@ -115,7 +115,8 @@
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
       RestartSec=30
-      SuccessExitStatus=143 # podman stop: the container ends on SIGTERM
+      # podman stop ends the container with SIGTERM (143), or with SIGKILL (137) after 10 seconds.
+      SuccessExitStatus=137 143
 
       [Install]
       WantedBy=multi-user.target
