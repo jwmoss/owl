@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/jwmoss/owl/compare/v2.1.0...v2.2.0) (2026-11-16)
+
+
+### Features
+
+* **halogen:** read pictures with the vision file by default ([#62](https://github.com/jwmoss/owl/issues/62)) ([72e04cb](https://github.com/jwmoss/owl/commit/72e04cb9e148a8bb001da344eae84f314d2fe284))
+
 ## [2.1.0](https://github.com/jwmoss/owl/compare/v2.0.0...v2.1.0) (2026-11-15)
 
 
