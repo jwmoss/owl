@@ -54,6 +54,8 @@ halogen_abliterated: false
 halogen_abliterated_revision: "e7783c5822dfda2785a0f5b435abf54df89fe8ee" # r2, validated with the stock companions
 halogen_abliterated_sha256: "7bbac319851b500639462133085156b4f998dec562f511e65ca1c14d7af5163e"
 halogen_port: 8731
+# true: halogen reads pictures with the vision file beside the checkpoint (about 2 GiB more memory).
+halogen_vision: true
 # Small models on the NPU beside the Flash model, on the same port, for example
 # "decider-0.8b,qwen3-embedding-0.6b,qwen3-reranker-0.6b,qwen3guard-gen-0.6b,qwen3.5-2b" (about 8 GiB more memory).
 # halogen fetches them on its first start. Empty: no NPU. See https://peonist.ai/halogen/docs/NPU/

@@ -170,6 +170,11 @@ with the refusal direction from orcarouter's uncensored fine-tune transplanted i
 Speed and memory stay the same. The playbook pins the r2 revision, the one validated against the
 stock lookup table and tokenizer, and checks the file's SHA-256.
 
+halogen reads pictures with `halogen_vision: true`, the default. The playbook downloads the vision file
+(about 0.9 GB) with the checkpoint and passes it as `HALOGEN_VISION_TOWER`. It works with the abliterated build too.
+The vision file uses about 2 GiB of memory. Send a picture as a `data:` URL or as base64: halogen refuses `http(s)` URLs.
+Set `halogen_vision: false` for text only.
+
 ### halogen on the NPU
 
 halogen can serve small models on the NPU beside the Flash model on the GPU, on the same port.
@@ -237,7 +242,7 @@ Maya serves one model at a time and ignores the request's `id`, so the ids only 
       "apiKey": "<Strata API key>",
       "models": [
         { "id": "halogen-qwen3.8-flash-next", "name": "halogen-qwen3.8-flash-next",
-          "reasoning": true, "contextWindow": 262144, "maxTokens": 32768 },
+          "reasoning": true, "input": ["text", "image"], "contextWindow": 262144, "maxTokens": 32768 },
         { "id": "qwen3.8-flash-next-iq3_s", "name": "strata-qwen3.8-flash-next", "baseUrl": "http://<host>:8080/v1",
           "reasoning": true, "contextWindow": 131072, "maxTokens": 32768 },
         { "id": "glm-5.3-flash", "name": "owl-maya-glm-5.3-flash", "baseUrl": "http://<host>:8099/v1",
