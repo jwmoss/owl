@@ -97,6 +97,9 @@
       ExecStart=/usr/bin/podman run --rm --name halogen -p {{ halogen_port }}:8731 \
         --device /dev/kfd --device /dev/dri --group-add keep-groups --ipc=host --ulimit memlock=-1:-1 \
         -e HALOGEN_CHECKPOINT=/models/qwen38-flash-next-v2{{ '-abliterated' if halogen_abliterated else '' }}.hgn \
+      {% if halogen_vision %}
+        -e HALOGEN_VISION_TOWER=/models/qwen38-flash-next-vision.hgn \
+      {% endif %}
       {% for k, v in halogen_env.items() %}
         -e "{{ k }}={{ v }}" \
       {% endfor %}
