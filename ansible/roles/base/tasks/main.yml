@@ -45,6 +45,20 @@
   become: false
   when: "'~/.cache/huggingface/token' | expanduser is file"
 
+# An engine unit that fails 4 times in 15 minutes runs owl-fallback@<unit>, which starts the engine enabled at boot.
+- name: Install the fallback script
+  ansible.builtin.template:
+    src: owl-fallback.j2
+    dest: /usr/local/bin/owl-fallback
+    mode: "0755"
+
+- name: Install the fallback unit
+  ansible.builtin.template:
+    src: owl-fallback@.service.j2
+    dest: /etc/systemd/system/owl-fallback@.service
+    mode: "0644"
+  notify: Reload systemd
+
 # The GPU driver frees an engine's memory some seconds after its process stops.
 # Each engine service runs this first, so a new engine does not start out of memory.
 - name: Install the wait-for-free-memory script

@@ -32,6 +32,7 @@ model_cache_dir: /mnt/model-cache
 
 # The engine that starts at boot: strata, maya or halogen. Each one uses almost all memory, so only one runs.
 default_engine: halogen
+engines: [strata, maya, halogen] # every engine Owl can install
 
 
 # renovate: datasource=github-tags depName=mw00/project-maya

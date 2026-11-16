@@ -1,0 +1,7 @@
+#!/bin/sh
+# Start the engine that is enabled at boot, unless it is the one that failed ($1, for example maya.service).
+for e in {{ engines | join(' ') }}; do
+  [ "$e.service" = "$1" ] && continue
+  systemctl is-enabled -q "$e" 2>/dev/null && exec systemctl start --no-block "$e"
+done
+echo "owl-fallback: $1 failed and no other engine is enabled at boot" >&2

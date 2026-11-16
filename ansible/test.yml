@@ -5,7 +5,6 @@
   hosts: all
   become: true
   vars:
-    engines: [strata, halogen, maya]
     auth: "{{ {'Authorization': 'Bearer ' ~ (strata_key.stdout | regex_search('sk-strata-\\S+'))} if engine == 'strata' else {} }}"
   tasks:
     - name: Find the installed engines

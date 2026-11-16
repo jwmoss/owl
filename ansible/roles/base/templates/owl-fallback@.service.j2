@@ -1,0 +1,6 @@
+[Unit]
+Description=Start the boot engine after %i failed
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/owl-fallback %i

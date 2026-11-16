@@ -85,6 +85,7 @@ can do: the BIOS, the Ubuntu install and the sudo password.
 |----------|------|
 | `ubuntu.yml` | Build tools, passwordless sudo, GPU groups, Hugging Face CLI, ROCm, GPU memory limit |
 | `<engine>.yml` | One engine, its model and its systemd service |
+| `engine.yml` | Switches the engine that runs and starts at boot: `-e default_engine=maya`. Downloads nothing. See [switch engines](docs/03-engines.md#switch-engines) |
 | `site.yml` | `ubuntu.yml` and all engines (about 600 GB of downloads) |
 | `tailscale.yml` | Optional. Installs [Tailscale](https://tailscale.com) and joins your tailnet. `site.yml` does not run it |
 | `test.yml` | Starts each installed engine, sends one chat request and checks the answer |
