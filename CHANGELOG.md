@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.0.0](https://github.com/jwmoss/owl/compare/v2.3.0...v3.0.0) (2026-11-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* serve every engine on one port, with HTTPS through Tailscale Serve ([#67](https://github.com/jwmoss/owl/issues/67))
+
+### Features
+
+* serve every engine on one port, with HTTPS through Tailscale Serve ([#67](https://github.com/jwmoss/owl/issues/67)) ([6800e32](https://github.com/jwmoss/owl/commit/6800e3260750da2d6555bdc61c97ea45ac61f569))
+* switch the default engine with engine.yml, fall back to it on failure ([#68](https://github.com/jwmoss/owl/issues/68)) ([b2bb746](https://github.com/jwmoss/owl/commit/b2bb74609555ae4c2a4268265a1c1d79232ee208))
+
 ## [2.3.0](https://github.com/jwmoss/owl/compare/v2.2.0...v2.3.0) (2026-11-16)
 
 
