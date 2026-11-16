@@ -7,6 +7,9 @@ rocm_version: "7.14.1"
 rocm_sha256: "c40e8f2bd6630a7d11557c762b99c6fa8afb04c9bd0e51ed1675ee1ca24afb00"
 ttm_pages_limit: 29637703 # about 113 GiB of 4 KiB pages
 
+# Every engine serves its API on this port. Only one engine runs at a time.
+engine_port: 8731
+
 # renovate: datasource=github-releases depName=Niko1221/Strata
 strata_release: "v0.2.14"
 # The Strata models, by preset name: a --family and --model of strata launch, and optional context and env.
@@ -15,7 +18,6 @@ strata_presets:
   qwen: { family: qwen, model: iq3_s } # Qwen3.8-Flash-Next, the ISTA-DAS quant
 strata_preset: qwen
 strata_context: 128k
-strata_port: 8080
 strata_env: {} # environment variables for every Strata preset, for example { NAME: "value" }; a preset's env adds to them
 
 
@@ -34,7 +36,6 @@ default_engine: halogen
 
 # renovate: datasource=github-tags depName=mw00/project-maya
 maya_commit: "c81fab6c9d63cf69b928f92460e0a662b28aa9ec" # v1.1.65
-maya_port: 8099
 # The Maya models, by name: the --model options of maya.sh, and optional context (tokens) and env for that model only.
 # maya_model is the one the maya service serves. Swap: ansible-playbook maya.yml -e maya_model=glm.
 maya_models:
@@ -53,7 +54,6 @@ halogen_weights_revision: "e3b33d6422216419d46434c2d9a64d82a9654d08" # main
 halogen_abliterated: false
 halogen_abliterated_revision: "e7783c5822dfda2785a0f5b435abf54df89fe8ee" # r2, validated with the stock companions
 halogen_abliterated_sha256: "7bbac319851b500639462133085156b4f998dec562f511e65ca1c14d7af5163e"
-halogen_port: 8731
 # true: halogen reads pictures with the vision file beside the checkpoint (about 2 GiB more memory).
 halogen_vision: true
 # Small models on the NPU beside the Flash model, on the same port, for example
@@ -70,3 +70,6 @@ tailscale_version: "v1.104.7"
 # Ansible logs the machine in with the auth key in this file on your computer, outside the repo.
 # Make a one-off key in the Tailscale admin console. No file: the playbook shows a login URL and waits.
 tailscale_authkey: "{{ lookup('ansible.builtin.file', '~/.config/tailscale/authkey', errors='ignore') | default('', true) }}"
+# true: Tailscale Serve gives the engine port an HTTPS address, https://<machine>.<tailnet>.ts.net/v1.
+# Turn on HTTPS certificates in the Tailscale admin console first (DNS page).
+tailscale_serve: true

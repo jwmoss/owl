@@ -80,7 +80,7 @@ A second run of any playbook must show `changed=0` (or only the download checks)
 
 Give them:
 
-- The API: `http://<host>:<port>/v1` (ports: halogen 8731, Strata 8080, Maya 8099).
+- The API: `http://<host>:8731/v1` for every engine, or `https://<machine>.<tailnet>.ts.net/v1` with `tailscale.yml`.
 - The model id from `curl http://<host>:<port>/v1/models`.
 - How to switch engines: `ssh <user>@<host> sudo systemctl start <service>`.
 - The pi client example in [docs/03-engines.md](../../../docs/03-engines.md#use-with-pi), if they use pi.

@@ -85,7 +85,7 @@
     mode: "0644"
     content: |
       [Unit]
-      Description=Project Maya {{ maya_model }} API (port {{ maya_port }}, LAN, no key)
+      Description=Project Maya {{ maya_model }} API (port {{ engine_port }}, LAN, no key)
       After=network-online.target
       Wants=network-online.target
       Conflicts=strata.service halogen.service
@@ -97,7 +97,7 @@
       {% endfor %}
       WorkingDirectory={{ maya_dir }}
       ExecStart={{ maya_dir }}/.venv/bin/python {{ maya_dir }}/maya.py --config {{ maya_dir }}/{{ maya_marker }} \
-        --port {{ maya_port }} --host 0.0.0.0
+        --port {{ engine_port }} --host 0.0.0.0
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
       RestartSec=30
