@@ -75,3 +75,14 @@
       retries: 120
       delay: 5
       changed_when: false
+
+# The first request to the address waits a few seconds while Tailscale gets the certificate.
+- name: Serve the engine port over HTTPS on the tailnet
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: >-
+      set -o pipefail; tailscale serve status | grep -q 'proxy http://127.0.0.1:{{ engine_port }}$'
+      || tailscale serve --bg --yes --https=443 http://127.0.0.1:{{ engine_port }}
+  register: tailscale_serve_out
+  changed_when: "'Serve started' in tailscale_serve_out.stdout"
+  when: tailscale_serve

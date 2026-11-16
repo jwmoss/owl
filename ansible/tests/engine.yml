@@ -6,7 +6,7 @@
 
 - name: "Wait for the model to load: {{ engine }}"
   ansible.builtin.uri:
-    url: "http://127.0.0.1:{{ ports[engine] }}/health"
+    url: "http://127.0.0.1:{{ engine_port }}/health"
   register: health
   until: >-
     health.status == 200 and (health.json.loaded | default(true))
@@ -16,13 +16,13 @@
 
 - name: "Read the model name: {{ engine }}"
   ansible.builtin.uri:
-    url: "http://127.0.0.1:{{ ports[engine] }}/v1/models"
+    url: "http://127.0.0.1:{{ engine_port }}/v1/models"
     headers: "{{ auth }}"
   register: models
 
 - name: "Send a chat request: {{ engine }}"
   ansible.builtin.uri:
-    url: "http://127.0.0.1:{{ ports[engine] }}/v1/chat/completions"
+    url: "http://127.0.0.1:{{ engine_port }}/v1/chat/completions"
     method: POST
     headers: "{{ auth }}"
     body_format: json

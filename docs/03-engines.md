@@ -5,9 +5,13 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 
 | Service | Engine | Model | Port | Access | Playbook |
 |---------|--------|-------|------|--------|----------|
-| `strata` | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next IQ3_S, 128K context, or another preset (`strata_preset`) | 8080 | LAN, API key | `strata.yml` |
+| `strata` | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next IQ3_S, 128K context, or another preset (`strata_preset`) | 8731 | LAN, API key | `strata.yml` |
 | `halogen` | [halogen](https://github.com/peonist-ai/halogen-flash-server) (Podman, closed-source EULA) | Qwen3.8-Flash-Next halogen v2 (4.16 bpw), or the abliterated r2 (`halogen_abliterated`) | 8731 | LAN, no key | `halogen.yml` |
-| `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS or GLM-5.3-Flash Maya-S; `maya_model` picks one | 8099 | LAN, no key | `maya.yml` |
+| `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS or GLM-5.3-Flash Maya-S; `maya_model` picks one | 8731 | LAN, no key | `maya.yml` |
+
+All engines use one port, `engine_port` (8731). The running engine answers there.
+With `tailscale.yml`, Tailscale Serve also gives it an HTTPS address on the tailnet: `https://<machine>.<tailnet>.ts.net/v1`.
+Turn on HTTPS certificates in the Tailscale admin console (DNS page) first.
 
 The table shows Owl's configured models. Read [group_vars/all.yml](../ansible/inventory/group_vars/all.yml) for the exact engine versions and model revisions.
 
@@ -230,22 +234,22 @@ ansible-playbook test.yml -e '{"engines": ["halogen"]}'
 ## Use with pi
 
 [pi](https://github.com/earendil-works/pi) can use all engines through one `owl` provider in `~/.pi/agent/models.json`.
-Each model sets the `baseUrl` of its engine. Strata needs its API key; the other engines ignore it.
+All engines share one address, so a model answers only while its engine runs. Strata needs its API key; the other engines ignore it.
 Maya serves one model at a time and ignores the request's `id`, so the ids only tell its models apart in pi.
 
 ```json
 {
   "providers": {
     "owl": {
-      "baseUrl": "http://<host>:8731/v1",
+      "baseUrl": "https://<machine>.<tailnet>.ts.net/v1",
       "api": "openai-completions",
       "apiKey": "<Strata API key>",
       "models": [
         { "id": "halogen-qwen3.8-flash-next", "name": "halogen-qwen3.8-flash-next",
           "reasoning": true, "input": ["text", "image"], "contextWindow": 262144, "maxTokens": 32768 },
-        { "id": "qwen3.8-flash-next-iq3_s", "name": "strata-qwen3.8-flash-next", "baseUrl": "http://<host>:8080/v1",
+        { "id": "qwen3.8-flash-next-iq3_s", "name": "strata-qwen3.8-flash-next",
           "reasoning": true, "contextWindow": 131072, "maxTokens": 32768 },
-        { "id": "glm-5.3-flash", "name": "owl-maya-glm-5.3-flash", "baseUrl": "http://<host>:8099/v1",
+        { "id": "glm-5.3-flash", "name": "owl-maya-glm-5.3-flash",
           "reasoning": true, "contextWindow": 32768, "maxTokens": 16384 }
       ]
     }

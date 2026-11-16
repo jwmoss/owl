@@ -11,7 +11,7 @@
 
 - name: Send requests to the configured standard NPU models
   ansible.builtin.uri:
-    url: "http://127.0.0.1:{{ halogen_port }}/v1/{{ item.endpoint }}"
+    url: "http://127.0.0.1:{{ engine_port }}/v1/{{ item.endpoint }}"
     method: POST
     body_format: json
     body: "{{ item.body | combine({'model': item.model}) }}"
