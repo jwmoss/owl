@@ -87,6 +87,9 @@
       After=halogen-fabric-clock.service
       {% endif %}
       Conflicts=strata.service maya.service
+      OnFailure=owl-fallback@%n.service
+      StartLimitIntervalSec=900
+      StartLimitBurst=4
 
       [Service]
       User={{ ansible_user }}
@@ -112,6 +115,8 @@
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
       RestartSec=30
+      # podman stop ends the container with SIGTERM (143), or with SIGKILL (137) after 10 seconds.
+      SuccessExitStatus=137 143
 
       [Install]
       WantedBy=multi-user.target

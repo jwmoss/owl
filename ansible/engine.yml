@@ -1,0 +1,27 @@
+---
+# Set the engine that starts at boot, and start it: ansible-playbook engine.yml -e default_engine=maya
+# It downloads and sets up nothing. To keep the choice, set default_engine in your host_vars.
+- name: Set the default engine
+  hosts: all
+  become: true
+  tasks:
+    - name: Read the services
+      ansible.builtin.service_facts:
+
+    - name: Require an installed default engine
+      ansible.builtin.assert:
+        that: (default_engine ~ '.service') in ansible_facts.services
+        fail_msg: "{{ default_engine }} is not installed. Run {{ default_engine }}.yml first."
+
+    - name: Enable only the default engine at boot
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        enabled: "{{ item == default_engine }}"
+      loop: "{{ engines }}"
+      when: (item ~ '.service') in ansible_facts.services
+
+    # The units conflict, so this stops the engine that runs now.
+    - name: Start the default engine
+      ansible.builtin.systemd_service:
+        name: "{{ default_engine }}"
+        state: started

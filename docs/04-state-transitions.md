@@ -26,7 +26,7 @@ Report each state separately. A marker file records an earlier completed task; i
 | Strata upgrade: `roles/strata` | Feed current → no action; update available → stop installed engines → update/test → restore default. | The `always` block attempts restoration on success and task failure. The original failure still propagates. |
 | Strata profile: `roles/strata` | Profile absent → launch/download/save → stop temporary server → install service. | An existing profile skips setup even if model, context, or port settings change. |
 | Unit configuration: all engine roles | Unit missing/changed → write → daemon reload → enable default → start/restart default. | A changed non-default unit does not restart its running process. |
-| Boot selection: all engine roles | Default selected → its unit enabled; other roles disable their units when those roles run. | Changing `default_engine` does not reconcile roles that the user does not run. |
+| Boot selection: all engine roles | Default selected → its unit enabled; other roles disable their units when those roles run. | `engine.yml` enables only the default and starts it, with no setup. |
 | Runtime switch: unit `Conflicts=` and `owl-wait-memory` | Engine A active → A stops → memory releases → B starts → model loads. | Memory wait times out after about 80 seconds. Systemd retries failures after 30 seconds. |
 | Container lifecycle: halogen unit | Image available/pulled → container starts → container stops → container removed. | Images persist. Linger keeps the rootless runtime available after logout. |
 | Test selection: `test.yml` | Requested names → installed subset → nonempty assertion → tests. | Missing services are skipped. A nonempty subset can pass without testing every requested name. |

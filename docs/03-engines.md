@@ -15,7 +15,22 @@ Turn on HTTPS certificates in the Tailscale admin console (DNS page) first.
 
 The table shows Owl's configured models. Read [group_vars/all.yml](../ansible/inventory/group_vars/all.yml) for the exact engine versions and model revisions.
 
-`halogen` starts at boot. To change that, set `default_engine` in `ansible/inventory/group_vars/all.yml`.
+## Switch engines
+
+`default_engine` (`halogen`) is the engine that starts at boot. Run these from `ansible/` after the setup:
+
+```sh
+ansible-playbook engine.yml -e default_engine=maya     # maya starts now and at boot; the engine that runs stops
+ansible-playbook engine.yml                            # back to default_engine from your settings
+ansible-playbook maya.yml -e maya_model=deepseek       # Maya serves another of its models
+```
+
+`engine.yml` downloads and sets up nothing, so it takes only the model's load time.
+To keep a choice, set `default_engine` or `maya_model` in `ansible/inventory/host_vars/<host>.yml`.
+Without that, the next run of an engine's playbook goes back to your settings.
+
+If an engine fails 4 times in 15 minutes, systemd starts the engine that is enabled at boot.
+Read why on the machine: `journalctl -u <engine>`. Clear the failure with `sudo systemctl reset-failed <engine>`.
 
 Only Strata has an API key. The other engines are open to your network without a key, so run them only on a trusted network.
 
@@ -51,7 +66,7 @@ Set the lists and the served model in `ansible/inventory/group_vars/all.yml`:
 | Maya | `maya_models` | `maya_model` | `~/models/maya`, passed as `--models-dir` |
 | Strata | `strata_presets` | `strata_preset` | `~/models/strata`, passed as `STRATA_DATA_DIR` |
 
-Swap the served model with one command. If the engine runs, the playbook restarts it with the new model.
+Swap the served model with one command. If the engine runs, the playbook restarts it with the new model. A swap copies and downloads nothing.
 
 ```sh
 ansible-playbook maya.yml -e maya_model=glm

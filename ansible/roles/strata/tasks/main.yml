@@ -73,7 +73,7 @@
       ansible.builtin.systemd_service:
         name: "{{ item }}"
         state: stopped
-      loop: [strata, maya, halogen]
+      loop: "{{ engines }}"
       when: (item ~ '.service') in ansible_facts.services
 
     - name: Update Strata from the pinned signed feed
@@ -125,6 +125,9 @@
       After=network-online.target
       Wants=network-online.target
       Conflicts=maya.service halogen.service
+      OnFailure=owl-fallback@%n.service
+      StartLimitIntervalSec=900
+      StartLimitBurst=4
 
       [Service]
       User={{ ansible_user }}
@@ -137,6 +140,8 @@
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
       RestartSec=30
+      # strata serve exits with 130 when it stops while it loads the model.
+      SuccessExitStatus=130
 
       [Install]
       WantedBy=multi-user.target

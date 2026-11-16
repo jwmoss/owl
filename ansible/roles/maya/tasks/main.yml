@@ -89,6 +89,9 @@
       After=network-online.target
       Wants=network-online.target
       Conflicts=strata.service halogen.service
+      OnFailure=owl-fallback@%n.service
+      StartLimitIntervalSec=900
+      StartLimitBurst=4
 
       [Service]
       User={{ ansible_user }}
@@ -101,6 +104,8 @@
       ExecStartPre=/usr/local/bin/owl-wait-memory
       Restart=on-failure
       RestartSec=30
+      # maya.py exits with 241 when it stops while it loads the model.
+      SuccessExitStatus=241
 
       [Install]
       WantedBy=multi-user.target
