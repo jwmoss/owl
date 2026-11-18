@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.1.0](https://github.com/jwmoss/owl/compare/v3.0.0...v3.1.0) (2026-11-18)
+
+
+### Features
+
+* **engines:** update dependency mw00/project-maya to v1.1.66 ([#73](https://github.com/jwmoss/owl/issues/73)) ([fe8d93d](https://github.com/jwmoss/owl/commit/fe8d93d69ddfa9a91e03f34b7ed3d83db02c0ca4))
+* **engines:** update dependency niko1221/strata to v0.2.15 ([#71](https://github.com/jwmoss/owl/issues/71)) ([2906a4c](https://github.com/jwmoss/owl/commit/2906a4cbb8bbe459593183959bf0c2b72f30a576))
+* **engines:** update ghcr.io/peonist-ai/halogen-flash-server docker tag to v0.20.6 ([#72](https://github.com/jwmoss/owl/issues/72)) ([95f71a2](https://github.com/jwmoss/owl/commit/95f71a29648bdd9e5313432c9495f4d27857c65f))
+* **engines:** update https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next digest to 5c72aef ([#70](https://github.com/jwmoss/owl/issues/70)) ([df5a251](https://github.com/jwmoss/owl/commit/df5a251352802287c176b2a066f57aa9058e1a92))
+
 ## [3.0.0](https://github.com/jwmoss/owl/compare/v2.3.0...v3.0.0) (2026-11-16)
 
 
