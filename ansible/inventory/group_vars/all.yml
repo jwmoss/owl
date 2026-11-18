@@ -50,7 +50,7 @@ maya_vram_reserve_mib: 16384
 # renovate: datasource=docker depName=ghcr.io/peonist-ai/halogen-flash-server
 halogen_image: "ghcr.io/peonist-ai/halogen-flash-server:0.20.5"
 # renovate: datasource=git-refs depName=https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next
-halogen_weights_revision: "e3b33d6422216419d46434c2d9a64d82a9654d08" # main
+halogen_weights_revision: "5c72aeff67617168b2a10e707e1477de6a1adb47" # main
 # true: Quat3rnion's uncensored v2 (about 89 GB more on disk). Same speed, refusals removed.
 halogen_abliterated: false
 halogen_abliterated_revision: "e7783c5822dfda2785a0f5b435abf54df89fe8ee" # r2, validated with the stock companions
