@@ -48,7 +48,7 @@ maya_env: {} # environment variables for every Maya model, for example { NAME: "
 maya_vram_reserve_mib: 16384
 
 # renovate: datasource=docker depName=ghcr.io/peonist-ai/halogen-flash-server
-halogen_image: "ghcr.io/peonist-ai/halogen-flash-server:0.20.6"
+halogen_image: "ghcr.io/peonist-ai/halogen-flash-server:0.20.7"
 # renovate: datasource=git-refs depName=https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next
 halogen_weights_revision: "05ec74b75cd68c4d6486d15825f2fc73b2ffe304" # main
 # true: Quat3rnion's uncensored v2 (about 89 GB more on disk). Same speed, refusals removed.
