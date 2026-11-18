@@ -15,7 +15,7 @@
   ansible.builtin.command:
     cmd: >-
       hf download peonist-ai/halogen-qwen3.8-flash-next --revision {{ halogen_weights_revision }}
-      --exclude "*w4b*" --exclude "*ht43*" --local-dir {{ models_dir }}/halogen
+      --exclude "*w4b*" --exclude "*ht4*" --local-dir {{ models_dir }}/halogen
   environment:
     PATH: "/home/{{ ansible_user }}/.local/bin:{{ ansible_env.PATH }}"
     HF_HUB_DISABLE_XET: "1" # Xet downloads stalled in testing; plain HTTP does not
@@ -73,26 +73,14 @@
 
 # Closed-source engine under the Peonist EULA (free, no telemetry). Without HALOGEN_DOWNLOAD it opens no outbound connections.
 # With NPU models it gets HALOGEN_DOWNLOAD and a writable volume to fetch them into models_dir/halogen/npu (skips files it has).
-- name: Install the halogen service
-  register: halogen_unit
-  ansible.builtin.copy:
-    dest: /etc/systemd/system/halogen.service
-    mode: "0644"
-    content: |
-      [Unit]
-      Description=halogen Qwen3.8-Flash-Next API (port {{ engine_port }})
-      After=network-online.target
-      Wants=network-online.target
-      {% if halogen_npu_models %}
-      After=halogen-fabric-clock.service
-      {% endif %}
-      Conflicts=strata.service maya.service
-      OnFailure=owl-fallback@%n.service
-      StartLimitIntervalSec=900
-      StartLimitBurst=4
-
-      [Service]
-      User={{ ansible_user }}
+- name: Install and start the halogen service
+  ansible.builtin.include_role:
+    name: base
+    tasks_from: engine_unit
+  vars:
+    base_engine: halogen
+    base_engine_description: halogen Qwen3.8-Flash-Next API (port {{ engine_port }})
+    base_engine_service: |
       {% if halogen_npu_models %}
       # The NPU pins its models in memory; a service's default memlock limit is 8 MiB.
       LimitMEMLOCK=infinity
@@ -112,19 +100,5 @@
       {% endif %}
         -v {{ models_dir }}/halogen:/models{{ '' if halogen_npu_models else ':ro' }} {{ halogen_image }}
       ExecStop=/usr/bin/podman stop halogen
-      ExecStartPre=/usr/local/bin/owl-wait-memory
-      Restart=on-failure
-      RestartSec=30
       # podman stop ends the container with SIGTERM (143), or with SIGKILL (137) after 10 seconds.
       SuccessExitStatus=137 143
-
-      [Install]
-      WantedBy=multi-user.target
-
-# Restart the default engine when its unit changes (a new image or setting), else make sure it runs.
-- name: Set the halogen service state
-  ansible.builtin.systemd_service:
-    name: halogen
-    enabled: "{{ default_engine == 'halogen' }}"
-    state: "{{ ('restarted' if halogen_unit is changed else 'started') if default_engine == 'halogen' else omit }}"
-    daemon_reload: true

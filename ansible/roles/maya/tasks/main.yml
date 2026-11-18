@@ -16,7 +16,7 @@
 
 - name: Find the Maya models with a complete copy in the store
   ansible.builtin.stat:
-    path: "{{ maya_store }}/{{ item }}/.done"
+    path: "{{ model_cache_dir }}/owl/maya/{{ item }}/.done"
   loop: "{{ maya_models.keys() | list }}"
   register: maya_stored
   when: model_cache_nfs | length > 0
@@ -28,15 +28,13 @@
 
 # Every listed model stays on the SSD: a model the store has comes back when its files are missing or old.
 - name: Copy the Maya models from the store
-  ansible.builtin.shell: mkdir -p {{ maya_models_dir }} && {{ maya_pull }} --itemize-changes
+  ansible.builtin.include_role:
+    name: model_cache
+    tasks_from: pull
   vars:
-    maya_item: "{{ item }}"
-  loop: "{{ maya_stored.results | default([]) | selectattr('stat.exists', 'defined') | selectattr('stat.exists') | map(attribute='item') | list }}"
-  register: maya_copied
-  changed_when: maya_copied.stdout | length > 0
-  become: false
-  async: 21600
-  poll: 30
+    model_cache_engine: maya/{{ item }}
+  loop: "{{ maya_models.keys() | list }}"
+  when: model_cache_nfs | length > 0
 
 # A setup uses the GPU, so maya stops first. It starts again at the end if it ran.
 # A model without its setup here, or without a complete copy in the store, is set up; the served model goes first.
@@ -57,17 +55,15 @@
 
     # Builds the HIP engine and downloads the model; Maya checks each shard by SHA-256 and skips files it has.
     # The setup writes a config named by the engine (maya-ds4-hip.json), so models on one engine overwrite it:
-    # the marker is the model's own copy. With a store, the setup takes the store's files first and saves after.
+    # the marker is the model's own copy.
     - name: Set up the Maya models
       vars:
         maya_item: "{{ item }}"
       ansible.builtin.shell:
         cmd: >-
-          {% if model_cache_nfs %}mkdir -p {{ maya_store }}/{{ item }} {{ maya_models_dir }} && {{ maya_pull }} && {% endif %}
           {{ maya_setup }}
           && for f in $(ls -t maya-*.json); do grep -q '{{ maya_models_dir }}/' "$f" && cp "$f" {{ maya_marker }} && break; done
           && test -f {{ maya_marker }}
-          {% if model_cache_nfs %}&& {{ maya_push }}{% endif %}
         chdir: "{{ maya_dir }}"
       environment:
         ROCM_PATH: /opt/rocm
@@ -78,49 +74,35 @@
       poll: 60
       loop: "{{ maya_order }}"
 
-- name: Install the maya service
-  register: maya_unit
-  ansible.builtin.copy:
-    dest: /etc/systemd/system/maya.service
-    mode: "0644"
-    content: |
-      [Unit]
-      Description=Project Maya {{ maya_model }} API (port {{ engine_port }}, LAN, no key)
-      After=network-online.target
-      Wants=network-online.target
-      Conflicts=strata.service halogen.service
-      OnFailure=owl-fallback@%n.service
-      StartLimitIntervalSec=900
-      StartLimitBurst=4
+    - name: Save the new Maya models to the store
+      ansible.builtin.include_role:
+        name: model_cache
+        tasks_from: push
+      vars:
+        model_cache_engine: maya/{{ item }}
+      loop: "{{ maya_order }}"
+      when: model_cache_nfs | length > 0
 
-      [Service]
-      User={{ ansible_user }}
+- name: Install and start the maya service
+  ansible.builtin.include_role:
+    name: base
+    tasks_from: engine_unit
+  vars:
+    base_engine: maya
+    base_engine_description: Project Maya {{ maya_model }} API (port {{ engine_port }}, LAN, no key)
+    base_engine_service: |
       {% for k, v in (maya_env | combine(maya_models[maya_model].env | default({}))).items() %}
       Environment="{{ k }}={{ v }}"
       {% endfor %}
       WorkingDirectory={{ maya_dir }}
       ExecStart={{ maya_dir }}/.venv/bin/python {{ maya_dir }}/maya.py --config {{ maya_dir }}/{{ maya_marker }} \
         --port {{ engine_port }} --host 0.0.0.0
-      ExecStartPre=/usr/local/bin/owl-wait-memory
-      Restart=on-failure
-      RestartSec=30
       # maya.py exits with 241 when it stops while it loads the model.
       SuccessExitStatus=241
-
-      [Install]
-      WantedBy=multi-user.target
-
-# Restart the default engine when its unit changes (a new image or setting), else make sure it runs.
-- name: Set the maya service state
-  ansible.builtin.systemd_service:
-    name: maya
-    enabled: "{{ default_engine == 'maya' }}"
-    state: "{{ ('restarted' if maya_unit is changed else 'started') if default_engine == 'maya' else omit }}"
-    daemon_reload: true
 
 # A maya that ran before the playbook runs again, on the new model when it changed.
 - name: Start maya again if it ran before
   ansible.builtin.systemd_service:
     name: maya
-    state: "{{ 'restarted' if maya_unit is changed else 'started' }}"
+    state: "{{ 'restarted' if base_engine_unit is changed else 'started' }}"
   when: default_engine != 'maya' and maya_service.status.ActiveState == 'active'
