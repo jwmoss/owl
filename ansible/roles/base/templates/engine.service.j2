@@ -1,0 +1,17 @@
+[Unit]
+Description={{ base_engine_description }}
+After=network-online.target halogen-fabric-clock.service
+Wants=network-online.target
+Conflicts={{ engines | reject('equalto', base_engine) | map('regex_replace', '$', '.service') | join(' ') }}
+OnFailure=owl-fallback@%n.service
+StartLimitIntervalSec=900
+StartLimitBurst=4
+
+[Service]
+User={{ ansible_user }}
+ExecStartPre=/usr/local/bin/owl-wait-memory
+Restart=on-failure
+RestartSec=30
+{{ base_engine_service }}
+[Install]
+WantedBy=multi-user.target

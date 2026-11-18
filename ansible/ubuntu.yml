@@ -1,5 +1,5 @@
 ---
-# Run after a fresh Ubuntu Server 26.04 install (docs/02-ubuntu-install.md).
+# Run after a fresh Ubuntu Server 26.04 install (docs/01-ubuntu-install.md).
 - name: Prepare Ubuntu for the engines
   hosts: all
   become: true

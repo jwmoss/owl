@@ -7,15 +7,12 @@
   vars:
     auth: "{{ {'Authorization': 'Bearer ' ~ (strata_key.stdout | regex_search('sk-strata-\\S+'))} if engine == 'strata' else {} }}"
   tasks:
-    - name: Find the installed engines
-      ansible.builtin.find:
-        paths: /etc/systemd/system
-        patterns: "{{ engines | map('regex_replace', '$', '.service') | list }}"
-      register: units
+    - name: Read the services
+      ansible.builtin.service_facts:
 
     - name: Keep the installed engines
       ansible.builtin.set_fact:
-        installed: "{{ engines | select('in', units.files | map(attribute='path') | map('basename') | map('regex_replace', '[.]service$', '') | list) | list }}"
+        installed: "{{ engines | select('in', ansible_facts.services.keys() | map('replace', '.service', '') | list) | list }}"
 
     - name: Require at least one installed engine
       ansible.builtin.assert:

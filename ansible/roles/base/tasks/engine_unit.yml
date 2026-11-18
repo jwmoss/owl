@@ -1,0 +1,16 @@
+---
+# Each engine role includes this with base_engine, base_engine_description and base_engine_service (its [Service] lines).
+- name: Install the engine service, {{ base_engine }}
+  ansible.builtin.template:
+    src: engine.service.j2
+    dest: /etc/systemd/system/{{ base_engine }}.service
+    mode: "0644"
+  register: base_engine_unit
+
+# Restart the default engine when its unit changes (a new image or setting), else make sure it runs.
+- name: Set the engine service state, {{ base_engine }}
+  ansible.builtin.systemd_service:
+    name: "{{ base_engine }}"
+    enabled: "{{ default_engine == base_engine }}"
+    state: "{{ ('restarted' if base_engine_unit is changed else 'started') if default_engine == base_engine else omit }}"
+    daemon_reload: true

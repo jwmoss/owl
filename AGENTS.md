@@ -34,9 +34,9 @@ Run all Ansible commands from `ansible/`.
 
 ## Change the code
 
-- Keep each role in the same shape: a pinned download, a unit with `Conflicts=` for the other engines,
-  `ExecStartPre=/usr/local/bin/owl-wait-memory`, `RestartSec=30`, and a restart of the default engine
-  when its unit changes.
+- Keep each role in the same shape: a pinned download, `model_cache` pull and push for the store, and the
+  `base` role's `engine_unit` tasks for the unit. That template holds the lines that every engine shares
+  (`Conflicts=`, the fallback, `owl-wait-memory`, restarts); a role gives only its own `[Service]` lines.
 - Pin every version: a commit, a release tag, an image tag or a Hugging Face revision. Check a SHA-256 when the source gives one.
 - Put Jinja at the end of a task name (ansible-lint `name[template]`).
 - Write docs in ASD-STE100 Simplified Technical English: active voice, present tense, short sentences.
