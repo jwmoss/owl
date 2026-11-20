@@ -11,7 +11,7 @@ ttm_pages_limit: 29637703 # about 113 GiB of 4 KiB pages
 engine_port: 8731
 
 # renovate: datasource=github-releases depName=Niko1221/Strata
-strata_release: "v0.2.16"
+strata_release: "v0.2.17"
 # The Strata models, by preset name: a --family and --model of strata launch, and optional context and env.
 # strata_preset is the one the strata service serves. Swap: ansible-playbook strata.yml -e strata_preset=<name>.
 strata_presets:
