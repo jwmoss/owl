@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.5.0](https://github.com/jwmoss/owl/compare/v3.4.0...v3.5.0) (2026-11-23)
+
+
+### Features
+
+* **engines:** update dependency mw00/project-maya to v1.1.74 ([#89](https://github.com/jwmoss/owl/issues/89)) ([97e44fd](https://github.com/jwmoss/owl/commit/97e44fd36272abad03f8cf1adcff2f60c4d1c2e5))
+* **engines:** update dependency niko1221/strata to v0.2.20 ([#91](https://github.com/jwmoss/owl/issues/91)) ([46e9d18](https://github.com/jwmoss/owl/commit/46e9d18c7ff2ab7093c24fda07f1f90208b77211))
+
 ## [3.4.0](https://github.com/jwmoss/owl/compare/v3.3.0...v3.4.0) (2026-11-22)
 
 
