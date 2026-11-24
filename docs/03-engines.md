@@ -220,8 +220,13 @@ as environment variables, with `-e` for a container and `Environment=` for a hos
 ```yaml
 # ansible/inventory/host_vars/<host>.yml
 halogen_env:
+  HALOGEN_REASONING_EFFORT: medium # the default in group_vars; a halogen_env here replaces it, so keep it
   HALOGEN_WEIGHTS_LOCK: "1" # keep the Flash model in memory while NPU models work
 ```
+
+`HALOGEN_REASONING_EFFORT` sets the thinking for a request that sends no `reasoning_effort`. The chat template has
+three levels: `low`, `medium` and `xhigh`. The template's own default is `xhigh`, which thinks for hundreds to
+thousands of tokens on each agent turn. Owl sets `medium`.
 
 ## Measured on a GMKtec EVO-X2 (128 GB)
 

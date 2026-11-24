@@ -62,8 +62,11 @@ halogen_vision: true
 # halogen fetches them on its first start. Empty: no NPU. See https://peonist.ai/halogen/docs/NPU/
 halogen_npu_models: ""
 # Any other halogen setting, as environment variables. The list: https://peonist.ai/halogen/docs/FLAGS/
-# For example { HALOGEN_WEIGHTS_LOCK: "1" }
-halogen_env: {}
+# A halogen_env in host_vars replaces this one, so copy HALOGEN_REASONING_EFFORT into it.
+# medium: the template's xhigh default thinks for hundreds to thousands of tokens on each agent turn.
+# A request that sends reasoning_effort still wins.
+halogen_env:
+  HALOGEN_REASONING_EFFORT: medium
 
 # Tailscale is optional: only tailscale.yml installs it.
 # renovate: datasource=github-releases depName=tailscale/tailscale
