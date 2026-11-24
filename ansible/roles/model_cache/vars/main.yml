@@ -1,0 +1,4 @@
+---
+# The copy in both directions. It skips rsync's temporary files (.<name>.XXXXXX), which a killed copy can leave behind,
+# the store's .done marker, and Maya's saved conversations (slots/), which it keeps in the model folder.
+model_cache_rsync: rsync -rlt --exclude='.*.??????' --exclude=.done --exclude=slots/ --itemize-changes
