@@ -1,5 +1,5 @@
 ---
 strata_bin: /home/{{ ansible_user }}/.local/bin/strata
 strata_state: /home/{{ ansible_user }}/.local/state/strata/launch
-strata_data_dir: "{{ models_dir }}/strata/{{ strata_item }}" # STRATA_DATA_DIR, one folder for each preset
+strata_data_dir: "{{ models_dir }}/strata/{{ strata_item }}" # --data-dir of strata launch, one folder for each preset
 strata_item: "{{ strata_preset }}" # the preset a task works on; the setup loop sets it to each new preset
