@@ -64,7 +64,7 @@ Set the lists and the served model in `ansible/inventory/group_vars/all.yml`:
 | Engine | Models, by name | Model it serves | Model files |
 |--------|-----------------|-----------------|-------------|
 | Maya | `maya_models` | `maya_model` | `~/models/maya`, passed as `--models-dir` |
-| Strata | `strata_presets` | `strata_preset` | `~/models/strata`, passed as `STRATA_DATA_DIR` |
+| Strata | `strata_presets` | `strata_preset` | `~/models/strata`, passed as `--data-dir` |
 
 Swap the served model with one command. If the engine runs, the playbook restarts it with the new model. A swap copies and downloads nothing.
 
@@ -86,7 +86,7 @@ The Strata API key is per preset: `~/.local/bin/strata launch --show-key --prese
 ### Model files and the model store
 
 Every engine keeps its files in `models_dir/<engine>` (`~/models/halogen`, `~/models/maya` ...), set with the engine's
-own option: `--local-dir`, `--models-dir` or `STRATA_DATA_DIR`. Hugging Face's own cache
+own option: `--local-dir`, `--models-dir` or `--data-dir`. Hugging Face's own cache
 (`~/.cache/huggingface/hub`) is not used: each engine downloads into its own layout and builds index files beside it.
 
 The model store is optional. Set `model_cache_nfs` to an NFS share in your host_vars, for example

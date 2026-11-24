@@ -87,6 +87,7 @@
 
     # Downloads the model, writes the run config with an API key, starts serving, then stops so systemd can start it.
     # Each preset has its own folder, so a save to the store never takes another preset's files.
+    # --data-dir names that folder: strata launch does not read STRATA_DATA_DIR, only --data-dir or its last folder.
     - name: Set up the Strata presets
       vars:
         strata_item: "{{ item }}"
@@ -94,7 +95,7 @@
         cmd: >-
           {{ strata_bin }} launch --family {{ strata_presets[item].family }} --model {{ strata_presets[item].model }}
           --context {{ strata_presets[item].context | default(strata_context) }} --vision gpu --access lan --port {{ engine_port }}
-          --save-preset {{ item }} --yes --no-tui
+          --data-dir {{ strata_data_dir }} --save-preset {{ item }} --yes --no-tui
           && {{ strata_bin }} launch --stop --preset {{ item }}
       environment:
         STRATA_DATA_DIR: "{{ strata_data_dir }}"

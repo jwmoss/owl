@@ -1,6 +1,9 @@
 [Unit]
 Description={{ base_engine_description }}
-After=network-online.target halogen-fabric-clock.service
+# Conflicts= does not wait for the other engine to stop, so the new one could find the port in use.
+# An order (one way only, by the engines list) makes systemd finish the stop first.
+After=network-online.target halogen-fabric-clock.service{% for e in engines[:engines.index(base_engine)] %} {{ e }}.service{% endfor %}
+
 Wants=network-online.target
 Conflicts={{ engines | reject('equalto', base_engine) | map('regex_replace', '$', '.service') | join(' ') }}
 OnFailure=owl-fallback@%n.service
