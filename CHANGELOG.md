@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.6.0](https://github.com/jwmoss/owl/compare/v3.5.0...v3.6.0) (2026-11-24)
+
+
+### Features
+
+* **engines:** update dependency mw00/project-maya to v1.1.77 ([#92](https://github.com/jwmoss/owl/issues/92)) ([bacece2](https://github.com/jwmoss/owl/commit/bacece2d911479bcd302949269a16f1ce0e1685c))
+
 ## [3.5.0](https://github.com/jwmoss/owl/compare/v3.4.0...v3.5.0) (2026-11-23)
 
 
