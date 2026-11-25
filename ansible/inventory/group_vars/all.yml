@@ -36,7 +36,7 @@ engines: [strata, maya, halogen] # every engine Owl can install
 
 
 # renovate: datasource=github-tags depName=mw00/project-maya
-maya_commit: "1016876a387e332fc5bf8bb82030fca7dc2821b2" # v1.1.78
+maya_commit: "4a0ce6e86e1896309b8114914ce178bc69492e84" # v1.1.81
 # The Maya models, by name: the --model options of maya.sh, and optional context (tokens) and env for that model only.
 # maya_model is the one the maya service serves. Swap: ansible-playbook maya.yml -e maya_model=glm.
 maya_models:
