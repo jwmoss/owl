@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.8.0](https://github.com/jwmoss/owl/compare/v3.7.0...v3.8.0) (2026-11-26)
+
+
+### Features
+
+* **strata:** set up a preset again when its context changes; 256K default ([d2031e6](https://github.com/jwmoss/owl/commit/d2031e659f03bc913e010ac7c60f5631a1c1931b))
+
+
+### Bug Fixes
+
+* **halogen:** remove the halogen images that are not pinned ([d2031e6](https://github.com/jwmoss/owl/commit/d2031e659f03bc913e010ac7c60f5631a1c1931b))
+* **maya:** use Maya's own GPU memory reserve, with 16384 for DeepSeek ([d2031e6](https://github.com/jwmoss/owl/commit/d2031e659f03bc913e010ac7c60f5631a1c1931b))
+* **rocm:** stop background memory compaction that pauses the GPU ([d2031e6](https://github.com/jwmoss/owl/commit/d2031e659f03bc913e010ac7c60f5631a1c1931b))
+
 ## [3.7.0](https://github.com/jwmoss/owl/compare/v3.6.0...v3.7.0) (2026-11-26)
 
 
