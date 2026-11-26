@@ -1,15 +1,16 @@
 # Writes a CycloneDX 1.6 SBOM for one benchmark run: the machine, the engines and every model file.
 # Each file's SHA-256 (sha256sum on the machine) is matched to a Hugging Face LFS oid at a pinned commit.
 # A file with no match was made on the machine (a tokenizer extract, a Maya pack): the SBOM says so.
-# Usage: uv run --no-project python -I sbom.py <run folder>   (reads <run>/sha256sums.txt, writes <run>/sbom.cdx.json)
+# Usage: uv run --no-project python -I sbom.py <sha256sums.txt> <date>.cdx.json
 import json
 import os
 import sys
 import urllib.request
+import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 
-RUN = sys.argv[1]
+SUMS, OUT = sys.argv[1], sys.argv[2]
 MACHINE = {
     "vendor": "GMKtec",
     "name": "EVO-X2",
@@ -114,7 +115,7 @@ components = [
     for e in ENGINES
 ]
 unmatched = 0
-for line in Path(RUN, "sha256sums.txt").read_text().splitlines():
+for line in Path(SUMS).read_text().splitlines():
     digest, path = line.split(None, 1)
     path = path.strip()
     c = {
@@ -163,8 +164,10 @@ for line in Path(RUN, "sha256sums.txt").read_text().splitlines():
     components.append(c)
 
 sbom = {
+    "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
     "bomFormat": "CycloneDX",
     "specVersion": "1.6",
+    "serialNumber": f"urn:uuid:{uuid.uuid4()}",
     "version": 1,
     "metadata": {
         "timestamp": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -179,68 +182,7 @@ sbom = {
     },
     "components": components,
 }
-Path(RUN, "sbom.cdx.json").write_text(json.dumps(sbom, indent=1))
-
-# The same list as SPDX 2.3: one package for the machine, each engine and each file; the document describes them all.
-PURPOSE = {"device": "DEVICE", "application": "APPLICATION", "container": "CONTAINER"}
-created = sbom["metadata"]["timestamp"]
-machine = {
-    "SPDXID": "SPDXRef-machine",
-    "name": "owl",
-    "supplier": f"Organization: {MACHINE['vendor']}",
-    "downloadLocation": "NOASSERTION",
-    "filesAnalyzed": False,
-    "primaryPackagePurpose": "DEVICE",
-    "comment": "; ".join(f"{k}: {v}" for k, v in MACHINE.items()),
-}
-packages = [machine]
-for i, c in enumerate(components):
-    ref = c["externalReferences"][0]["url"] if c.get("externalReferences") else None
-    p = {
-        "SPDXID": f"SPDXRef-{i}",
-        "name": c["name"],
-        "downloadLocation": ref or "NONE",
-        "filesAnalyzed": False,
-        "primaryPackagePurpose": PURPOSE.get(c["type"], "FILE"),
-    }
-    if c.get("version"):
-        p["versionInfo"] = c["version"]
-    if c.get("hashes"):
-        p["checksums"] = [
-            {"algorithm": "SHA256", "checksumValue": c["hashes"][0]["content"]}
-        ]
-    if c.get("purl"):
-        p["externalRefs"] = [
-            {
-                "referenceCategory": "PACKAGE-MANAGER",
-                "referenceType": "purl",
-                "referenceLocator": c["purl"],
-            }
-        ]
-    if c.get("properties"):
-        p["comment"] = c["properties"][0]["value"]
-    packages.append(p)
-spdx = {
-    "spdxVersion": "SPDX-2.3",
-    "dataLicense": "CC0-1.0",
-    "SPDXID": "SPDXRef-DOCUMENT",
-    "name": f"owl benchmark run {os.path.basename(os.path.normpath(RUN))}",
-    "documentNamespace": f"https://github.com/jwmoss/owl/tree/main/docs/benchmarks/{os.path.basename(os.path.normpath(RUN))}",
-    "creationInfo": {
-        "created": created,
-        "creators": ["Tool: owl-docs-benchmarks-sbom.py"],
-    },
-    "packages": packages,
-    "relationships": [
-        {
-            "spdxElementId": "SPDXRef-DOCUMENT",
-            "relationshipType": "DESCRIBES",
-            "relatedSpdxElement": p["SPDXID"],
-        }
-        for p in packages
-    ],
-}
-Path(RUN, "sbom.spdx.json").write_text(json.dumps(spdx, indent=1))
+Path(OUT).write_text(json.dumps(sbom, indent=1))
 print(
     f"{len(components)} components, {sum('purl' in c and 'huggingface' in c['purl'] for c in components)} matched "
     f"to Hugging Face, {unmatched} made on the machine"

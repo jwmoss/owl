@@ -58,3 +58,21 @@ Check:
 ```sh
 cat /sys/module/ttm/parameters/pages_limit                 # 29637703
 ```
+
+### 3. Kernel: memory compaction
+
+The AMD driver stops all GPU work while Linux moves memory that the GPU uses.
+After many model loads, Strata logged 74 s of these pauses, and a request failed.
+The `rocm` role sets two values, with no reboot:
+
+| Setting | File | Value |
+|---------|------|-------|
+| `vm.compaction_proactiveness` | `/etc/sysctl.d/60-owl-gpu.conf` | `0`: no background compaction. Linux still compacts when it must |
+| `transparent_hugepage/defrag` | `/etc/tmpfiles.d/owl-thp.conf` | `defer`: a huge page request without a free 2 MB block gets 4 KB pages at once (Maya's `docs/SETTINGS.md`) |
+
+Check:
+
+```sh
+sysctl vm.compaction_proactiveness                         # 0
+cat /sys/kernel/mm/transparent_hugepage/defrag             # ... [defer] ...
+```

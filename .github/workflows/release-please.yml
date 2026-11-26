@@ -1,6 +1,6 @@
 ---
 # Keeps one release PR open with the next version and CHANGELOG.md, from the conventional commits.
-# Merge that PR to tag vX.Y.Z and publish the GitHub release.
+# Merge that PR to tag vX.Y.Z and publish the GitHub release, with the newest benchmark and its SBOM attached.
 name: Release Please
 "on":
   push:
@@ -17,7 +17,27 @@ jobs:
       pull-requests: write # open and update the release PR
     steps:
       - name: Update the release PR or publish the release
+        id: release
         uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+      - name: Check out the release
+        if: steps.release.outputs.release_created
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.release.outputs.tag_name }}
+          persist-credentials: false
+
+      # The benchmark runs on the machine (docs/benchmarks/README.md); its files are committed as <date>.md, .raw.txt, .cdx.json.
+      - name: Attach the newest benchmark and its CycloneDX SBOM
+        if: steps.release.outputs.release_created
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag_name }}
+        run: |
+          sbom=$(find docs/benchmarks -maxdepth 1 -name '*.cdx.json' | sort | tail -1)
+          [ -n "$sbom" ] || { echo "No benchmark in docs/benchmarks"; exit 0; }
+          base=${sbom%.cdx.json}
+          gh release upload "$TAG" "$sbom" "$base.md" "$base.raw.txt" --clobber --repo "$GITHUB_REPOSITORY"

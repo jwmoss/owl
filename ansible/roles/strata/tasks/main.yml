@@ -30,6 +30,28 @@
   loop: "{{ strata_presets.keys() | list }}"
   register: strata_preset_files
 
+- name: Read the saved Strata presets
+  ansible.builtin.slurp:
+    src: "{{ strata_state }}/{{ item.item }}.json"
+  loop: "{{ strata_preset_files.results | selectattr('stat.exists') | list }}"
+  loop_control:
+    label: "{{ item.item }}"
+  register: strata_saved
+  no_log: true # the saved preset holds the API key
+
+# Only a setup reads the context, so a saved preset whose context differs from the one set here is set up again.
+- name: Note the Strata presets whose context changed
+  ansible.builtin.set_fact:
+    strata_resized: "{{ strata_resized | default([]) + [item.item.item] }}"
+  loop: "{{ strata_saved.results }}"
+  loop_control:
+    label: "{{ item.item.item }}"
+  vars:
+    strata_args: "{{ (item.content | b64decode | from_json).args | map('string') | list }}"
+    strata_want: "{{ strata_presets[item.item.item].context | default(strata_context) | string | lower }}"
+    strata_want_tokens: "{{ (strata_want[:-1] | int * 1024) if strata_want.endswith('k') else strata_want | int }}"
+  when: "'--max-context' in strata_args and strata_args[strata_args.index('--max-context') + 1] | int != strata_want_tokens | int"
+
 - name: Find the Strata presets with a complete copy in the store
   ansible.builtin.stat:
     path: "{{ model_cache_dir }}/owl/strata/{{ item }}/.done"
@@ -64,7 +86,7 @@
     strata_new: >-
       {{ (strata_preset_files.results | rejectattr('stat.exists') | map(attribute='item') | list
       + strata_stored.results | default([]) | rejectattr('skipped', 'defined') | rejectattr('stat.exists')
-      | map(attribute='item') | list) | unique }}
+      | map(attribute='item') | list + strata_resized | default([])) | unique }}
     strata_order: "{{ strata_new | select('equalto', strata_preset) | list + strata_new | reject('equalto', strata_preset) | list }}"
   when: strata_update or strata_new | length > 0
   block:

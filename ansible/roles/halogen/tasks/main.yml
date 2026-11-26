@@ -102,3 +102,16 @@
       ExecStop=/usr/bin/podman stop halogen
       # podman stop ends the container with SIGTERM (143), or with SIGKILL (137) after 10 seconds.
       SuccessExitStatus=137 143
+
+# Each version pin pulls a new image of about 10 GB and leaves the old ones; keep only the pinned one.
+- name: Remove the halogen images that are not pinned
+  ansible.builtin.shell: >-
+    set -o pipefail;
+    podman images --format {% raw %}'{{.Repository}}:{{.Tag}}'{% endraw %}
+    --filter reference={{ halogen_image.split(':')[0] }}
+    | { grep -vxF '{{ halogen_image }}' || true; } | xargs -r podman rmi
+  args:
+    executable: /bin/bash
+  become: false
+  register: halogen_old_images
+  changed_when: halogen_old_images.stdout | length > 0

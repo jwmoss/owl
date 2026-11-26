@@ -1,9 +1,11 @@
 {
+ "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
  "bomFormat": "CycloneDX",
  "specVersion": "1.6",
+ "serialNumber": "urn:uuid:1eff915d-928a-4cc2-9dd7-d2b2cbb4ac1d",
  "version": 1,
  "metadata": {
-  "timestamp": "2026-11-26T05:18:42Z",
+  "timestamp": "2026-11-26T09:33:44Z",
   "component": {
    "type": "device",
    "name": "owl",
@@ -109,11 +111,11 @@
   },
   {
    "type": "data",
-   "name": "maya/deepseek/DeepSeek-V4.1-Flash-1017-GGUF/Maya-XS/maya-ds4/tensors.txt",
+   "name": "maya/deepseek/DeepSeek-V4.1-Flash-1017-GGUF/Maya-XS/maya-ds4/tokenizer/vocab.json",
    "hashes": [
     {
      "alg": "SHA-256",
-     "content": "97317e264031e56a2a50119908c6988a734c3dfb3f5e5b49be4b7d611d64234c"
+     "content": "2f0bf5b31f4aa191d5d0d78291927a4f28c9ceb498a5e345b97e926c4cb99c1a"
     }
    ],
    "properties": [
@@ -125,11 +127,11 @@
   },
   {
    "type": "data",
-   "name": "maya/deepseek/DeepSeek-V4.1-Flash-1017-GGUF/Maya-XS/maya-ds4/tokenizer/vocab.json",
+   "name": "maya/deepseek/DeepSeek-V4.1-Flash-1017-GGUF/Maya-XS/maya-ds4/tensors.txt",
    "hashes": [
     {
      "alg": "SHA-256",
-     "content": "2f0bf5b31f4aa191d5d0d78291927a4f28c9ceb498a5e345b97e926c4cb99c1a"
+     "content": "97317e264031e56a2a50119908c6988a734c3dfb3f5e5b49be4b7d611d64234c"
     }
    ],
    "properties": [
@@ -657,24 +659,6 @@
   },
   {
    "type": "machine-learning-model",
-   "name": "maya/deepseek/DeepSeek-V4.1-Flash-1017-GGUF/Engram-Q6_K/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00004-of-00005.gguf",
-   "hashes": [
-    {
-     "alg": "SHA-256",
-     "content": "0d93315942c523d82f6dbc0a6e0e1751548e309f3963f96b82f92e8f9bc52e36"
-    }
-   ],
-   "purl": "pkg:huggingface/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF@c33d87b8c7a3b7d55e71324dc82395587a870b0b",
-   "version": "c33d87b8c7a3b7d55e71324dc82395587a870b0b",
-   "externalReferences": [
-    {
-     "type": "distribution",
-     "url": "https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF/blob/c33d87b8c7a3b7d55e71324dc82395587a870b0b/Maya-XS/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00004-of-00005.gguf"
-    }
-   ]
-  },
-  {
-   "type": "machine-learning-model",
    "name": "maya/deepseek/DeepSeek-V4.1-Flash-1017-GGUF/Engram-Q6_K/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00005-of-00005.gguf",
    "hashes": [
     {
@@ -706,6 +690,24 @@
     {
      "type": "distribution",
      "url": "https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-GGUF/blob/6f6c6a8394c32f556c09bea0a06dce0b76a3dc37/vision/GLM-5.3-Flash-vocab.gguf"
+    }
+   ]
+  },
+  {
+   "type": "machine-learning-model",
+   "name": "maya/deepseek/DeepSeek-V4.1-Flash-1017-GGUF/Engram-Q6_K/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00004-of-00005.gguf",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "0d93315942c523d82f6dbc0a6e0e1751548e309f3963f96b82f92e8f9bc52e36"
+    }
+   ],
+   "purl": "pkg:huggingface/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF@c33d87b8c7a3b7d55e71324dc82395587a870b0b",
+   "version": "c33d87b8c7a3b7d55e71324dc82395587a870b0b",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF/blob/c33d87b8c7a3b7d55e71324dc82395587a870b0b/Maya-XS/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00004-of-00005.gguf"
     }
    ]
   },

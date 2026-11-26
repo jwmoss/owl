@@ -17,7 +17,7 @@ strata_release: "v0.2.22"
 strata_presets:
   qwen: { family: qwen, model: iq3_s } # Qwen3.8-Flash-Next, the ISTA-DAS quant
 strata_preset: qwen
-strata_context: 128k
+strata_context: 256k # the context every Strata preset is set up with, as halogen's 256K; a preset's own context wins
 strata_env: {} # environment variables for every Strata preset, for example { NAME: "value" }; a preset's env adds to them
 
 
@@ -40,12 +40,14 @@ maya_commit: "4a0ce6e86e1896309b8114914ce178bc69492e84" # v1.1.81
 # The Maya models, by name: the --model options of maya.sh, and optional context (tokens) and env for that model only.
 # maya_model is the one the maya service serves. Swap: ansible-playbook maya.yml -e maya_model=glm.
 maya_models:
-  deepseek: { model: deepseek-maya-xs } # DeepSeek-V4.1-Flash-1017
+  deepseek: { model: deepseek-maya-xs, vram_reserve_mib: 16384 } # DeepSeek-V4.1-Flash-1017
   glm: { model: glm-maya-s } # GLM-5.3-Flash
 maya_model: deepseek
 maya_env: {} # environment variables for every Maya model, for example { NAME: "value" }; a model's env adds to them
-# Leave headroom below the shared GPU memory limit on a 128 GB Strix Halo.
-maya_vram_reserve_mib: 16384
+# GPU memory Maya leaves free beside its expert pool: 1024 MiB is Maya's own value on a Linux APU (hip_reserve_mib).
+# Give it: a setup keeps the reserve of a model's earlier config. GLM, Hy4 and Inkling keep RAM for the system themselves.
+# DeepSeek's engine does not, so its entry keeps 16384: with 1024 it filled the shared memory and Linux ran out of it.
+maya_vram_reserve_mib: 1024
 
 # renovate: datasource=docker depName=ghcr.io/peonist-ai/halogen-flash-server
 halogen_image: "ghcr.io/peonist-ai/halogen-flash-server:0.20.7"
@@ -60,6 +62,8 @@ halogen_vision: true
 # Small models on the NPU beside the Flash model, on the same port, for example
 # "decider-0.8b,qwen3-embedding-0.6b,qwen3-reranker-0.6b,qwen3guard-gen-0.6b,qwen3.5-2b" (about 8 GiB more memory).
 # halogen fetches them on its first start. Empty: no NPU. See https://peonist.ai/halogen/docs/NPU/
+# The NPU models pin up to 15 GiB. On 128 GB, also set HALOGEN_KV_POOL_POSITIONS: "262144" in halogen_env:
+# the default 512K-position KV pool (14.9 GiB) then leaves no room. One request can still use the full 256K.
 halogen_npu_models: ""
 # Any other halogen setting, as environment variables. The list: https://peonist.ai/halogen/docs/FLAGS/
 # For example { HALOGEN_WEIGHTS_LOCK: "1" }

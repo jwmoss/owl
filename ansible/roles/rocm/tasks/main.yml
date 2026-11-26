@@ -57,6 +57,22 @@
     content: "options ttm pages_limit={{ ttm_pages_limit }} page_pool_size={{ ttm_pages_limit }}\n"
   notify: Update the initramfs and reboot
 
+# The AMD driver pauses all GPU work while Linux moves memory the GPU uses: Strata logged 74 s of pauses after a day
+# of model loads, and its warm-up request failed. Background compaction moves those pages; Linux still compacts on demand.
+- name: Stop background memory compaction
+  ansible.posix.sysctl:
+    name: vm.compaction_proactiveness
+    value: "0"
+    sysctl_file: /etc/sysctl.d/60-owl-gpu.conf
+
+# Maya's docs/SETTINGS.md: a huge page fault without a free 2 MB block falls back to 4 KB at once; kcompactd refills later.
+- name: Keep huge page faults from compacting on the spot
+  ansible.builtin.copy:
+    dest: /etc/tmpfiles.d/owl-thp.conf
+    mode: "0644"
+    content: "w /sys/kernel/mm/transparent_hugepage/defrag - - - - defer\n"
+  notify: Apply the huge page setting
+
 - name: Apply the handlers before the engines build
   ansible.builtin.meta: flush_handlers
 
