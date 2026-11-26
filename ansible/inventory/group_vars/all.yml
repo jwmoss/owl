@@ -17,7 +17,7 @@ strata_release: "v0.2.22"
 strata_presets:
   qwen: { family: qwen, model: iq3_s } # Qwen3.8-Flash-Next, the ISTA-DAS quant
 strata_preset: qwen
-strata_context: 128k
+strata_context: 256k # the context every Strata preset is set up with, as halogen's 256K; a preset's own context wins
 strata_env: {} # environment variables for every Strata preset, for example { NAME: "value" }; a preset's env adds to them
 
 
