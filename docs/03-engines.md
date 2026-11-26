@@ -34,8 +34,9 @@ Read why on the machine: `journalctl -u <engine>`. Clear the failure with `sudo 
 
 Only Strata has an API key. The other engines are open to your network without a key, so run them only on a trusted network.
 
-Maya reserves 16 GiB of GPU memory on this machine. The 1 GiB upstream default can fail during model load.
-Set `maya_vram_reserve_mib` to change this reserve. Setup skips the optional speed calibration.
+Maya leaves 1024 MiB of GPU memory free beside its expert pool, its own value on a Linux APU.
+If a model fails to load, set a larger reserve in MiB with `maya_vram_reserve_mib`, for example `4096`.
+Setup skips the optional speed calibration.
 
 ## Other models and memory limits
 
