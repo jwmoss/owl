@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.7.0](https://github.com/jwmoss/owl/compare/v3.6.0...v3.7.0) (2026-11-26)
+
+
+### Features
+
+* **engines:** update dependency mw00/project-maya to v1.1.78 ([#99](https://github.com/jwmoss/owl/issues/99)) ([2ea73db](https://github.com/jwmoss/owl/commit/2ea73db93c8f2db67149192dd240928017fe3554))
+* **engines:** update dependency mw00/project-maya to v1.1.81 ([#101](https://github.com/jwmoss/owl/issues/101)) ([2875e23](https://github.com/jwmoss/owl/commit/2875e23fd41b5f4dc9a58c9e6131c34be807f7de))
+* **engines:** update dependency niko1221/strata to v0.2.21 ([#100](https://github.com/jwmoss/owl/issues/100)) ([a15d3b3](https://github.com/jwmoss/owl/commit/a15d3b3b414a9ba2ebf60dcda705a251a8af29af))
+* **engines:** update dependency niko1221/strata to v0.2.22 ([#103](https://github.com/jwmoss/owl/issues/103)) ([72e2b29](https://github.com/jwmoss/owl/commit/72e2b29699c04d1516b0c77b445bf8287c61f69a))
+* **engines:** update https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next digest to fe3653f ([#98](https://github.com/jwmoss/owl/issues/98)) ([457631d](https://github.com/jwmoss/owl/commit/457631dab7591eb41c54b96cfe0887b4a81f95d2))
+* **maya:** hard-link identical model files across Maya models ([#97](https://github.com/jwmoss/owl/issues/97)) ([b19e50c](https://github.com/jwmoss/owl/commit/b19e50c6886fa31e487563da9422ff495760aab5))
+
+
+### Bug Fixes
+
+* **model_cache:** retry a store copy that NFS stops ([e93e438](https://github.com/jwmoss/owl/commit/e93e438688782f8cb213d54384604a8a642f1664))
+* Strata preset folders, engine switch race and stale store mount ([#94](https://github.com/jwmoss/owl/issues/94)) ([039b378](https://github.com/jwmoss/owl/commit/039b3784a5677da3356d95bd74d5bc91c26c88a6))
+
 ## [3.6.0](https://github.com/jwmoss/owl/compare/v3.5.0...v3.6.0) (2026-11-24)
 
 
