@@ -14,12 +14,16 @@ Tested on a GMKtec EVO-X2 with 128 GB.
 
 Measured on a GMKtec EVO-X2 (Ryzen AI Max+ 395, 128 GB) on 2026-11-26, with each engine's own bench, at the
 versions that `main` pins.
-**These numbers do not compare engines.** Each engine's bench sends its own prompts with its own settings (greedy or
-sampled, thinking off or on), and each model runs at the context that owl serves it at. The
-[run record](docs/benchmarks/2026-11-26/README.md#how-each-engine-measures) lists the differences. The [run record](docs/benchmarks/2026-11-26/README.md) has the raw output of each bench,
-the engine commits and image digests, and the Hugging Face commit and SHA-256 of every model file, also as
+
+> [!NOTE]
+> These numbers do not compare engines. Each engine's bench sends its own prompts with its own settings (greedy or
+> sampled, thinking off or on), and each model runs at the context that owl serves it at.
+> [How each engine measures](docs/benchmarks/2026-11-26/README.md#how-each-engine-measures) lists the differences.
+
+The [run record](docs/benchmarks/2026-11-26/README.md) has the raw output of each bench, the engine commits and
+image digests, and the Hugging Face commit and SHA-256 of every model file, also as
 [CycloneDX](docs/benchmarks/2026-11-26/sbom.cdx.json) and [SPDX](docs/benchmarks/2026-11-26/sbom.spdx.json) SBOMs.
-[All runs](docs/benchmarks/README.md), with a `results.csv` for each run to search or compare.
+[All runs](docs/benchmarks/README.md) has a `results.csv` for each run, to search or compare.
 
 | Engine | Model (Hugging Face) | Quant | Context | Decode tok/s | Prompt tok/s ¹ |
 |---|---|---|---:|---:|---:|
