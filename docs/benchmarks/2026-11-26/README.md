@@ -26,13 +26,21 @@ Hugging Face file named in [Models](#models).
 
 ★ The model that owl serves on that engine.
 
-**How each engine measures**
+### How each engine measures
 
-| Engine | Bench | Decode | Prompt |
+These benches are not the same test. Compare rows of one engine only.
+
+| | halogen `bench` | Maya `--bench` | Strata `standard-v1` |
 |---|---|---|---|
-| halogen | `bench` mode of the image | Mean of 10 cases (code, proofs, procedures, chat, prose), 256 tokens each, effort `low` | Not in its bench: [halogen-prompt.py](../halogen-prompt.py), prompts of 2.6K / 11K tokens |
-| Maya | `./maya.sh --bench` | Median of 3 greedy answers of 256 tokens, thinking off | Median of 2K / 8K-token prompts |
-| Strata | `strata bench run`, suite `standard-v1` | Median of 3 short requests | Median of 4K / 16K-token prompts |
+| Decode prompts | 10 fixed prompts in 5 shapes: code, proofs, procedures, chat, prose | 3 fixed questions: a Python CSV parser, photosynthesis, an HTML bouncing ball | 1 question: how a hash table finds a value |
+| Sampling | greedy | greedy | temperature 1.0 |
+| Thinking | effort `low` | off | on, effort `xhigh` |
+| Answer | 256 tokens | 256 tokens | up to 512 tokens, thinking included |
+| Long prompts | none (see [halogen-prompt.py](../halogen-prompt.py)) | 2K / 8K tokens cut from Maya's docs | 4K / 16K tokens of `recordNNNNNN: alpha beta …` |
+| Context | the served one (256K) | the served one (32K or 256K) | the served one (128K) |
+
+
+Decode is the mean of halogen's 10 cases, and the median of Maya's 3 answers and Strata's 3 short requests.
 
 ¹ Strata's suite makes its prompts with Qwen's tokenizer. With Hy4's and Inkling's own tokenizers they are shorter
 (2.8K / 11.2K and 3.4K / 13.8K tokens), so Strata marks these two runs "nonconforming". All 21 requests finished,
