@@ -1,0 +1,14 @@
+Project Maya v1.1.77 benchmark, 2026-11-26 03:14
+GPUs: AMD Radeon (gfx1151); RAM 121 GB; CPU AMD RYZEN AI MAX+ 395 w/ Radeon 8060S
+setup: .installed-cfc825fbc90b56fd7e2625ca026b9924c7211ebb-9cca31bcf78b41eb0ced4edc0eff5c24e1f3b6d4.json, context 32768, GPUs [0], drafting: the MTP block, 81% of drafts accepted
+decode (writing the answer): median 22.4 (20.5-25.0) tokens/s over 3 answers of 256 tokens (greedy, thinking off)
+prompt reading: 2K tokens, median 162 (117-318) tokens/s
+prompt reading: 8K tokens, median 305 (187-329) tokens/s
+wall time: quiet check 1 s, load 415 s, warm-up 25 s, decode 37 s, prompts 132 s, stop 2 s (total 610 s); all 612 s
+owl | AMD Radeon (gfx1151) | amdgpu | hy4-flash Hy4-Flash-Maya-L | 32K the MTP block, 81% of drafts accepted | cfc825fb | v1.1.77 | decode 22.4 (20.5-25.0) | prompt 2K 162 / 8K 305 | 2026-11-26
+
+engine lines:
+maya-hy4: measuring this PC once, before the first answer: the prompt route (up to 10 chunks of 4096 tokens) - on 56225 tokens of text, 300 s at most; remembered, the next starts skip it
+maya-hy4: prompt route: the CPU lane 24.17 us an expert-token, GPU 0 streams 256 us a MB (break-even 10.6 entries a MB) (8 windows, the last 1 timed in); the times did not settle: kept for this run, measured again at the next start
+maya-hy4: measured this PC once in 276 s, before the first answer (the copies 0 s, the route 276 s; 0 s of it waiting for the lane's builder / placer): the prompt route's rates kept for this run
+maya-hy4: HY4_HOT: 123 swaps in 10 rounds, 0.04 s; the generated tokens' routes of the CPU-lane layers 99.6% in VRAM

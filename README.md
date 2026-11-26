@@ -10,6 +10,24 @@ Tested on a GMKtec EVO-X2 with 128 GB.
 
 ![How owl uses an AMD Strix Halo machine: Ansible sets it up over SSH, one engine runs on the Radeon 8060S GPU from 128 GB of shared memory, and serves an OpenAI-compatible API](docs/images/strix-halo.svg)
 
+## Measured speed
+
+Measured on a GMKtec EVO-X2 (128 GB) on 2026-11-26, with each engine's own bench. Decode: 256-token answers.
+The [run record](docs/benchmarks/2026-11-26/README.md) has the raw output, the engine commits and image digests, the
+Hugging Face commit and SHA-256 of each model file, and a [CycloneDX SBOM](docs/benchmarks/2026-11-26/sbom.cdx.json).
+
+| Engine | Model | Context | Decode tok/s | Prompt 8K tok/s |
+|---|---|---|---:|---:|
+| halogen 0.20.7 | Qwen3.8-Flash-Next v2 (abliterated) | 256K | **64.8** | 2347 ¹ |
+| Maya v1.1.77 | Inkling 2 Mini | 256K | **49.3** | 1049 |
+| Maya v1.1.77 | DeepSeek-V4.1-Flash Maya-XS | 256K | **33.5** | 439 |
+| Maya v1.1.77 | DeepSeek-V4.1-Flash abliterated | 256K | **32.3** | 428 |
+| Maya v1.1.77 | GLM-5.3-Flash Maya-S | 32K | **27.2** | 270 |
+| Maya v1.1.77 | Hy4-Flash Maya-L | 32K | **22.4** | 305 |
+| Maya v1.1.77 | GLM-5.3-Flash Maya-M-Derisked | 256K | **16.0** | 266 |
+
+¹ From [halogen-prompt.py](docs/benchmarks/halogen-prompt.py) with an 11K-token prompt; halogen's bench does not measure prompts.
+
 ## Before you start
 
 - **Machine:** a Ryzen AI Max+ 395 with 128 GB. `ubuntu.yml` stops if Linux sees less than about 115 GB.

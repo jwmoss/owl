@@ -1,0 +1,10 @@
+Project Maya v1.1.77 benchmark, 2026-11-26 03:15
+GPUs: AMD Radeon (gfx1151); RAM 121 GB; CPU AMD RYZEN AI MAX+ 395 w/ Radeon 8060S
+setup: .installed-cfc825fbc90b56fd7e2625ca026b9924c7211ebb-0a68794c1e9f68c73cd0058dccdd22a57507609d.json, context 262144, GPUs [0], drafting: the drafter, 63% of drafts accepted
+decode (writing the answer): median 49.3 (41.4-63.8) tokens/s over 3 answers of 256 tokens (greedy, thinking off)
+prompt reading: 2K tokens, median 1130 (1121-1132) tokens/s
+prompt reading: 8K tokens, median 1049 (1047-1049) tokens/s
+wall time: quiet check 1 s, load 16 s, warm-up 4 s, decode 14 s, prompts 29 s, stop 0 s (total 62 s); all 64 s
+owl | AMD Radeon (gfx1151) | amdgpu | inkling-2-mini unsloth UD-Q4_K_XL | 256K KV fp8 the drafter, 63% of drafts accepted | cfc825fb | v1.1.77 | decode 49.3 (41.4-63.8) | prompt 2K 1130 / 8K 1049 | 2026-11-26
+
+engine lines:
