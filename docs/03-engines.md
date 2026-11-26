@@ -225,12 +225,7 @@ halogen_env:
 
 ## Measured on a GMKtec EVO-X2 (128 GB)
 
-| Engine | Model | Decode | Date |
-|--------|-------|--------|------|
-| Strata | Qwen3.8-Flash-Next IQ3_S | 51.5 tok/s | 2026-11-08 |
-| Maya | DeepSeek-V4.1-Flash Maya-XS, 256K context | 22-27 tok/s | 2026-11-13 |
-| Maya | GLM-5.3-Flash Maya-S, 32K context | 23 tok/s | 2026-11-13 |
-| Maya | GLM-5.3-Flash Maya-M-Derisked, 512K context | 14-17 tok/s | 2026-11-14 |
+The latest run, with each engine's bench, versions and model hashes: [benchmarks/2026-11-26](benchmarks/2026-11-26/README.md).
 
 ## Test
 

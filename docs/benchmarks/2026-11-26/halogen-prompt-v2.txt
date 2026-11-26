@@ -1,0 +1,5 @@
+decode 94.1 tok/s (256 tokens), first token 0.16 s
+decode 69.2 tok/s (256 tokens), first token 0.14 s
+decode 95.5 tok/s (256 tokens), first token 0.15 s
+prompt 2602 tokens in 1.58 s = 1646 tok/s
+prompt 10938 tokens in 4.66 s = 2350 tok/s

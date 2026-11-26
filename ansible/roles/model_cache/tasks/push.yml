@@ -7,6 +7,10 @@
     {{ models_dir }}/{{ model_cache_engine }}/ {{ model_cache_dir }}/owl/{{ model_cache_engine }}/
     && touch {{ model_cache_dir }}/owl/{{ model_cache_engine }}/.done
   register: model_cache_push
+  # Unraid's shfs can change a file's NFS file ID during a copy ("fileid changed"); rsync then fails once.
+  until: model_cache_push.rc == 0
+  retries: 2
+  delay: 30
   changed_when: model_cache_push.stdout | length > 0
   become: false
   async: 21600
