@@ -18,29 +18,30 @@ versions that `main` pins.
 > [!NOTE]
 > These numbers do not compare engines. Each engine's bench sends its own prompts with its own settings (greedy or
 > sampled, thinking off or on), and each model runs at the context that owl serves it at.
-> [How each engine measures](docs/benchmarks/2026-11-26/README.md#how-each-engine-measures) lists the differences.
+> [How each engine measures](docs/benchmarks/2026-11-26.md#how-each-engine-measures) lists the differences.
 
-The [run record](docs/benchmarks/2026-11-26/README.md) has the raw output of each bench, the engine commits and
-image digests, and the Hugging Face commit and SHA-256 of every model file, also as
-[CycloneDX](docs/benchmarks/2026-11-26/sbom.cdx.json) and [SPDX](docs/benchmarks/2026-11-26/sbom.spdx.json) SBOMs.
-[All runs](docs/benchmarks/README.md) has a `results.csv` for each run, to search or compare.
+The [report](docs/benchmarks/2026-11-26.md) has the Hugging Face commit and SHA-256 of every model file and the engine
+versions. The [raw output](docs/benchmarks/2026-11-26.raw.txt) and the [CycloneDX SBOM](docs/benchmarks/2026-11-26.cdx.json)
+are also on each release. [All runs](docs/benchmarks/README.md).
 
-| Engine | Model (Hugging Face) | Quant | Context | Decode tok/s | Prompt tok/s ¹ |
-|---|---|---|---:|---:|---:|
-| halogen 0.20.7 | [`peonist-ai/halogen-qwen3.8-flash-next`](https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next) | v2 `.hgn` | 256K | **73.0** | 2350 |
-| halogen 0.20.7 | [`Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated`](https://huggingface.co/Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated) | v2 `.hgn` | 256K | **71.1** | 2354 |
-| Strata 0.2.22 | [`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF`](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF) | IQ3_S | 128K | **49.5** | 806 |
-| Maya v1.1.81 | [`unsloth/Inkling-2-Mini-GGUF`](https://huggingface.co/unsloth/Inkling-2-Mini-GGUF) | UD-Q4_K_XL | 256K | **47.8** | 1038 |
-| Maya v1.1.81 | [`peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF`](https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF) | Maya-XS v2 | 256K | **32.9** | 448 |
-| Maya v1.1.81 | [`orcarouter/DeepSeek-V4.1-Flash-1017-abliterated-GGUF`](https://huggingface.co/orcarouter/DeepSeek-V4.1-Flash-1017-abliterated-GGUF) | Mix-128G | 256K | **29.5** | 452 |
-| Strata 0.2.22 | [`strata-engine/Inkling-2-Mini-Strata`](https://huggingface.co/strata-engine/Inkling-2-Mini-Strata) | SQ-20 | 128K | **28.0** | 758 |
-| Maya v1.1.81 | [`peasantsmith/GLM-5.3-Flash-Maya-GGUF`](https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-GGUF) | Maya-S v2 IQ2_XXS | 32K | **27.1** | 270 |
-| Strata 0.2.22 | [`strata-engine/Hy4-Flash-Strata`](https://huggingface.co/strata-engine/Hy4-Flash-Strata) | SQ-96 | 128K | **25.8** | 600 |
-| Maya v1.1.81 | [`peasantsmith/Hy4-Flash-Maya-GGUF`](https://huggingface.co/peasantsmith/Hy4-Flash-Maya-GGUF) | Maya-L IQ4_XS | 32K | **22.4** | 205 |
-| Maya v1.1.81 | [`peasantsmith/GLM-5.3-Flash-Maya-M-Derisked-IQ2_S-GGUF`](https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-M-Derisked-IQ2_S-GGUF) | IQ2_S | 256K | **16.9** | 250 |
+| Engine | Model (Hugging Face) | Quant | Context | Decode tok/s | Prompt tok/s ¹ | Long prompt ² |
+|---|---|---|---:|---:|---:|---|
+| halogen 0.20.7 | [`peonist-ai/halogen-qwen3.8-flash-next`](https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next) | v2 `.hgn` | 256K | **73.5** | 2341 | 208K ✅ |
+| halogen 0.20.7 | [`Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated`](https://huggingface.co/Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated) | v2 `.hgn` | 256K | **71.7** | 2355 | 208K ✅ |
+| Maya v1.1.81 | [`unsloth/Inkling-2-Mini-GGUF`](https://huggingface.co/unsloth/Inkling-2-Mini-GGUF) | UD-Q4_K_XL | 256K | **49.8** | 1047 | 125K ✅ |
+| Maya v1.1.81 | [`peasantsmith/GLM-5.3-Flash-Maya-GGUF`](https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-GGUF) | Maya-S v2 IQ2_XXS | 32K | **28.6** | 271 | 29K ✅ |
+| Maya v1.1.81 | [`peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF`](https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF) | Maya-XS v2 | 256K | **28.2** | 407 | 125K ✅ |
+| Strata 0.2.22 | [`strata-engine/Inkling-2-Mini-Strata`](https://huggingface.co/strata-engine/Inkling-2-Mini-Strata) | SQ-20 | 128K | **28.0** | 753 | 114K ✅ |
+| Maya v1.1.81 | [`orcarouter/DeepSeek-V4.1-Flash-1017-abliterated-GGUF`](https://huggingface.co/orcarouter/DeepSeek-V4.1-Flash-1017-abliterated-GGUF) | Mix-128G | 256K | **27.2** | 409 | 125K ✅ |
+| Strata 0.2.22 | [`strata-engine/Hy4-Flash-Strata`](https://huggingface.co/strata-engine/Hy4-Flash-Strata) | SQ-96 | 128K | **25.3** | 586 | 114K ✅ |
+| Maya v1.1.81 | [`peasantsmith/Hy4-Flash-Maya-GGUF`](https://huggingface.co/peasantsmith/Hy4-Flash-Maya-GGUF) | Maya-L IQ4_XS | 32K | **22.5** | 268 | 29K ✅ |
+| Maya v1.1.81 | [`peasantsmith/GLM-5.3-Flash-Maya-M-Derisked-IQ2_S-GGUF`](https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-M-Derisked-IQ2_S-GGUF) | IQ2_S | 256K | **15.5** | 216 | 125K ✅ |
+| Strata 0.2.22 | [`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF`](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF) | IQ3_S | 128K | — ³ | — ³ | 114K ✅ |
 
-¹ The longest prompt of each bench: about 11K tokens for halogen (from [halogen-prompt.py](docs/benchmarks/halogen-prompt.py),
-because halogen's bench does not measure prompts), 8K for Maya and 16K for Strata. Decode is for 256-token answers.
+¹ The longest prompt of each bench: about 11K tokens for halogen ([halogen-prompt.py](docs/benchmarks/halogen-prompt.py)),
+8K for Maya and 16K for Strata. Decode is for 256-token answers.
+² One request at about 85% of the context: the model reads it without a memory failure.
+³ Its bench failed while the GPU paused for Linux memory compaction; see the [report](docs/benchmarks/2026-11-26.md).
 
 ## Before you start
 

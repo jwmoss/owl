@@ -226,7 +226,7 @@ halogen_env:
 
 ## Measured on a GMKtec EVO-X2 (128 GB)
 
-The latest run, with each engine's bench, versions and model hashes: [benchmarks/2026-11-26](benchmarks/2026-11-26/README.md).
+The latest run, with each engine's bench, versions and model hashes: [benchmarks/2026-11-26.md](benchmarks/2026-11-26.md).
 
 ## Test
 
