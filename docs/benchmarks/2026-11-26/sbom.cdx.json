@@ -3,7 +3,7 @@
  "specVersion": "1.6",
  "version": 1,
  "metadata": {
-  "timestamp": "2026-11-26T03:42:05Z",
+  "timestamp": "2026-11-26T05:18:42Z",
   "component": {
    "type": "device",
    "name": "owl",
@@ -58,12 +58,24 @@
   {
    "type": "application",
    "name": "project-maya",
-   "version": "1.1.77",
-   "purl": "pkg:github/mw00/project-maya@cfc825fbc90b56fd7e2625ca026b9924c7211ebb",
+   "version": "1.1.81",
+   "purl": "pkg:github/mw00/project-maya@4a0ce6e86e1896309b8114914ce178bc69492e84",
    "externalReferences": [
     {
      "type": "vcs",
-     "url": "https://github.com/mw00/project-maya/tree/cfc825fbc90b56fd7e2625ca026b9924c7211ebb"
+     "url": "https://github.com/mw00/project-maya/tree/4a0ce6e86e1896309b8114914ce178bc69492e84"
+    }
+   ]
+  },
+  {
+   "type": "application",
+   "name": "strata",
+   "version": "0.2.22",
+   "purl": "pkg:github/Niko1221/Strata@v0.2.22",
+   "externalReferences": [
+    {
+     "type": "vcs",
+     "url": "https://github.com/Niko1221/Strata/releases/tag/v0.2.22"
     }
    ]
   },
@@ -663,24 +675,6 @@
   },
   {
    "type": "machine-learning-model",
-   "name": "maya/glm/Maya-S-v2-IQ2_XXS/vision/GLM-5.3-Flash-vocab.gguf",
-   "hashes": [
-    {
-     "alg": "SHA-256",
-     "content": "8f53cb1bd2e631c14ef413e3284735d9e53f3c508d07a6f609e705b487105912"
-    }
-   ],
-   "purl": "pkg:huggingface/peasantsmith/GLM-5.3-Flash-Maya-GGUF@6f6c6a8394c32f556c09bea0a06dce0b76a3dc37",
-   "version": "6f6c6a8394c32f556c09bea0a06dce0b76a3dc37",
-   "externalReferences": [
-    {
-     "type": "distribution",
-     "url": "https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-GGUF/blob/6f6c6a8394c32f556c09bea0a06dce0b76a3dc37/vision/GLM-5.3-Flash-vocab.gguf"
-    }
-   ]
-  },
-  {
-   "type": "machine-learning-model",
    "name": "maya/deepseek/DeepSeek-V4.1-Flash-1017-GGUF/Engram-Q6_K/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00005-of-00005.gguf",
    "hashes": [
     {
@@ -694,6 +688,24 @@
     {
      "type": "distribution",
      "url": "https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF/blob/c33d87b8c7a3b7d55e71324dc82395587a870b0b/Maya-XS/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00005-of-00005.gguf"
+    }
+   ]
+  },
+  {
+   "type": "machine-learning-model",
+   "name": "maya/glm/Maya-S-v2-IQ2_XXS/vision/GLM-5.3-Flash-vocab.gguf",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "8f53cb1bd2e631c14ef413e3284735d9e53f3c508d07a6f609e705b487105912"
+    }
+   ],
+   "purl": "pkg:huggingface/peasantsmith/GLM-5.3-Flash-Maya-GGUF@6f6c6a8394c32f556c09bea0a06dce0b76a3dc37",
+   "version": "6f6c6a8394c32f556c09bea0a06dce0b76a3dc37",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-GGUF/blob/6f6c6a8394c32f556c09bea0a06dce0b76a3dc37/vision/GLM-5.3-Flash-vocab.gguf"
     }
    ]
   },
@@ -795,7 +807,7 @@
    "externalReferences": [
     {
      "type": "distribution",
-     "url": "https://huggingface.co/peasantsmith/Hy4-Flash-Maya-GGUF/blob/9d73294d20e1119d03d00ea81d1d352bfbe61ff4/Maya-L/Hy4-Flash-Maya-L-IQ4_XS-00002-of-00002.gguf"
+     "url": "https://huggingface.co/peasantsmith/Hy4-Flash-Maya-GGUF/blob/9d73294d20e1119d03d00ea81d1d352bfbe61ff4/Maya-XS/Hy4-Flash-Maya-XS-IQ2_XXS-00002-of-00002.gguf"
     }
    ]
   },
@@ -826,12 +838,12 @@
      "content": "d62e0ae553fe88afd3833733d4a4c669f34d20fd8dfce4b9610525bed2134b10"
     }
    ],
-   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
-   "version": "05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
+   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@fe3653f365c8f9d508712ffeded88ec93cf33852",
+   "version": "fe3653f365c8f9d508712ffeded88ec93cf33852",
    "externalReferences": [
     {
      "type": "distribution",
-     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/05ec74b75cd68c4d6486d15825f2fc73b2ffe304/qwen38-flash-next-vision.hgn"
+     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/fe3653f365c8f9d508712ffeded88ec93cf33852/qwen38-flash-next-vision.hgn"
     }
    ]
   },
@@ -859,15 +871,15 @@
    "hashes": [
     {
      "alg": "SHA-256",
-     "content": "07a7b5b358cb02737ecf85043db0d30b4938aed06ae6311772ea4e40b939696b"
+     "content": "5a5d07b39bf65168915ea8e36047f0ef89b5c68f89e698e4e9c70be408bd6b17"
     }
    ],
-   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
-   "version": "05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
+   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@fe3653f365c8f9d508712ffeded88ec93cf33852",
+   "version": "fe3653f365c8f9d508712ffeded88ec93cf33852",
    "externalReferences": [
     {
      "type": "distribution",
-     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/05ec74b75cd68c4d6486d15825f2fc73b2ffe304/qwen38-flash-next-drafter-r2.hgn"
+     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/fe3653f365c8f9d508712ffeded88ec93cf33852/qwen38-flash-next-drafter-r2.hgn"
     }
    ]
   },
@@ -877,15 +889,15 @@
    "hashes": [
     {
      "alg": "SHA-256",
-     "content": "f9aa330800cc921fe20f4cf997d660f519c67b0052af0c8078b6b648972b07e6"
+     "content": "6feed319c3d8fa6c4c6cb021131205c3e9ed3164446fe9d86b897cf514da00c8"
     }
    ],
-   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
-   "version": "05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
+   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@fe3653f365c8f9d508712ffeded88ec93cf33852",
+   "version": "fe3653f365c8f9d508712ffeded88ec93cf33852",
    "externalReferences": [
     {
      "type": "distribution",
-     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/05ec74b75cd68c4d6486d15825f2fc73b2ffe304/qwen38-flash-next-drafter-r2-ht4.hgn"
+     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/fe3653f365c8f9d508712ffeded88ec93cf33852/qwen38-flash-next-drafter-r2-ht4.hgn"
     }
    ]
   },
@@ -2285,19 +2297,19 @@
   },
   {
    "type": "machine-learning-model",
-   "name": "maya/glm/Maya-S-v2-IQ2_XXS/GLM-5.3-Flash-Maya-S-v2-IQ2_XXS-00002-of-00003.gguf",
+   "name": "halogen/qwen38-flash-next-mtp.hgn",
    "hashes": [
     {
      "alg": "SHA-256",
-     "content": "2d65d88a69f8dc124c8d24bd33b33161ddab218918b4253ad4f500aeede84df5"
+     "content": "0f50e9626df98168e7c6e0cc264e2a92b5184dd885a175a06628d979b5edceeb"
     }
    ],
-   "purl": "pkg:huggingface/peasantsmith/GLM-5.3-Flash-Maya-GGUF@6f6c6a8394c32f556c09bea0a06dce0b76a3dc37",
-   "version": "6f6c6a8394c32f556c09bea0a06dce0b76a3dc37",
+   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@fe3653f365c8f9d508712ffeded88ec93cf33852",
+   "version": "fe3653f365c8f9d508712ffeded88ec93cf33852",
    "externalReferences": [
     {
      "type": "distribution",
-     "url": "https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-GGUF/blob/6f6c6a8394c32f556c09bea0a06dce0b76a3dc37/Maya-S-v2-IQ2_XXS/GLM-5.3-Flash-Maya-S-v2-IQ2_XXS-00002-of-00003.gguf"
+     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/fe3653f365c8f9d508712ffeded88ec93cf33852/qwen38-flash-next-mtp.hgn"
     }
    ]
   },
@@ -2310,12 +2322,12 @@
      "content": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3"
     }
    ],
-   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
-   "version": "05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
+   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@fe3653f365c8f9d508712ffeded88ec93cf33852",
+   "version": "fe3653f365c8f9d508712ffeded88ec93cf33852",
    "externalReferences": [
     {
      "type": "distribution",
-     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/05ec74b75cd68c4d6486d15825f2fc73b2ffe304/tokenizer/tokenizer.json"
+     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/fe3653f365c8f9d508712ffeded88ec93cf33852/tokenizer/tokenizer.json"
     }
    ]
   },
@@ -2352,20 +2364,68 @@
    ]
   },
   {
-   "type": "machine-learning-model",
-   "name": "halogen/qwen38-flash-next-mtp.hgn",
+   "type": "data",
+   "name": "strata/hy4/packs/hy4-flash-sq-96/tokenizer-export/tokenizer.hf.json",
    "hashes": [
     {
      "alg": "SHA-256",
-     "content": "0f50e9626df98168e7c6e0cc264e2a92b5184dd885a175a06628d979b5edceeb"
+     "content": "2e3f3d22065c2be5765ce99ab2410411ae338b32ce809ea20dcdb61d00198e83"
     }
    ],
-   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
-   "version": "05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
+   "properties": [
+    {
+     "name": "owl:origin",
+     "value": "made on the machine by the engine's setup (no upstream file)"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/hy4/packs/hy4-flash-sq-96/tokenizer/merges.txt",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "fd62cf9ad198e3252758cda475c00ac2e2398974d666064af81811bdfff5ea19"
+    }
+   ],
+   "properties": [
+    {
+     "name": "owl:origin",
+     "value": "made on the machine by the engine's setup (no upstream file)"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/hy4/packs/hy4-flash-sq-96/tokenizer/vocab.json",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "ad6c0cb94e4ec278a1ad22f3dcca53c5a5a0a07f14ae04002de1c6648bc6d0c6"
+    }
+   ],
+   "properties": [
+    {
+     "name": "owl:origin",
+     "value": "made on the machine by the engine's setup (no upstream file)"
+    }
+   ]
+  },
+  {
+   "type": "machine-learning-model",
+   "name": "maya/glm/Maya-S-v2-IQ2_XXS/GLM-5.3-Flash-Maya-S-v2-IQ2_XXS-00002-of-00003.gguf",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "2d65d88a69f8dc124c8d24bd33b33161ddab218918b4253ad4f500aeede84df5"
+    }
+   ],
+   "purl": "pkg:huggingface/peasantsmith/GLM-5.3-Flash-Maya-GGUF@6f6c6a8394c32f556c09bea0a06dce0b76a3dc37",
+   "version": "6f6c6a8394c32f556c09bea0a06dce0b76a3dc37",
    "externalReferences": [
     {
      "type": "distribution",
-     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/05ec74b75cd68c4d6486d15825f2fc73b2ffe304/qwen38-flash-next-mtp.hgn"
+     "url": "https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-GGUF/blob/6f6c6a8394c32f556c09bea0a06dce0b76a3dc37/Maya-S-v2-IQ2_XXS/GLM-5.3-Flash-Maya-S-v2-IQ2_XXS-00002-of-00003.gguf"
     }
    ]
   },
@@ -2388,6 +2448,88 @@
    ]
   },
   {
+   "type": "data",
+   "name": "strata/hy4/models/hy4-flash/Hy4-Flash-Vision.strata",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "ef09bceff8f01b8d226d2dc56aef09cec719b21b45783ee9b5d64e7241b72a09"
+    }
+   ],
+   "purl": "pkg:huggingface/strata-engine/Hy4-Flash-Strata@995bac227ab7e0d221772be641e2b5954a9fac06",
+   "version": "995bac227ab7e0d221772be641e2b5954a9fac06",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/strata-engine/Hy4-Flash-Strata/blob/995bac227ab7e0d221772be641e2b5954a9fac06/Hy4-Flash-Vision.strata"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/qwen/packs/iq3_s/dense.bin",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "d2af3d8331e5c7a1985d1d589747230f9d56719a6d33c7cddc9ee6b81cde6b13"
+    }
+   ],
+   "properties": [
+    {
+     "name": "owl:origin",
+     "value": "made on the machine by the engine's setup (no upstream file)"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/qwen/packs/iq3_s/tokenizer/merges.txt",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "4ba698529766c7a2f5052083ea10cdf2485577f5237a332ee291054eb11e3332"
+    }
+   ],
+   "properties": [
+    {
+     "name": "owl:origin",
+     "value": "made on the machine by the engine's setup (no upstream file)"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/qwen/packs/iq3_s/tokenizer/vocab.json",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4"
+    }
+   ],
+   "properties": [
+    {
+     "name": "owl:origin",
+     "value": "made on the machine by the engine's setup (no upstream file)"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/qwen/dflash2/qwen3.8-flash-next-dflash2.strata1.q4_0-selq4.pack",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "4df2e5ab2b47c064afbe662e16e4f06569877125c2d0e2123a4ac755266c664c"
+    }
+   ],
+   "properties": [
+    {
+     "name": "owl:origin",
+     "value": "Strata 0.2.22's tuned DFlash2 pack (TUNED_SHA256), made from incoai/Qwen3.8-Flash-Next-DFlash2@a22a1744e85c17364dcc54a6a420af7135d4c7f6"
+    }
+   ]
+  },
+  {
    "type": "machine-learning-model",
    "name": "halogen/qwen38-flash-next-ngram.hgn",
    "hashes": [
@@ -2396,12 +2538,12 @@
      "content": "3450acada94e19aabad88bd49b45eb70304820949c2240fc178067b20ae5dffe"
     }
    ],
-   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
-   "version": "05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
+   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@fe3653f365c8f9d508712ffeded88ec93cf33852",
+   "version": "fe3653f365c8f9d508712ffeded88ec93cf33852",
    "externalReferences": [
     {
      "type": "distribution",
-     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/05ec74b75cd68c4d6486d15825f2fc73b2ffe304/qwen38-flash-next-ngram.hgn"
+     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/fe3653f365c8f9d508712ffeded88ec93cf33852/qwen38-flash-next-ngram.hgn"
     }
    ]
   },
@@ -2420,6 +2562,92 @@
     {
      "type": "distribution",
      "url": "https://huggingface.co/Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated/blob/e7783c5822dfda2785a0f5b435abf54df89fe8ee/qwen38-flash-next-v2-abliterated.hgn"
+    }
+   ]
+  },
+  {
+   "type": "machine-learning-model",
+   "name": "strata/qwen/models/mmproj-Qwen3.8-Flash-Next-BF16.gguf",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "b1a82259702816a5330d7bd7607cd9676b11780e79ff7348c21103ff3ce49bd0"
+    }
+   ],
+   "purl": "pkg:huggingface/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF@ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+   "version": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/blob/ed59f92082b1e93c0e96d60a8b11aab089b52f09/mmproj-Qwen3.8-Flash-Next-BF16.gguf"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/inkling/packs/inkling-2-mini-sq-20/tokenizer/merges.txt",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "fe0bc77954037ef9863de7066fab02302f0f739a4122eaf2e9bfdaa5a63ac39f"
+    }
+   ],
+   "properties": [
+    {
+     "name": "owl:origin",
+     "value": "made on the machine by the engine's setup (no upstream file)"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/inkling/packs/inkling-2-mini-sq-20/tokenizer/vocab.json",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "e31303ccaacbe11b82275695f26c25515505210a379193a6336a760cf91888f6"
+    }
+   ],
+   "properties": [
+    {
+     "name": "owl:origin",
+     "value": "made on the machine by the engine's setup (no upstream file)"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/inkling/models/inkling-2-mini/Inkling-2-Mini-Vision.strata",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "6589eff47f9c20bc3a032faa3d449f10bf4f04a84cc6b2ee8a44d51d2b6fc677"
+    }
+   ],
+   "purl": "pkg:huggingface/strata-engine/Inkling-2-Mini-Strata@04996a1e2c45009b6a04f2af126cb6bdb2ba3587",
+   "version": "04996a1e2c45009b6a04f2af126cb6bdb2ba3587",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/strata-engine/Inkling-2-Mini-Strata/blob/04996a1e2c45009b6a04f2af126cb6bdb2ba3587/Inkling-2-Mini-Vision.strata"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/inkling/models/inkling-2-mini/tokenizer.json",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "7f332727f9a3f093dd452a39cc978e6757627e5dad1b0673aa4e75174f236dd6"
+    }
+   ],
+   "purl": "pkg:huggingface/strata-engine/Inkling-2-Mini-Strata@04996a1e2c45009b6a04f2af126cb6bdb2ba3587",
+   "version": "04996a1e2c45009b6a04f2af126cb6bdb2ba3587",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/strata-engine/Inkling-2-Mini-Strata/blob/04996a1e2c45009b6a04f2af126cb6bdb2ba3587/tokenizer.json"
     }
    ]
   },
@@ -2460,6 +2688,42 @@
    ]
   },
   {
+   "type": "data",
+   "name": "strata/inkling/models/inkling-2-mini/Inkling-2-Mini-SQ-20.strata",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "0bbfd52344f0dd4779a7807b5f73554a812f24c035e6877b63cd0d499f7e1b97"
+    }
+   ],
+   "purl": "pkg:huggingface/strata-engine/Inkling-2-Mini-Strata@04996a1e2c45009b6a04f2af126cb6bdb2ba3587",
+   "version": "04996a1e2c45009b6a04f2af126cb6bdb2ba3587",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/strata-engine/Inkling-2-Mini-Strata/blob/04996a1e2c45009b6a04f2af126cb6bdb2ba3587/Inkling-2-Mini-SQ-20.strata"
+    }
+   ]
+  },
+  {
+   "type": "machine-learning-model",
+   "name": "strata/qwen/models/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+    }
+   ],
+   "purl": "pkg:huggingface/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF@ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+   "version": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/blob/ed59f92082b1e93c0e96d60a8b11aab089b52f09/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf"
+    }
+   ]
+  },
+  {
    "type": "machine-learning-model",
    "name": "halogen/qwen38-flash-next-v2.hgn",
    "hashes": [
@@ -2468,12 +2732,66 @@
      "content": "71246c6ab3fc1de2cf06326f18e275fe9c2a18366d646ed3357d194c884fc687"
     }
    ],
-   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
-   "version": "05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
+   "purl": "pkg:huggingface/peonist-ai/halogen-qwen3.8-flash-next@fe3653f365c8f9d508712ffeded88ec93cf33852",
+   "version": "fe3653f365c8f9d508712ffeded88ec93cf33852",
    "externalReferences": [
     {
      "type": "distribution",
-     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/05ec74b75cd68c4d6486d15825f2fc73b2ffe304/qwen38-flash-next-v2.hgn"
+     "url": "https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/blob/fe3653f365c8f9d508712ffeded88ec93cf33852/qwen38-flash-next-v2.hgn"
+    }
+   ]
+  },
+  {
+   "type": "machine-learning-model",
+   "name": "strata/qwen/models/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "4c1eb2ceb4915e1192f4f386021897bde56a97f40a0bb78bb86465e0f7d2aca3"
+    }
+   ],
+   "purl": "pkg:huggingface/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF@ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+   "version": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/blob/ed59f92082b1e93c0e96d60a8b11aab089b52f09/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/hy4/models/hy4-flash/Hy4-Flash-Engram-Q8.strata",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "ab0cf9b3f9c64bd25f6212d4508e7443ab8b9bc133fbccc7bdfb83510a20c2c1"
+    }
+   ],
+   "purl": "pkg:huggingface/strata-engine/Hy4-Flash-Strata@995bac227ab7e0d221772be641e2b5954a9fac06",
+   "version": "995bac227ab7e0d221772be641e2b5954a9fac06",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/strata-engine/Hy4-Flash-Strata/blob/995bac227ab7e0d221772be641e2b5954a9fac06/Hy4-Flash-Engram-Q8.strata"
+    }
+   ]
+  },
+  {
+   "type": "data",
+   "name": "strata/hy4/models/hy4-flash/Hy4-Flash-SQ-96.strata",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "3b1c5755a220c69892b3d2dbad506b8593a30be24b17a390ecbd1642c0c1e14c"
+    }
+   ],
+   "purl": "pkg:huggingface/strata-engine/Hy4-Flash-Strata@995bac227ab7e0d221772be641e2b5954a9fac06",
+   "version": "995bac227ab7e0d221772be641e2b5954a9fac06",
+   "externalReferences": [
+    {
+     "type": "distribution",
+     "url": "https://huggingface.co/strata-engine/Hy4-Flash-Strata/blob/995bac227ab7e0d221772be641e2b5954a9fac06/Hy4-Flash-SQ-96.strata"
     }
    ]
   }

@@ -226,11 +226,6 @@ halogen_env:
 ## Measured on a GMKtec EVO-X2 (128 GB)
 
 The latest run, with each engine's bench, versions and model hashes: [benchmarks/2026-11-26](benchmarks/2026-11-26/README.md).
-Strata was not in that run:
-
-| Engine | Model | Decode | Date |
-|--------|-------|--------|------|
-| Strata | Qwen3.8-Flash-Next IQ3_S | 51.5 tok/s | 2026-11-08 |
 
 ## Test
 

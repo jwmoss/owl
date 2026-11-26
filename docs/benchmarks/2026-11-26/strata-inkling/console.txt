@@ -1,0 +1,76 @@
+starting the engine (the model load is not part of the benchmark time) ...
+waiting for the model to load (0 s) ...
+[1/22] warmup (up to 128 tokens)
+    truncated: prompt 93.780849 tok/s, decode 31.235315 tok/s, first token 0.382814 s
+[2/22] performance-short-r1 (up to 512 tokens)
+    truncated: prompt 106.221548 tok/s, decode 28.027633 tok/s, first token 0.379554 s
+[3/22] performance-prompt-4k-r1 (up to 512 tokens)
+    truncated: prompt 745.832879 tok/s, decode 26.505394 tok/s, first token 4.586394 s
+[4/22] performance-prompt-16k-r1 (up to 512 tokens)
+    truncated: prompt 736.343566 tok/s, decode 23.591609 tok/s, first token 18.359489 s
+[5/22] performance-short-r2 (up to 512 tokens)
+    truncated: prompt 61.448427 tok/s, decode 27.799797 tok/s, first token 0.395745 s
+[6/22] performance-prompt-4k-r2 (up to 512 tokens)
+    truncated: prompt 779.70889 tok/s, decode 25.925078 tok/s, first token 4.380549 s
+[7/22] performance-prompt-16k-r2 (up to 512 tokens)
+    truncated: prompt 758.535242 tok/s, decode 23.287588 tok/s, first token 18.14191 s
+[8/22] performance-short-r3 (up to 512 tokens)
+    truncated: prompt 61.313869 tok/s, decode 28.187472 tok/s, first token 0.393847 s
+[9/22] performance-prompt-4k-r3 (up to 512 tokens)
+    truncated: prompt 780.597934 tok/s, decode 25.61847 tok/s, first token 4.374279 s
+[10/22] performance-prompt-16k-r3 (up to 512 tokens)
+    truncated: prompt 758.172021 tok/s, decode 23.804858 tok/s, first token 18.147998 s
+[11/22] sanity-I1 (up to 2048 tokens)
+    completed: prompt 182.808246 tok/s, decode 29.880244 tok/s, first token 0.398422 s
+[12/22] sanity-I2 (up to 2048 tokens)
+    completed: prompt 206.947524 tok/s, decode 37.139438 tok/s, first token 0.411988 s
+[13/22] sanity-I3 (up to 2048 tokens)
+    completed: prompt 194.285714 tok/s, decode 39.368819 tok/s, first token 0.403141 s
+[14/22] sanity-I4 (up to 2048 tokens)
+    completed: prompt 154.175589 tok/s, decode 28.657734 tok/s, first token 0.373423 s
+[15/22] sanity-R1 (up to 2048 tokens)
+    completed: prompt 809.627491 tok/s, decode 26.638083 tok/s, first token 4.388189 s
+[16/22] sanity-R2 (up to 2048 tokens)
+    completed: prompt 808.009256 tok/s, decode 27.308795 tok/s, first token 4.395935 s
+[17/22] sanity-R3 (up to 2048 tokens)
+    completed: prompt 766.247928 tok/s, decode 25.150905 tok/s, first token 18.16838 s
+[18/22] sanity-R4 (up to 2048 tokens)
+    completed: prompt 768.269901 tok/s, decode 27.07893 tok/s, first token 18.13076 s
+[19/22] sanity-T1 (up to 2048 tokens)
+    completed: prompt 365.853659 tok/s, decode 30.937983 tok/s, first token 0.503625 s
+[20/22] sanity-T2 (up to 2048 tokens)
+    completed: prompt 390.256679 tok/s, decode 30.680575 tok/s, first token 0.525491 s
+[21/22] sanity-T3 (up to 2048 tokens)
+    completed: prompt 433.39079 tok/s, decode 30.693539 tok/s, first token 0.549049 s
+[22/22] sanity-T4 (up to 2048 tokens)
+    completed: prompt 411.686587 tok/s, decode 34.9086 tok/s, first token 0.518523 s
+Strata standard benchmark (strata-qwen38-thinking-v1-draft.1)
+Status: nonconforming. 21 of 21 required requests finished, 0 failed, 0 skipped. Time after the model loaded: 5 min 49 s.
+Machine: AMD Radeon; AMD RYZEN AI MAX+ 395 w/ Radeon 8060S; 121 GB RAM; Ubuntu 26.04.1 LTS 7.0.0-43-generic.
+Model: inkling-2-mini-sq-20, quantization not read, context 131072; engine strata-inkling-0.1.67; track custom.
+
+Speed (median, min-max, n; the engine's own prompt and decode timings, the client's first-token time):
+  Case        Prompt tok/s             Decode tok/s          TTFT s                   Total s               Capped
+  short       n/a                      28.0 (27.8-28.2) n=3  0.39 (0.38-0.40) n=3     18.4 (18.1-18.6) n=3  3/3
+  prompt-4k   779.7 (745.8-780.6) n=3  25.9 (25.6-26.5) n=3  4.38 (4.37-4.59) n=3     23.6 (23.4-23.9) n=3  3/3
+  prompt-16k  758.2 (736.3-758.5) n=3  23.6 (23.3-23.8) n=3  18.15 (18.14-18.36) n=3  39.5 (39.1-39.9) n=3  3/3
+  short is a prompt of about 80 tokens: its prompt rate is dominated by the fixed cost of a request, so it is not shown; read prompt speed from prompt-4k and prompt-16k.
+  Capped = requests that reached the 512-token cap, reasoning and answer together. A capped request's total time is the time to the cap, not to an answer, and it has no first-answer time when it was still reasoning.
+
+Sanity checks: 12 of 12 passed (instruction 4/4, retrieval 4/4, tool calls 4/4).
+
+Why this is not a complete standard result:
+  - no model file could be hashed
+  - performance-prompt-4k-r1 measured 3423 prompt tokens, outside 2% of its target
+  - performance-prompt-16k-r1 measured 13775 prompt tokens, outside 2% of its target
+  - performance-prompt-4k-r2 measured 3423 prompt tokens, outside 2% of its target
+  - performance-prompt-16k-r2 measured 13775 prompt tokens, outside 2% of its target
+  - performance-prompt-4k-r3 measured 3423 prompt tokens, outside 2% of its target
+  - performance-prompt-16k-r3 measured 13775 prompt tokens, outside 2% of its target
+  - sanity-R1 measured 3421 prompt tokens, outside 2% of its target
+  - sanity-R2 measured 3422 prompt tokens, outside 2% of its target
+  - sanity-R3 measured 13773 prompt tokens, outside 2% of its target
+  - sanity-R4 measured 13777 prompt tokens, outside 2% of its target
+
+Report: ~/bench-2026-11-26b/strata-inkling/README.md
+Result: ~/bench-2026-11-26b/strata-inkling/results.json

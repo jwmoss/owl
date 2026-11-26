@@ -25,9 +25,15 @@ MACHINE = {
 ENGINES = [
     {
         "name": "project-maya",
-        "version": "1.1.77",
-        "purl": "pkg:github/mw00/project-maya@cfc825fbc90b56fd7e2625ca026b9924c7211ebb",
-        "url": "https://github.com/mw00/project-maya/tree/cfc825fbc90b56fd7e2625ca026b9924c7211ebb",
+        "version": "1.1.81",
+        "purl": "pkg:github/mw00/project-maya@4a0ce6e86e1896309b8114914ce178bc69492e84",
+        "url": "https://github.com/mw00/project-maya/tree/4a0ce6e86e1896309b8114914ce178bc69492e84",
+    },
+    {
+        "name": "strata",
+        "version": "0.2.22",
+        "purl": "pkg:github/Niko1221/Strata@v0.2.22",
+        "url": "https://github.com/Niko1221/Strata/releases/tag/v0.2.22",
     },
     {
         "name": "halogen-flash-server",
@@ -38,7 +44,7 @@ ENGINES = [
         "url": "https://github.com/peonist-ai/halogen-flash-server",
     },
 ]
-# The commits that Maya v1.1.77 pins (tools/*/download*.json, maya.py) and Owl pins; "main" is resolved at run time.
+# The commits that Maya v1.1.81 pins (tools/*/download*.json, maya.py) and Owl pins; "main" is resolved at run time.
 REPOS = [
     (
         "peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF",
@@ -54,13 +60,24 @@ REPOS = [
     ("unsloth/Inkling-2-Mini-GGUF", "ae9327c5fbc7333116ba32eee78bb5d2bbefae4f"),
     (
         "peonist-ai/halogen-qwen3.8-flash-next",
-        "05ec74b75cd68c4d6486d15825f2fc73b2ffe304",
+        "fe3653f365c8f9d508712ffeded88ec93cf33852",
     ),
     (
         "Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated",
         "e7783c5822dfda2785a0f5b435abf54df89fe8ee",
     ),
+    # Strata downloads from these without a pinned commit; "main" is the commit whose files match.
+    ("ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF", "main"),
+    ("unsloth/Qwen3.8-Flash-Next-GGUF", "main"),
+    ("strata-engine/Hy4-Flash-Strata", "main"),
+    ("strata-engine/Inkling-2-Mini-Strata", "main"),
 ]
+
+# Files that an engine pins by SHA-256 in its own code, not by a Hugging Face file.
+PINNED = {
+    "4df2e5ab2b47c064afbe662e16e4f06569877125c2d0e2123a4ac755266c664c": "Strata 0.2.22's tuned DFlash2 pack (TUNED_SHA256),"
+    " made from incoai/Qwen3.8-Flash-Next-DFlash2@a22a1744e85c17364dcc54a6a420af7135d4c7f6",
+}
 
 token_file = os.path.expanduser("~/.cache/huggingface/token")
 token = (
@@ -82,7 +99,7 @@ for repo, rev in REPOS:
     sha = get(f"https://huggingface.co/api/models/{repo}/revision/{rev}")["sha"]
     for f in get(f"https://huggingface.co/api/models/{repo}/tree/{sha}?recursive=true"):
         if (f.get("lfs") or {}).get("oid"):
-            oids.setdefault(f["lfs"]["oid"], (repo, sha, f["path"]))
+            oids.setdefault(f["lfs"]["oid"], []).append((repo, sha, f["path"]))
 
 components = [
     {
@@ -106,7 +123,13 @@ for line in Path(RUN, "sha256sums.txt").read_text().splitlines():
         "hashes": [{"alg": "SHA-256", "content": digest}],
     }
     if digest in oids:
-        repo, sha, hf_path = oids[digest]
+        # Identical files can sit in several folders (a shared shard): take the one with the same name.
+        same = [
+            m
+            for m in oids[digest]
+            if m[2].rsplit("/", 1)[-1] == path.rsplit("/", 1)[-1]
+        ]
+        repo, sha, hf_path = (same or oids[digest])[0]
         c |= {
             "type": "machine-learning-model"
             if path.endswith((".gguf", ".hgn", ".dfly2", ".bin"))
@@ -120,6 +143,8 @@ for line in Path(RUN, "sha256sums.txt").read_text().splitlines():
                 }
             ],
         }
+    elif digest in PINNED:
+        c["properties"] = [{"name": "owl:origin", "value": PINNED[digest]}]
     elif path.startswith("halogen/npu/"):
         c["properties"] = [
             {
@@ -155,6 +180,67 @@ sbom = {
     "components": components,
 }
 Path(RUN, "sbom.cdx.json").write_text(json.dumps(sbom, indent=1))
+
+# The same list as SPDX 2.3: one package for the machine, each engine and each file; the document describes them all.
+PURPOSE = {"device": "DEVICE", "application": "APPLICATION", "container": "CONTAINER"}
+created = sbom["metadata"]["timestamp"]
+machine = {
+    "SPDXID": "SPDXRef-machine",
+    "name": "owl",
+    "supplier": f"Organization: {MACHINE['vendor']}",
+    "downloadLocation": "NOASSERTION",
+    "filesAnalyzed": False,
+    "primaryPackagePurpose": "DEVICE",
+    "comment": "; ".join(f"{k}: {v}" for k, v in MACHINE.items()),
+}
+packages = [machine]
+for i, c in enumerate(components):
+    ref = c["externalReferences"][0]["url"] if c.get("externalReferences") else None
+    p = {
+        "SPDXID": f"SPDXRef-{i}",
+        "name": c["name"],
+        "downloadLocation": ref or "NONE",
+        "filesAnalyzed": False,
+        "primaryPackagePurpose": PURPOSE.get(c["type"], "FILE"),
+    }
+    if c.get("version"):
+        p["versionInfo"] = c["version"]
+    if c.get("hashes"):
+        p["checksums"] = [
+            {"algorithm": "SHA256", "checksumValue": c["hashes"][0]["content"]}
+        ]
+    if c.get("purl"):
+        p["externalRefs"] = [
+            {
+                "referenceCategory": "PACKAGE-MANAGER",
+                "referenceType": "purl",
+                "referenceLocator": c["purl"],
+            }
+        ]
+    if c.get("properties"):
+        p["comment"] = c["properties"][0]["value"]
+    packages.append(p)
+spdx = {
+    "spdxVersion": "SPDX-2.3",
+    "dataLicense": "CC0-1.0",
+    "SPDXID": "SPDXRef-DOCUMENT",
+    "name": f"owl benchmark run {os.path.basename(os.path.normpath(RUN))}",
+    "documentNamespace": f"https://github.com/jwmoss/owl/tree/main/docs/benchmarks/{os.path.basename(os.path.normpath(RUN))}",
+    "creationInfo": {
+        "created": created,
+        "creators": ["Tool: owl-docs-benchmarks-sbom.py"],
+    },
+    "packages": packages,
+    "relationships": [
+        {
+            "spdxElementId": "SPDXRef-DOCUMENT",
+            "relationshipType": "DESCRIBES",
+            "relatedSpdxElement": p["SPDXID"],
+        }
+        for p in packages
+    ],
+}
+Path(RUN, "sbom.spdx.json").write_text(json.dumps(spdx, indent=1))
 print(
     f"{len(components)} components, {sum('purl' in c and 'huggingface' in c['purl'] for c in components)} matched "
     f"to Hugging Face, {unmatched} made on the machine"

@@ -1,38 +1,38 @@
-Project Maya v1.1.77 benchmark, 2026-11-26 02:55
+Project Maya v1.1.81 benchmark, 2026-11-26 04:30
 GPUs: AMD Radeon (gfx1151); RAM 121 GB; CPU AMD RYZEN AI MAX+ 395 w/ Radeon 8060S
-setup: .installed-cfc825fbc90b56fd7e2625ca026b9924c7211ebb-5760d0275b6e08b4db3a39def33502365477a1b0.json, context 262144, GPUs [0], drafting: DSpark on, 82% of drafts accepted
-decode (writing the answer): median 32.3 (23.6-37.8) tokens/s over 3 answers of 256 tokens (greedy, thinking off)
-prompt reading: 2K tokens, median 284 (244-291) tokens/s
-prompt reading: 8K tokens, median 428 (386-432) tokens/s
-wall time: quiet check 1 s, load 43 s, warm-up 13 s, decode 28 s, prompts 82 s, stop 1 s (total 166 s); all 168 s
-owl | AMD Radeon (gfx1151) | amdgpu | deepseek-v4.1-flash-abliterated DeepSeek-V4.1-Flash-1017 | 256K DSpark on, 82% of drafts accepted | cfc825fb | v1.1.77 | decode 32.3 (23.6-37.8) | prompt 2K 284 / 8K 428 | 2026-11-26
+setup: .installed-4a0ce6e86e1896309b8114914ce178bc69492e84-5760d0275b6e08b4db3a39def33502365477a1b0.json, context 262144, GPUs [0], drafting: DSpark on, 83% of drafts accepted
+decode (writing the answer): median 29.5 (22.8-36.8) tokens/s over 3 answers of 256 tokens (greedy, thinking off)
+prompt reading: 2K tokens, median 262 (254-272) tokens/s
+prompt reading: 8K tokens, median 452 (438-456) tokens/s
+layout: GPUs: dev0 | engine: engine_kind=ds4 | drafting: DSpark on (engine log kept: ~/src/project-maya/.bench-logs/this-r1.log)
+wall time: quiet check 1 s, load 42 s, warm-up 10 s, decode 29 s, prompts 78 s, stop 1 s (total 161 s); all 162 s
+owl | AMD Radeon (gfx1151) | amdgpu | deepseek-v4.1-flash-abliterated DeepSeek-V4.1-Flash-1017 | 256K DSpark on, 83% of drafts accepted | 4a0ce6e8 | v1.1.81 | decode 29.5 (22.8-36.8) | prompt 2K 262 / 8K 452 | 2026-11-26
 
 engine lines:
-ds4: CUDA0 keeps 32 MiB free beside the 16384 MiB reserve (measured on this PC: the start and the requests allocate that much after the memory plan, so the reserve itself stays free; MAYA_VRAM_LATE_MB=0 turns this off)
 ds4: the one-GPU decode path (in-place pulls, windows streamed, landings): off (v1.1.27's path: not NVIDIA + one GPU)
 ds4: expert profile ~/models/maya/deepseek-abl/DeepSeek-V4.1-Flash-1017-abliterated-GGUF/Mix-128G/maya-ds4/expert-profile.bin
-ds4: CUDA0 prompt ring: 48 slots of 7.8 MB, 12 a batch (375 MB) for its 78.5 GB/s link (DS4_RING_MB sets it)
-ds4: the experts VRAM leaves over (~20.1 GB) are read in place from the model's files (copied into RAM after the GPUs' share when the RAM holds them all; --mmap-experts on keeps them in place) (116.3 GB of RAM free to keep them: the most-routed 20.1 GB read ahead; prompts in chunks of 4096)
+ds4: CUDA0 prompt ring: 48 slots of 7.8 MB, 12 a batch (375 MB) for its 72.0 GB/s link (DS4_RING_MB sets it)
+ds4: the experts VRAM leaves over (~20.1 GB) are read in place from the model's files (copied into RAM after the GPUs' share when the RAM holds them all; --mmap-experts on keeps them in place) (115.9 GB of RAM free to keep them: the most-routed 20.1 GB read ahead; prompts in chunks of 4096)
 ds4: CPU lane iq1_m rows: AVX-512
-ds4: PCIe lane: CUDA0 IQ1_S/IQ1_S/IQ1_S 6912000 B: an expert 0.112 ms on the CPU lane (+0.022 a call), 0.101 streamed (+0.122 a request, read in place), 0.044 on the GPU, 2.00 from the disk -> of 0..6 picks in RAM it streams 0 0 0 1 1 2 3 (decode's check of streaming - picks all in RAM: being measured, some from the disk: being measured)
-ds4: PCIe lane: CUDA0 IQ1_M/IQ1_M/IQ1_S 7464960 B: an expert 0.121 ms on the CPU lane (+0.046 a call), 0.207 streamed (+0.091 a request, read in place), 0.093 on the GPU, 2.16 from the disk -> of 0..6 picks in RAM it streams 0 0 0 1 1 1 2 (decode's check of streaming - picks all in RAM: being measured, some from the disk: being measured)
-ds4: PCIe lane: CUDA0 IQ1_S/IQ1_S/IQ1_M 7188480 B: an expert 0.122 ms on the CPU lane (+0.031 a call), 0.145 streamed (+0.096 a request, read in place), 0.109 on the GPU, 2.08 from the disk -> of 0..6 picks in RAM it streams 0 0 0 1 1 2 2 (decode's check of streaming - picks all in RAM: being measured, some from the disk: being measured)
-ds4: PCIe lane: CUDA0 IQ1_S/IQ1_S/IQ2_XXS 7649280 B: an expert 0.104 ms on the CPU lane (+0.033 a call), 0.158 streamed (+0.158 a request, read in place), 0.104 on the GPU, 2.22 from the disk -> of 0..6 picks in RAM it streams 0 0 0 0 1 1 1 (decode's check of streaming - picks all in RAM: being measured, some from the disk: being measured)
-ds4: PCIe lane: CUDA0 IQ1_M/IQ1_M/IQ2_XXS 8202240 B: an expert 0.100 ms on the CPU lane (+0.072 a call), 0.170 streamed (+0.214 a request, read in place), 0.103 on the GPU, 2.38 from the disk -> of 0..6 picks in RAM it streams 0 0 0 0 0 0 0 (decode's check of streaming - picks all in RAM: being measured, some from the disk: being measured)
-ds4: PCIe lane: 40 layers on 1 GPU(s) stream some of a token's CPU-lane experts (2 reading threads; timed, 594 ms)
-ds4: CUDA0: 16404 MiB of VRAM free with everything loaded (the reserve 16384 MiB, 32 MiB more kept beside it)
+ds4: PCIe lane: CUDA0 IQ1_S/IQ1_S/IQ1_S 6912000 B: an expert 0.116 ms on the CPU lane (+0.038 a call), 0.122 streamed (+0.134 a request, read in place), 0.037 on the GPU, 1.83 from the disk -> of 0..6 picks in RAM it streams 0 0 0 1 1 2 2 (decode's check of streaming - picks all in RAM: being measured, some from the disk: being measured)
+ds4: PCIe lane: CUDA0 IQ1_M/IQ1_M/IQ1_S 7464960 B: an expert 0.121 ms on the CPU lane (+0.043 a call), 0.157 streamed (+0.141 a request, read in place), 0.096 on the GPU, 1.97 from the disk -> of 0..6 picks in RAM it streams 0 0 0 1 1 1 2 (decode's check of streaming - picks all in RAM: being measured, some from the disk: being measured)
+ds4: PCIe lane: CUDA0 IQ1_S/IQ1_S/IQ1_M 7188480 B: an expert 0.123 ms on the CPU lane (+0.029 a call), 0.136 streamed (+0.192 a request, read in place), 0.106 on the GPU, 1.90 from the disk -> of 0..6 picks in RAM it streams 0 0 0 0 1 1 2 (decode's check of streaming - picks all in RAM: being measured, some from the disk: being measured)
+ds4: PCIe lane: CUDA0 IQ1_S/IQ1_S/IQ2_XXS 7649280 B: an expert 0.107 ms on the CPU lane (+0.023 a call), 0.140 streamed (+0.138 a request, read in place), 0.115 on the GPU, 2.02 from the disk -> of 0..6 picks in RAM it streams 0 0 0 0 0 0 0 (decode's check of streaming - picks all in RAM: being measured, some from the disk: being measured)
+ds4: PCIe lane: CUDA0 IQ1_M/IQ1_M/IQ2_XXS 8202240 B: an expert 0.096 ms on the CPU lane (+0.070 a call), 0.140 streamed (+0.195 a request, read in place), 0.103 on the GPU, 2.17 from the disk -> of 0..6 picks in RAM it streams 0 0 0 0 0 0 0 (decode's check of streaming - picks all in RAM: being measured, some from the disk: being measured)
+ds4: PCIe lane: 40 layers on 1 GPU(s) stream some of a token's CPU-lane experts (2 reading threads; timed, 564 ms)
+ds4: CUDA0: 16384 MiB of VRAM free with everything loaded (the reserve 16384 MiB)
 ds4: abliteration: ~/models/maya/deepseek-abl/refusal-directions/DeepSeek-V4.1-Flash-refusal-direction.gguf direction.1, scale 1, projected out of every layer's attention and MoE writes
-ds4: CUDA0 layers [0, 42] + head: weights 6.05 GB, experts 95.38 GB (12862 of 15744 in VRAM), caches 0.24 GB, 16404 MiB free
+ds4: CUDA0 layers [0, 42] + head: weights 6.05 GB, experts 95.40 GB (12862 of 15744 in VRAM), caches 0.24 GB, 16384 MiB free
 ds4: 2882 routed experts on the CPU lane (20.4 GB, in place in the model's files), 16 threads
 ds4: GPU0 (gfx1151) the indexer's scores on the WMMAs (the default on RDNA 3; DS4_INDEX_TC=0: off)
-maya ds4 serve: prompt read: 2048 tokens in 10.7 s; VRAM free CUDA0 16.0 of 113.1 GB before, 15.8 after
-ds4: WARNING - CUDA0: 16185 MiB free, short of the 16384 MiB reserve - the next start keeps 256 MiB free beside it for what the start and the requests allocate after the experts' plan
+maya ds4 serve: prompt read: 2048 tokens in 8.6 s; VRAM free CUDA0 16.0 of 113.1 GB before, 15.8 after
+ds4: WARNING - CUDA0: 16166 MiB free, short of the 16384 MiB reserve - the next start keeps 224 MiB free beside it for what the start and the requests allocate after the experts' plan
 maya ds4 serve: prompt read: 28 tokens in 0.9 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
-maya ds4 serve: prompt read: 19 tokens in 1.0 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
+maya ds4 serve: prompt read: 19 tokens in 0.6 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
 maya ds4 serve: prompt read: 21 tokens in 0.8 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
-maya ds4 serve: prompt read: 2048 tokens in 8.4 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
-maya ds4 serve: prompt read: 8192 tokens in 21.2 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
-maya ds4 serve: prompt read: 2048 tokens in 7.2 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
-maya ds4 serve: prompt read: 8192 tokens in 19.0 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
-maya ds4 serve: prompt read: 2048 tokens in 7.0 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
-maya ds4 serve: prompt read: 8192 tokens in 19.1 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
+maya ds4 serve: prompt read: 2048 tokens in 8.1 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
+maya ds4 serve: prompt read: 8192 tokens in 18.7 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
+maya ds4 serve: prompt read: 2048 tokens in 7.8 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
+maya ds4 serve: prompt read: 8192 tokens in 18.0 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
+maya ds4 serve: prompt read: 2048 tokens in 7.5 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after
+maya ds4 serve: prompt read: 8192 tokens in 18.1 s; VRAM free CUDA0 15.8 of 113.1 GB before, 15.8 after

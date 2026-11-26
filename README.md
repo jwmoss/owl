@@ -12,21 +12,27 @@ Tested on a GMKtec EVO-X2 with 128 GB.
 
 ## Measured speed
 
-Measured on a GMKtec EVO-X2 (128 GB) on 2026-11-26, with each engine's own bench. Decode: 256-token answers.
-The [run record](docs/benchmarks/2026-11-26/README.md) has the raw output, the engine commits and image digests, the
-Hugging Face commit and SHA-256 of each model file, and a [CycloneDX SBOM](docs/benchmarks/2026-11-26/sbom.cdx.json).
+Measured on a GMKtec EVO-X2 (Ryzen AI Max+ 395, 128 GB) on 2026-11-26, with each engine's own bench, at the
+versions that `main` pins. The [run record](docs/benchmarks/2026-11-26/README.md) has the raw output of each bench,
+the engine commits and image digests, and the Hugging Face commit and SHA-256 of every model file, also as
+[CycloneDX](docs/benchmarks/2026-11-26/sbom.cdx.json) and [SPDX](docs/benchmarks/2026-11-26/sbom.spdx.json) SBOMs.
 
-| Engine | Model | Context | Decode tok/s | Prompt 8K tok/s |
-|---|---|---|---:|---:|
-| halogen 0.20.7 | Qwen3.8-Flash-Next v2 (abliterated) | 256K | **64.8** | 2347 ¹ |
-| Maya v1.1.77 | Inkling 2 Mini | 256K | **49.3** | 1049 |
-| Maya v1.1.77 | DeepSeek-V4.1-Flash Maya-XS | 256K | **33.5** | 439 |
-| Maya v1.1.77 | DeepSeek-V4.1-Flash abliterated | 256K | **32.3** | 428 |
-| Maya v1.1.77 | GLM-5.3-Flash Maya-S | 32K | **27.2** | 270 |
-| Maya v1.1.77 | Hy4-Flash Maya-L | 32K | **22.4** | 305 |
-| Maya v1.1.77 | GLM-5.3-Flash Maya-M-Derisked | 256K | **16.0** | 266 |
+| Engine | Model (Hugging Face) | Quant | Context | Decode tok/s | Prompt tok/s ¹ |
+|---|---|---|---:|---:|---:|
+| halogen 0.20.7 | [`peonist-ai/halogen-qwen3.8-flash-next`](https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next) | v2 `.hgn` | 256K | **73.0** | 2350 |
+| halogen 0.20.7 | [`Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated`](https://huggingface.co/Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated) | v2 `.hgn` | 256K | **71.1** | 2354 |
+| Strata 0.2.22 | [`ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF`](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF) | IQ3_S | 128K | **49.5** | 806 |
+| Maya v1.1.81 | [`unsloth/Inkling-2-Mini-GGUF`](https://huggingface.co/unsloth/Inkling-2-Mini-GGUF) | UD-Q4_K_XL | 256K | **47.8** | 1038 |
+| Maya v1.1.81 | [`peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF`](https://huggingface.co/peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF) | Maya-XS v2 | 256K | **32.9** | 448 |
+| Maya v1.1.81 | [`orcarouter/DeepSeek-V4.1-Flash-1017-abliterated-GGUF`](https://huggingface.co/orcarouter/DeepSeek-V4.1-Flash-1017-abliterated-GGUF) | Mix-128G | 256K | **29.5** | 452 |
+| Strata 0.2.22 | [`strata-engine/Inkling-2-Mini-Strata`](https://huggingface.co/strata-engine/Inkling-2-Mini-Strata) | SQ-20 | 128K | **28.0** | 758 |
+| Maya v1.1.81 | [`peasantsmith/GLM-5.3-Flash-Maya-GGUF`](https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-GGUF) | Maya-S v2 IQ2_XXS | 32K | **27.1** | 270 |
+| Strata 0.2.22 | [`strata-engine/Hy4-Flash-Strata`](https://huggingface.co/strata-engine/Hy4-Flash-Strata) | SQ-96 | 128K | **25.8** | 600 |
+| Maya v1.1.81 | [`peasantsmith/Hy4-Flash-Maya-GGUF`](https://huggingface.co/peasantsmith/Hy4-Flash-Maya-GGUF) | Maya-L IQ4_XS | 32K | **22.4** | 205 |
+| Maya v1.1.81 | [`peasantsmith/GLM-5.3-Flash-Maya-M-Derisked-IQ2_S-GGUF`](https://huggingface.co/peasantsmith/GLM-5.3-Flash-Maya-M-Derisked-IQ2_S-GGUF) | IQ2_S | 256K | **16.9** | 250 |
 
-¹ From [halogen-prompt.py](docs/benchmarks/halogen-prompt.py) with an 11K-token prompt; halogen's bench does not measure prompts.
+¹ The longest prompt of each bench: about 11K tokens for halogen (from [halogen-prompt.py](docs/benchmarks/halogen-prompt.py),
+because halogen's bench does not measure prompts), 8K for Maya and 16K for Strata. Decode is for 256-token answers.
 
 ## Before you start
 
