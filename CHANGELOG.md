@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.9.0](https://github.com/jwmoss/owl/compare/v3.8.0...v3.9.0) (2026-11-27)
+
+
+### Features
+
+* **engines:** update ghcr.io/peonist-ai/halogen-flash-server docker tag to v0.21.0 ([#110](https://github.com/jwmoss/owl/issues/110)) ([07fa2b5](https://github.com/jwmoss/owl/commit/07fa2b59543df505b114ceae4480e17ad798286e))
+* **engines:** update https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next digest to 3842e10 ([#109](https://github.com/jwmoss/owl/issues/109)) ([f111495](https://github.com/jwmoss/owl/commit/f1114952526dac2cb6dd740f1ec825d989a941c6))
+
 ## [3.8.0](https://github.com/jwmoss/owl/compare/v3.7.0...v3.8.0) (2026-11-26)
 
 
