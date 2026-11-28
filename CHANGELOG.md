@@ -1,5 +1,29 @@
 # Changelog
 
+## [4.0.0](https://github.com/jwmoss/owl/compare/v3.9.0...v4.0.0) (2026-11-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* give each engine its own port
+* one model catalog in group_vars; maya_install and strata_install select the models
+* take the model store out of the engine setups; backup.yml and restore.yml use it
+
+### Features
+
+* **engines:** update dependency mw00/project-maya to v1.1.83 ([#112](https://github.com/jwmoss/owl/issues/112)) ([b042313](https://github.com/jwmoss/owl/commit/b04231328b01b4dfefd43ee9ec23762d5ecb076c))
+* **engines:** update dependency niko1221/strata to v0.2.23 ([#113](https://github.com/jwmoss/owl/issues/113)) ([905826e](https://github.com/jwmoss/owl/commit/905826ea18de11c63d0e304cfe4c7e816fc474c9))
+* give each engine its own port ([57fed0f](https://github.com/jwmoss/owl/commit/57fed0f5f0692f637344e9c87bca229fb33abda5))
+* **halogen:** keep the prompt cache on disk, give the stop 60 s ([12a6f56](https://github.com/jwmoss/owl/commit/12a6f56c333e474bbad74996894c335f30ce0d50))
+* one model catalog in group_vars; maya_install and strata_install select the models ([d6de0a2](https://github.com/jwmoss/owl/commit/d6de0a29e124beacdfee9fe275c795f986757e9d))
+* take the model store out of the engine setups; backup.yml and restore.yml use it ([d6de0a2](https://github.com/jwmoss/owl/commit/d6de0a29e124beacdfee9fe275c795f986757e9d))
+
+
+### Bug Fixes
+
+* **maya:** stop every engine before a Maya setup, then start the default one ([57fed0f](https://github.com/jwmoss/owl/commit/57fed0f5f0692f637344e9c87bca229fb33abda5))
+* **rocm:** keep compaction off locked memory, not off entirely ([12a6f56](https://github.com/jwmoss/owl/commit/12a6f56c333e474bbad74996894c335f30ce0d50))
+
 ## [3.9.0](https://github.com/jwmoss/owl/compare/v3.8.0...v3.9.0) (2026-11-27)
 
 
