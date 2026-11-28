@@ -57,13 +57,17 @@
     content: "options ttm pages_limit={{ ttm_pages_limit }} page_pool_size={{ ttm_pages_limit }}\n"
   notify: Update the initramfs and reboot
 
-# The AMD driver pauses all GPU work while Linux moves memory the GPU uses: Strata logged 74 s of pauses after a day
-# of model loads, and its warm-up request failed. Background compaction moves those pages; Linux still compacts on demand.
-- name: Stop background memory compaction
+# The AMD driver pauses all GPU work while Linux moves memory the GPU uses (Strata logged 74 s of pauses).
+# halogen's docs/host-setup.md: keep compaction off the locked weights; proactiveness 0 slowed its KV pool reservation
+# and did not stop the pauses (issue #85), so it stays at the kernel default.
+- name: Keep memory compaction off locked memory, {{ item.name }}
   ansible.posix.sysctl:
-    name: vm.compaction_proactiveness
-    value: "0"
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
     sysctl_file: /etc/sysctl.d/60-owl-gpu.conf
+  loop:
+    - { name: vm.compact_unevictable_allowed, value: "0" }
+    - { name: vm.compaction_proactiveness, value: "20" }
 
 # Maya's docs/SETTINGS.md: a huge page fault without a free 2 MB block falls back to 4 KB at once; kcompactd refills later.
 - name: Keep huge page faults from compacting on the spot
