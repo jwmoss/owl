@@ -61,11 +61,12 @@
     maya_order: "{{ maya_new | select('equalto', maya_model) | list + maya_new | reject('equalto', maya_model) | list }}"
   when: maya_new | length > 0
   block:
-    - name: Stop maya before the setup
+    # A setup can load the model, so no engine may hold the memory beside it.
+    - name: Stop engines before the Maya setup
       ansible.builtin.systemd_service:
-        name: maya
+        name: "{{ item }}"
         state: stopped
-      when: maya_service.status.ActiveState == 'active'
+      loop: "{{ engines }}"
 
     # Builds the HIP engine and downloads the model; Maya checks each shard by SHA-256 and skips files it has.
     # The setup writes a config named by the engine (maya-ds4-hip.json), so models on one engine overwrite it:
@@ -96,6 +97,12 @@
         model_cache_engine: maya/{{ item }}
       loop: "{{ maya_order }}"
       when: model_cache_nfs | length > 0
+  always:
+    - name: Restore the default engine after the Maya setup
+      ansible.builtin.systemd_service:
+        name: "{{ default_engine }}"
+        state: started
+      when: default_engine != 'maya'
 
 # deepseek and deepseek-abl download the same Engram tables (161 GB), each into its own folder. Keep one copy on the SSD.
 # The next run's first task matches the store's times to the linked files.
