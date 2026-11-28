@@ -57,10 +57,10 @@ The table shows the models that Owl's playbooks install. Each engine can support
 | Engine | Model installed by Owl | Port | Playbook |
 |--------|-------|------|----------|
 | [halogen](https://github.com/peonist-ai/halogen-flash-server) (default, closed source, free under an EULA) | Qwen3.8-Flash-Next, optional abliterated | 8731 | `halogen.yml` |
-| [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next | 8731 | `strata.yml` |
-| [Project Maya](https://github.com/mw00/project-maya) | GLM-5.3-Flash and DeepSeek-V4.1-Flash, one at a time | 8731 | `maya.yml` |
+| [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next | 8081 | `strata.yml` |
+| [Project Maya](https://github.com/mw00/project-maya) | GLM-5.3-Flash and DeepSeek-V4.1-Flash, one at a time | 8080 | `maya.yml` |
 
-Each engine uses almost all of the memory, so only one runs at a time, and all use port 8731. See [docs/03-engines.md](docs/03-engines.md).
+Each engine uses almost all of the memory, so only one runs at a time. Each engine has its own port. See [docs/03-engines.md](docs/03-engines.md).
 
 ### Other model options
 

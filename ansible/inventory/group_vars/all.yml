@@ -7,8 +7,9 @@ rocm_version: "7.14.1"
 rocm_sha256: "c40e8f2bd6630a7d11557c762b99c6fa8afb04c9bd0e51ed1675ee1ca24afb00"
 ttm_pages_limit: 29637703 # about 113 GiB of 4 KiB pages
 
-# Every engine serves its API on this port. Only one engine runs at a time.
-engine_port: 8731
+# Each engine serves its API on its own port, so a client that asks a stopped engine gets an error, not another model.
+# Only one engine runs at a time. halogen and Maya use their published ports; Strata publishes 8080 too, so it gets 8081.
+engine_ports: { halogen: 8731, maya: 8080, strata: 8081 }
 
 # renovate: datasource=github-releases depName=Niko1221/Strata
 strata_release: "v0.2.23"

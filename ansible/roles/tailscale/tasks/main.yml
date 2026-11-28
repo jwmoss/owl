@@ -81,8 +81,8 @@
   ansible.builtin.shell:
     executable: /bin/bash
     cmd: >-
-      set -o pipefail; tailscale serve status | grep -q 'proxy http://127.0.0.1:{{ engine_port }}$'
-      || tailscale serve --bg --yes --https=443 http://127.0.0.1:{{ engine_port }}
+      set -o pipefail; tailscale serve status | grep -q 'proxy http://127.0.0.1:{{ engine_ports[default_engine] }}$'
+      || tailscale serve --bg --yes --https=443 http://127.0.0.1:{{ engine_ports[default_engine] }}
   register: tailscale_serve_out
   changed_when: "'Serve started' in tailscale_serve_out.stdout"
   when: tailscale_serve

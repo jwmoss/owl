@@ -79,13 +79,13 @@
     tasks_from: engine_unit
   vars:
     base_engine: halogen
-    base_engine_description: halogen Qwen3.8-Flash-Next API (port {{ engine_port }})
+    base_engine_description: halogen Qwen3.8-Flash-Next API (port {{ engine_ports.halogen }})
     base_engine_service: |
       {% if halogen_npu_models %}
       # The NPU pins its models in memory; a service's default memlock limit is 8 MiB.
       LimitMEMLOCK=infinity
       {% endif %}
-      ExecStart=/usr/bin/podman run --rm --name halogen -p {{ engine_port }}:8731 \
+      ExecStart=/usr/bin/podman run --rm --name halogen -p {{ engine_ports.halogen }}:8731 \
         --device /dev/kfd --device /dev/dri --group-add keep-groups --ipc=host --ulimit memlock=-1:-1 \
         -e HALOGEN_CHECKPOINT=/models/qwen38-flash-next-v2{{ '-abliterated' if halogen_abliterated else '' }}.hgn \
       {% if halogen_vision %}

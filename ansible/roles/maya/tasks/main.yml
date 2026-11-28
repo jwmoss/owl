@@ -111,14 +111,14 @@
     tasks_from: engine_unit
   vars:
     base_engine: maya
-    base_engine_description: Project Maya {{ maya_model }} API (port {{ engine_port }}, LAN, no key)
+    base_engine_description: Project Maya {{ maya_model }} API (port {{ engine_ports.maya }}, LAN, no key)
     base_engine_service: |
       {% for k, v in (maya_env | combine(maya_models[maya_model].env | default({}))).items() %}
       Environment="{{ k }}={{ v }}"
       {% endfor %}
       WorkingDirectory={{ maya_dir }}
       ExecStart={{ maya_dir }}/.venv/bin/python {{ maya_dir }}/maya.py --config {{ maya_dir }}/{{ maya_marker }} \
-        --port {{ engine_port }} --host 0.0.0.0
+        --port {{ engine_ports.maya }} --host 0.0.0.0
       # maya.py exits with 241 when it stops while it loads the model.
       SuccessExitStatus=241
 
