@@ -1,5 +1,10 @@
 ---
 # The model store: a backup of every model on the share; the engines run from the SSD. Over 1 Gbps a model loads too slowly to run from NFS.
+- name: Require a model store
+  ansible.builtin.assert:
+    that: model_cache_nfs | length > 0
+    fail_msg: Set model_cache_nfs in your host_vars, for example "tower:/mnt/user/huggingface".
+
 - name: Install the NFS client and rsync
   ansible.builtin.apt:
     name: [nfs-common, rsync]

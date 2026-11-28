@@ -3,14 +3,6 @@
   ansible.builtin.apt:
     name: [podman, crun, aria2]
 
-- name: Copy halogen from the model store
-  ansible.builtin.include_role:
-    name: model_cache
-    tasks_from: pull
-  vars:
-    model_cache_engine: halogen
-  when: model_cache_nfs | length > 0
-
 - name: Download the halogen v2 checkpoint and its lookup table (about 120 GB)
   ansible.builtin.command:
     cmd: >-
@@ -41,14 +33,6 @@
   async: 43200
   poll: 60
   when: halogen_abliterated
-
-- name: Save halogen to the model store
-  ansible.builtin.include_role:
-    name: model_cache
-    tasks_from: push
-  vars:
-    model_cache_engine: halogen
-  when: model_cache_nfs | length > 0
 
 # GPU and NPU work at once can hang Strix Halo unless the GPU fabric clock is held (ROCm/TheRock#8709).
 # Rootless Podman cannot hold it, so halogen's own unit does, at the same version as the image.

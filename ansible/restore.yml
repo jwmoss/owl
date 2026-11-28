@@ -1,0 +1,15 @@
+---
+# Copy the model store back to a fresh machine, before site.yml: ansible-playbook restore.yml site.yml
+# The engine setups then download only what the store did not have.
+- name: Copy the models from the model store
+  hosts: all
+  become: true
+  roles: [model_cache]
+  tasks:
+    - name: Copy each engine folder from the store
+      ansible.builtin.include_role:
+        name: model_cache
+        tasks_from: pull
+      vars:
+        model_cache_engine: "{{ item }}"
+      loop: "{{ engines }}"

@@ -134,8 +134,9 @@ halogen_abliterated: true   # halogen runs the abliterated Qwen3.8-Flash-Next
 
 ### Model store
 
-Optional: set `model_cache_nfs` to an NFS share, for example a NAS. The playbooks save every model there after
-its download and restore it from there on a fresh machine, so each model downloads from Hugging Face once.
+Optional: set `model_cache_nfs` to an NFS share, for example a NAS. `ansible-playbook backup.yml` saves every model there.
+On a fresh machine, `ansible-playbook restore.yml site.yml` copies them back first, so each model downloads from
+Hugging Face once. The engine setups do not use the share.
 See [model files and the model store](docs/03-engines.md#model-files-and-the-model-store).
 
 ### Tailscale
