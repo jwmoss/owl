@@ -16,6 +16,7 @@ with ROCm and local LLM engines. Read [README.md](README.md) first.
 | `ansible/ubuntu.yml` | Base packages, sudo, groups, ROCm, GPU memory limit (reboots once) |
 | `ansible/<engine>.yml`, `ansible/roles/<engine>/` | One engine: download, systemd unit, start |
 | `ansible/test.yml` | Starts each installed engine and checks one chat answer |
+| `ansible/backup.yml`, `ansible/restore.yml` | Save the models to the NFS model store, and copy them back to a fresh machine |
 | `docs/` | Install, ROCm and engine details |
 
 Run all Ansible commands from `ansible/`.
@@ -24,8 +25,8 @@ Run all Ansible commands from `ansible/`.
 
 - Never delete anything under `~/models` on the machine by hand. The models are hundreds of GB.
   A download that stops resumes when you run the playbook again.
-- With a model store, check that the store has a model (its `.done` file) before you remove the model from a list,
-  the SSD or the repo. The user keeps every model they used on the store.
+- With a model store, run `backup.yml` and check `owl/<engine>/.done` on the store before you remove a model from
+  a list, the SSD or the repo. The user keeps every model they used on the store.
 - Only one engine runs at a time. Switch with `sudo systemctl start <service>`; the units conflict.
 - Do not use `pkill -f <pattern>` over SSH. The pattern matches your own SSH command and kills it.
   Use `systemctl stop`, or a bracket pattern such as `pkill -f "[a]ria2c"`.
@@ -34,9 +35,9 @@ Run all Ansible commands from `ansible/`.
 
 ## Change the code
 
-- Keep each role in the same shape: a pinned download, `model_cache` pull and push for the store, and the
-  `base` role's `engine_unit` tasks for the unit. That template holds the lines that every engine shares
-  (`Conflicts=`, the fallback, `owl-wait-memory`, restarts); a role gives only its own `[Service]` lines.
+- Keep each role in the same shape: a pinned download and the `base` role's `engine_unit` tasks for the unit.
+  That template holds the lines that every engine shares (`Conflicts=`, the fallback, `owl-wait-memory`,
+  restarts); a role gives only its own `[Service]` lines. Only `backup.yml` and `restore.yml` use the model store.
 - Pin every version: a commit, a release tag, an image tag or a Hugging Face revision. Check a SHA-256 when the source gives one.
 - Put Jinja at the end of a task name (ansible-lint `name[template]`).
 - Write docs in ASD-STE100 Simplified Technical English: active voice, present tense, short sentences.

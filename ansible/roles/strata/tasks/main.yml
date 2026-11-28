@@ -24,10 +24,17 @@
   changed_when: false
   check_mode: false # it only reads, and the next tasks need its output
 
+- name: Check the Strata preset lists
+  ansible.builtin.assert:
+    that:
+      - strata_install | difference(strata_presets.keys()) | length == 0
+      - strata_preset in strata_install
+    fail_msg: Every name in strata_install must be in strata_presets, and strata_preset must be in strata_install.
+
 - name: Find the Strata presets set up on this machine
   ansible.builtin.stat:
     path: "{{ strata_state }}/{{ item }}.json"
-  loop: "{{ strata_presets.keys() | list }}"
+  loop: "{{ strata_install }}"
   register: strata_preset_files
 
 - name: Read the saved Strata presets
@@ -52,23 +59,6 @@
     strata_want_tokens: "{{ (strata_want[:-1] | int * 1024) if strata_want.endswith('k') else strata_want | int }}"
   when: "'--max-context' in strata_args and strata_args[strata_args.index('--max-context') + 1] | int != strata_want_tokens | int"
 
-- name: Find the Strata presets with a complete copy in the store
-  ansible.builtin.stat:
-    path: "{{ model_cache_dir }}/owl/strata/{{ item }}/.done"
-  loop: "{{ strata_presets.keys() | list }}"
-  register: strata_stored
-  when: model_cache_nfs | length > 0
-
-# Every listed preset stays on the SSD: a preset the store has comes back when its files are missing or old.
-- name: Copy the Strata presets from the store
-  ansible.builtin.include_role:
-    name: model_cache
-    tasks_from: pull
-  vars:
-    model_cache_engine: strata/{{ item }}
-  loop: "{{ strata_presets.keys() | list }}"
-  when: model_cache_nfs | length > 0
-
 - name: Read the services before the Strata changes
   ansible.builtin.service_facts:
 
@@ -82,11 +72,10 @@
     strata_update: >-
       {{ (strata_update_check.stdout | from_json).engine.status == 'available'
       or (strata_update_check.stdout | from_json).control.status == 'available' }}
-    # A preset without its setup here, or without a complete copy in the store, is set up; the served one goes first.
+    # A preset without its setup here, or with a new context, is set up; the served one goes first.
     strata_new: >-
       {{ (strata_preset_files.results | rejectattr('stat.exists') | map(attribute='item') | list
-      + strata_stored.results | default([]) | rejectattr('skipped', 'defined') | rejectattr('stat.exists')
-      | map(attribute='item') | list + strata_resized | default([])) | unique }}
+      + strata_resized | default([])) | unique }}
     strata_order: "{{ strata_new | select('equalto', strata_preset) | list + strata_new | reject('equalto', strata_preset) | list }}"
   when: strata_update or strata_new | length > 0
   block:
@@ -108,7 +97,7 @@
       when: strata_update
 
     # Downloads the model, writes the run config with an API key, starts serving, then stops so systemd can start it.
-    # Each preset has its own folder, so a save to the store never takes another preset's files.
+    # Each preset has its own folder.
     # --data-dir names that folder: strata launch does not read STRATA_DATA_DIR, only --data-dir or its last folder.
     - name: Set up the Strata presets
       vars:
@@ -126,15 +115,6 @@
       async: 43200
       poll: 60
       loop: "{{ strata_order }}"
-
-    - name: Save the new Strata presets to the store
-      ansible.builtin.include_role:
-        name: model_cache
-        tasks_from: push
-      vars:
-        model_cache_engine: strata/{{ item }}
-      loop: "{{ strata_order }}"
-      when: model_cache_nfs | length > 0
   always:
     - name: Restore an installed default engine after the Strata changes
       ansible.builtin.systemd_service:

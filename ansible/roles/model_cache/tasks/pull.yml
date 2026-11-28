@@ -1,5 +1,5 @@
 ---
-# Copies an engine's model files from the store before its download, so the engine downloads only what is missing.
+# Copies an engine's model files from the store, so the engine downloads only what is missing.
 - name: Copy the model files from the store, {{ model_cache_engine }}
   ansible.builtin.shell: >-
     mkdir -p {{ model_cache_dir }}/owl/{{ model_cache_engine }} {{ models_dir }}/{{ model_cache_engine }}

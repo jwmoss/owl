@@ -6,58 +6,31 @@
     version: "{{ maya_commit }}"
   become: false
 
+- name: Check the Maya model lists
+  ansible.builtin.assert:
+    that:
+      - maya_install | difference(maya_models.keys()) | length == 0
+      - maya_model in maya_install
+    fail_msg: Every name in maya_install must be in maya_models, and maya_model must be in maya_install.
+
 - name: Find the Maya models set up on this machine
   ansible.builtin.stat:
     path: "{{ maya_dir }}/{{ maya_marker }}"
   vars:
     maya_item: "{{ item }}"
-  loop: "{{ maya_models.keys() | list }}"
+  loop: "{{ maya_install }}"
   register: maya_markers
-
-- name: Find the Maya models with a complete copy in the store
-  ansible.builtin.stat:
-    path: "{{ model_cache_dir }}/owl/maya/{{ item }}/.done"
-  loop: "{{ maya_models.keys() | list }}"
-  register: maya_stored
-  when: model_cache_nfs | length > 0
 
 - name: Read the maya service state
   ansible.builtin.systemd_service:
     name: maya
   register: maya_service
 
-# Hard-linked files (the hard-link task below) share one time, so the store copy's time must follow; else the pull copies
-# the file again and the link is lost. --size-only changes only the times of files of equal size, and copies no data.
-- name: Match the store's file times to the Maya models # noqa: command-instead-of-module
-  # synchronize copies between the controller and a host; both folders are on the host here.
-  ansible.builtin.command: >-
-    rsync -rt --size-only --existing --itemize-changes
-    {{ models_dir }}/maya/{{ item }}/ {{ model_cache_dir }}/owl/maya/{{ item }}/
-  loop: "{{ maya_models.keys() | list }}"
-  register: maya_store_times
-  changed_when: maya_store_times.stdout | length > 0
-  failed_when: maya_store_times.rc not in [0, 23] # 23: a model not in the store yet
-  become: false
-  when: model_cache_nfs | length > 0
-
-# Every listed model stays on the SSD: a model the store has comes back when its files are missing or old.
-- name: Copy the Maya models from the store
-  ansible.builtin.include_role:
-    name: model_cache
-    tasks_from: pull
-  vars:
-    model_cache_engine: maya/{{ item }}
-  loop: "{{ maya_models.keys() | list }}"
-  when: model_cache_nfs | length > 0
-
 # A setup uses the GPU, so maya stops first. It starts again at the end if it ran.
-# A model without its setup here, or without a complete copy in the store, is set up; the served model goes first.
+# A model without its setup here is set up; the served model goes first.
 - name: Set up the new Maya models
   vars:
-    maya_new: >-
-      {{ (maya_markers.results | rejectattr('stat.exists') | map(attribute='item') | list
-      + maya_stored.results | default([]) | rejectattr('skipped', 'defined') | rejectattr('stat.exists')
-      | map(attribute='item') | list) | unique }}
+    maya_new: "{{ maya_markers.results | rejectattr('stat.exists') | map(attribute='item') | list }}"
     maya_order: "{{ maya_new | select('equalto', maya_model) | list + maya_new | reject('equalto', maya_model) | list }}"
   when: maya_new | length > 0
   block:
@@ -89,14 +62,6 @@
       poll: 60
       loop: "{{ maya_order }}"
 
-    - name: Save the new Maya models to the store
-      ansible.builtin.include_role:
-        name: model_cache
-        tasks_from: push
-      vars:
-        model_cache_engine: maya/{{ item }}
-      loop: "{{ maya_order }}"
-      when: model_cache_nfs | length > 0
   always:
     - name: Restore the default engine after the Maya setup
       ansible.builtin.systemd_service:
@@ -105,7 +70,6 @@
       when: default_engine != 'maya'
 
 # deepseek and deepseek-abl download the same Engram tables (161 GB), each into its own folder. Keep one copy on the SSD.
-# The next run's first task matches the store's times to the linked files.
 - name: Hard-link the identical Maya model files
   ansible.builtin.command: hardlink --content --minimum-size 1G {{ models_dir }}/maya
   register: maya_hardlink

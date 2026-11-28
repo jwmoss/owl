@@ -53,8 +53,8 @@ These examples come from the upstream versions linked below. They do not list ev
 
 | Engine | Additional upstream choices | Owl configuration |
 |--------|-----------------------------|-------------------|
-| [Strata](https://github.com/Niko1221/Strata/blob/v0.2.13/README.md#models) | Qwen3.6-35B-A3B; other Qwen Flash quants; DeepSeek-V4.1-Flash | `strata_presets` lists the models to set up. Read [Swap models](#swap-models). |
-| [Maya](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MODELS.md) | Other GLM-5.3-Flash and DeepSeek quants, full GLM-5.3, MiniMax-M3.1-Flash and Qwen Flash | `maya_models` lists the models to set up. Read [Swap models](#swap-models). |
+| [Strata](https://github.com/Niko1221/Strata/blob/v0.2.13/README.md#models) | Qwen3.6-35B-A3B; other Qwen Flash quants; DeepSeek-V4.1-Flash | `strata_presets` is the catalog; `strata_install` lists the presets to set up. Read [Swap models](#swap-models). |
+| [Maya](https://github.com/mw00/project-maya/blob/v1.1.58/docs/MODELS.md) | Other GLM-5.3-Flash and DeepSeek quants, full GLM-5.3, MiniMax-M3.1-Flash and Qwen Flash | `maya_models` is the catalog; `maya_install` lists the models to set up. Read [Swap models](#swap-models). |
 | [halogen](https://github.com/peonist-ai/halogen-flash-server/blob/v0.20.1/docs/NPU.md) | Small classifiers, embeddings, rerankers, moderation and other NPU models | `halogen_npu_models` selects the NPU models beside Qwen Flash. |
 
 Do not treat upstream support as a successful test on this machine. Additional model families need Ansible download, launch and test support.
@@ -62,13 +62,16 @@ An engine update does not change Owl's selected model family. An environment ove
 
 ## Swap models
 
-Maya and Strata set up every model in their list and serve one of them.
-Set the lists and the served model in `ansible/inventory/group_vars/all.yml`:
+`maya_models` and `strata_presets` in `ansible/inventory/group_vars/all.yml` are the catalog: every model Owl knows,
+with its settings. A machine lists the names to set up in `maya_install` and `strata_install`, and serves one of them:
 
-| Engine | Models, by name | Model it serves | Model files |
-|--------|-----------------|-----------------|-------------|
-| Maya | `maya_models` | `maya_model` | `~/models/maya`, passed as `--models-dir` |
-| Strata | `strata_presets` | `strata_preset` | `~/models/strata`, passed as `--data-dir` |
+| Engine | Catalog | Models to set up | Model it serves | Model files |
+|--------|---------|------------------|-----------------|-------------|
+| Maya | `maya_models` | `maya_install` | `maya_model` | `~/models/maya`, passed as `--models-dir` |
+| Strata | `strata_presets` | `strata_install` | `strata_preset` | `~/models/strata`, passed as `--data-dir` |
+
+Set the lists in your host_vars, for example `maya_install: [deepseek, glm, inkling]`. Add a model that is not in the
+catalog to the catalog in `all.yml`, so every machine gets the same settings for it.
 
 Swap the served model with one command. If the engine runs, the playbook restarts it with the new model. A swap copies and downloads nothing.
 
@@ -84,7 +87,7 @@ maya_models:
   glm: { model: glm-maya-s, env: { NAME: "value" } }
 ```
 
-To keep a swap, change `maya_model` or `strata_preset` in `all.yml`.
+To keep a swap, set `maya_model` or `strata_preset` in your host_vars.
 The Strata API key is per preset: `~/.local/bin/strata launch --show-key --preset <preset>`.
 
 ### Model files and the model store
@@ -95,15 +98,18 @@ own option: `--local-dir`, `--models-dir` or `--data-dir`. Hugging Face's own ca
 
 The model store is optional. Set `model_cache_nfs` to an NFS share in your host_vars, for example
 `<nas-ip>:/mnt/user/huggingface`, or a Tailscale name such as `tower:/mnt/user/huggingface` after `tailscale.yml`.
-The playbooks mount it at `/mnt/model-cache` and keep the files in `owl/<engine>` on the share.
-Each file then downloads from Hugging Face once, and a fresh machine gets its models from the share.
+Two playbooks use it. They mount it at `/mnt/model-cache` and keep the files in `owl/<engine>` on the share.
+The engine setups do not use the share, so a share that is down does not stop a setup.
+
+```sh
+ansible-playbook backup.yml               # save models_dir to the share, after a new model
+ansible-playbook restore.yml site.yml     # a fresh machine: copy the share back, then set up
+```
 
 - Every model in your lists stays on the SSD, and the share is its backup. To use less SSD space, list fewer models.
-- Each engine copies its files from the share before the download or setup, and saves them to the share after.
-  Maya and Strata keep each model in its own folder, `owl/maya/<name>` and `owl/strata/<name>`.
+- The copy skips files the share has, and it deletes nothing on the share.
+- `owl/<engine>/.done` marks a complete copy of that engine's folder.
 - A swap only restarts the engine on another model. It copies nothing.
-- The `.done` file marks a complete copy. A Maya or Strata model without it is set up again: the engine downloads
-  only missing files.
 - The engines always run from the SSD: over 1 Gbps a model loads too slowly to run from the share.
   A copy of 100 GB takes about 15 minutes on the LAN and about 30 minutes over Tailscale.
 

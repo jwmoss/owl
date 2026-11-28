@@ -13,10 +13,15 @@ engine_ports: { halogen: 8731, maya: 8080, strata: 8081 }
 
 # renovate: datasource=github-releases depName=Niko1221/Strata
 strata_release: "v0.2.23"
-# The Strata models, by preset name: a --family and --model of strata launch, and optional context and env.
-# strata_preset is the one the strata service serves. Swap: ansible-playbook strata.yml -e strata_preset=<name>.
+# Every Strata model Owl knows, by preset name: a --family and --model of strata launch, and optional context and env.
+# strata_install lists the presets to set up; strata_preset is the one the service serves.
+# Swap: ansible-playbook strata.yml -e strata_preset=<name>.
 strata_presets:
   qwen: { family: qwen, model: iq3_s } # Qwen3.8-Flash-Next, the ISTA-DAS quant
+  # Strata's fit rules give SQ-96 on a 128 GB Halo: SQ-128 does not fit in the 113 GiB GPU limit.
+  hy4: { family: hy4-flash, model: SQ-96 } # Tencent Hy4-Flash (Tencent Hy License)
+  inkling: { family: inkling-2-mini, model: SQ-20 } # Inkling 2 Mini, the lossless build (Apache-2.0)
+strata_install: [qwen]
 strata_preset: qwen
 strata_context: 256k # the context every Strata preset is set up with, as halogen's 256K; a preset's own context wins
 strata_env: {} # environment variables for every Strata preset, for example { NAME: "value" }; a preset's env adds to them
@@ -26,8 +31,8 @@ strata_env: {} # environment variables for every Strata preset, for example { NA
 models_dir: /home/{{ ansible_user }}/models
 
 # Optional model store on an NFS share, for example "tower:/mnt/user/huggingface". Set it in host_vars. Empty: no store.
-# Every model in your lists stays on the SSD; the store is a backup. Each model is saved there after its setup,
-# and a fresh machine copies it back from there instead of downloading it from Hugging Face.
+# The store is a backup of models_dir; the engines run from the SSD. backup.yml saves models_dir to it,
+# and restore.yml copies it back to a fresh machine before the engine setups.
 model_cache_nfs: ""
 model_cache_dir: /mnt/model-cache
 
@@ -38,11 +43,19 @@ engines: [strata, maya, halogen] # every engine Owl can install
 
 # renovate: datasource=github-tags depName=mw00/project-maya
 maya_commit: "6382132eddd7cad0b448d7343aeac86e49215bde" # v1.1.83
-# The Maya models, by name: the --model options of maya.sh, and optional context (tokens) and env for that model only.
-# maya_model is the one the maya service serves. Swap: ansible-playbook maya.yml -e maya_model=glm.
+# Every Maya model Owl knows, by name: the --model options of maya.sh, and optional context (tokens) and env.
+# maya_install lists the models to set up; maya_model is the one the service serves.
+# Swap: ansible-playbook maya.yml -e maya_model=glm.
 maya_models:
   deepseek: { model: deepseek-maya-xs, vram_reserve_mib: 16384 } # DeepSeek-V4.1-Flash-1017
+  # orcarouter's build with refusals removed. Gated: accept its terms on Hugging Face first.
+  deepseek-abl: { model: "DeepSeek-V4.1-Flash-1017 --ds4-quant abliterated-128g", vram_reserve_mib: 16384 }
   glm: { model: glm-maya-s } # GLM-5.3-Flash
+  # Blackfrost-AI's edit that cuts blanket refusals. 256K: at 512K the KV cache pushes experts to the SSD.
+  glm-derisked: { model: glm-maya-m-derisked, context: 262144 }
+  hy4: { model: hy4-flash-maya-l } # Tencent Hy4-Flash (Tencent Hy License); Maya-L is the size for a 128 GB Halo
+  inkling: { model: inkling-2-mini } # Thinking Machines Inkling 2 Mini (Apache-2.0), an experimental preview on AMD
+maya_install: [deepseek, glm]
 maya_model: deepseek
 maya_env: {} # environment variables for every Maya model, for example { NAME: "value" }; a model's env adds to them
 # GPU memory Maya leaves free beside its expert pool: 1024 MiB is Maya's own value on a Linux APU (hip_reserve_mib).
