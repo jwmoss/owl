@@ -5,12 +5,15 @@ Each engine is a systemd service, and the services conflict, so starting one sto
 
 | Service | Engine | Model | Port | Access | Playbook |
 |---------|--------|-------|------|--------|----------|
-| `strata` | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next IQ3_S, 128K context, or another preset (`strata_preset`) | 8731 | LAN, API key | `strata.yml` |
+| `strata` | [Strata](https://github.com/Niko1221/Strata) | Qwen3.8-Flash-Next IQ3_S, 128K context, or another preset (`strata_preset`) | 8081 | LAN, API key | `strata.yml` |
 | `halogen` | [halogen](https://github.com/peonist-ai/halogen-flash-server) (Podman, closed-source EULA) | Qwen3.8-Flash-Next halogen v2 (4.16 bpw), or the abliterated r2 (`halogen_abliterated`) | 8731 | LAN, no key | `halogen.yml` |
-| `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS or GLM-5.3-Flash Maya-S; `maya_model` picks one | 8731 | LAN, no key | `maya.yml` |
+| `maya` | [Project Maya](https://github.com/mw00/project-maya) | DeepSeek-V4.1-Flash-1017 Maya-XS or GLM-5.3-Flash Maya-S; `maya_model` picks one | 8080 | LAN, no key | `maya.yml` |
 
-All engines use one port, `engine_port` (8731). The running engine answers there.
-With `tailscale.yml`, Tailscale Serve also gives it an HTTPS address on the tailnet: `https://<machine>.<tailnet>.ts.net/v1`.
+Each engine has its own port (`engine_ports`). Only the running engine answers, so a client that asks a stopped
+engine gets a connection error, not an answer from another model. Point each client model at its engine's port,
+for example `http://<machine>:8080/v1` for Maya. halogen and Maya use their published ports; Strata publishes
+8080 too, so it gets 8081. Over Tailscale, use the machine's tailnet name with the same port.
+With `tailscale.yml`, Tailscale Serve also gives the default engine an HTTPS address: `https://<machine>.<tailnet>.ts.net/v1`.
 Turn on HTTPS certificates in the Tailscale admin console (DNS page) first.
 
 The table shows Owl's configured models. Read [group_vars/all.yml](../ansible/inventory/group_vars/all.yml) for the exact engine versions and model revisions.

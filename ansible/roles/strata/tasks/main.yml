@@ -105,7 +105,7 @@
       ansible.builtin.shell:
         cmd: >-
           {{ strata_bin }} launch --family {{ strata_presets[item].family }} --model {{ strata_presets[item].model }}
-          --context {{ strata_presets[item].context | default(strata_context) }} --vision gpu --access lan --port {{ engine_port }}
+          --context {{ strata_presets[item].context | default(strata_context) }} --vision gpu --access lan --port {{ engine_ports.strata }}
           --data-dir {{ strata_data_dir }} --save-preset {{ item }} --yes --no-tui
           && {{ strata_bin }} launch --stop --preset {{ item }}
       environment:
@@ -128,13 +128,13 @@
     tasks_from: engine_unit
   vars:
     base_engine: strata
-    base_engine_description: Strata {{ strata_preset }} API (port {{ engine_port }}, API key required)
+    base_engine_description: Strata {{ strata_preset }} API (port {{ engine_ports.strata }}, API key required)
     base_engine_service: |
       Environment="STRATA_DATA_DIR={{ strata_data_dir }}"
       {% for k, v in (strata_env | combine(strata_presets[strata_preset].env | default({}))).items() %}
       Environment="{{ k }}={{ v }}"
       {% endfor %}
-      ExecStart={{ strata_bin }} serve --host 0.0.0.0 --port {{ engine_port }} \
+      ExecStart={{ strata_bin }} serve --host 0.0.0.0 --port {{ engine_ports.strata }} \
         --profile {{ strata_state }}/{{ strata_preset }}.json
       # strata serve exits with 130 when it stops while it loads the model.
       SuccessExitStatus=130
