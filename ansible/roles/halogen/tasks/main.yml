@@ -55,6 +55,14 @@
   changed_when: false # a oneshot that exits, so each start only holds the clock again
   when: halogen_npu_models | length > 0
 
+# The prompt cache on disk: a conversation keeps its cache over a restart or an engine swap (at most 64 GiB).
+- name: Make the halogen prompt cache folder
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/.cache/halogen
+    state: directory
+    mode: "0755"
+  become: false
+
 # Closed-source engine under the Peonist EULA (free, no telemetry). Without HALOGEN_DOWNLOAD it opens no outbound connections.
 # With NPU models it gets HALOGEN_DOWNLOAD and a writable volume to fetch them into models_dir/halogen/npu (skips files it has).
 - name: Install and start the halogen service
@@ -75,6 +83,7 @@
       {% if halogen_vision %}
         -e HALOGEN_VISION_TOWER=/models/qwen38-flash-next-vision.hgn \
       {% endif %}
+        -e HALOGEN_CACHE_DIR=/cache -v /home/{{ ansible_user }}/.cache/halogen:/cache \
       {% for k, v in halogen_env.items() %}
         -e "{{ k }}={{ v }}" \
       {% endfor %}
@@ -83,8 +92,9 @@
         -e HALOGEN_DOWNLOAD=peonist-ai/halogen-qwen3.8-flash-next \
       {% endif %}
         -v {{ models_dir }}/halogen:/models{{ '' if halogen_npu_models else ':ro' }} {{ halogen_image }}
-      ExecStop=/usr/bin/podman stop halogen
-      # podman stop ends the container with SIGTERM (143), or with SIGKILL (137) after 10 seconds.
+      # halogen flushes the last turn on stop; its compose file gives it 60 s.
+      ExecStop=/usr/bin/podman stop -t 60 halogen
+      # podman stop ends the container with SIGTERM (143), or with SIGKILL (137) after 60 seconds.
       SuccessExitStatus=137 143
 
 # Each version pin pulls a new image of about 10 GB and leaves the old ones; keep only the pinned one.

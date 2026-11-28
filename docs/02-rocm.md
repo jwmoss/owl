@@ -63,16 +63,17 @@ cat /sys/module/ttm/parameters/pages_limit                 # 29637703
 
 The AMD driver stops all GPU work while Linux moves memory that the GPU uses.
 After many model loads, Strata logged 74 s of these pauses, and a request failed.
-The `rocm` role sets two values, with no reboot:
+The `rocm` role sets three values, with no reboot:
 
 | Setting | File | Value |
 |---------|------|-------|
-| `vm.compaction_proactiveness` | `/etc/sysctl.d/60-owl-gpu.conf` | `0`: no background compaction. Linux still compacts when it must |
+| `vm.compact_unevictable_allowed` | `/etc/sysctl.d/60-owl-gpu.conf` | `0`: compaction does not move locked memory, such as halogen's weights (`HALOGEN_WEIGHTS_LOCK=1`) |
+| `vm.compaction_proactiveness` | `/etc/sysctl.d/60-owl-gpu.conf` | `20`, the kernel default. `0` slowed halogen's start and did not stop the pauses (halogen `docs/host-setup.md`) |
 | `transparent_hugepage/defrag` | `/etc/tmpfiles.d/owl-thp.conf` | `defer`: a huge page request without a free 2 MB block gets 4 KB pages at once (Maya's `docs/SETTINGS.md`) |
 
 Check:
 
 ```sh
-sysctl vm.compaction_proactiveness                         # 0
+sysctl vm.compact_unevictable_allowed vm.compaction_proactiveness   # 0, 20
 cat /sys/kernel/mm/transparent_hugepage/defrag             # ... [defer] ...
 ```
