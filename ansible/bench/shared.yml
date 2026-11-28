@@ -1,0 +1,39 @@
+---
+# Owl's shared bench for one model: start the engine as the owl-bench unit, send the shared requests, stop it.
+# The caller gives bench_label, bench_cmd, bench_workdir, bench_env, bench_meta and, for Strata, bench_key_file.
+- name: Wait for free memory, {{ bench_label }}
+  ansible.builtin.command: /usr/local/bin/owl-wait-memory
+  changed_when: false
+
+- name: Run the shared bench, {{ bench_label }}
+  block:
+    - name: Start the engine at the bench context, {{ bench_label }}
+      ansible.builtin.command:
+        argv: "{{ ['systemd-run', '--unit=owl-bench', '--collect', '--uid=' ~ ansible_user, '--working-directory=' ~ bench_workdir]
+          + ((bench_env | default({})).items() | map('join', '=') | map('regex_replace', '^', '--setenv=') | list)
+          + ['/bin/bash', '-c', bench_cmd] }}"
+      changed_when: true
+
+    - name: Send the shared requests, {{ bench_label }}
+      ansible.builtin.command:
+        argv: "{{ ['python3', bench_client, '--out', bench_dir ~ '/shared-' ~ bench_label ~ '.json', '--meta', bench_meta | to_json]
+          + (['--key-file', bench_key_file] if bench_key_file is defined else []) }}"
+      become: false
+      register: bench_shared
+      changed_when: true
+      failed_when: false # a model that does not start at bench_context is a result too; the log keeps the reason
+
+    - name: Show the shared result, {{ bench_label }}
+      ansible.builtin.debug:
+        msg: "{{ bench_shared.stdout | default('') }} {{ bench_shared.stderr | default('') | regex_search('[^\\n]*$') }}"
+  always:
+    - name: Save the engine log, {{ bench_label }}
+      ansible.builtin.shell: journalctl -u owl-bench --no-pager -n 400 > {{ bench_dir }}/shared-{{ bench_label }}.log
+      changed_when: false
+      failed_when: false
+
+    - name: Stop the engine, {{ bench_label }}
+      ansible.builtin.systemd_service:
+        name: owl-bench
+        state: stopped
+      failed_when: false

@@ -1,0 +1,114 @@
+---
+# Benchmark every installed engine and model, and save the results to docs/benchmarks/<date>/ on this computer.
+# Each model gets Owl's shared bench (bench/owl_bench.py: the same requests at bench_context, so engines compare)
+# and, with bench_native, the engine's own bench. Then the playbook hashes every model file and writes the SBOMs.
+# One engine: ansible-playbook bench.yml -e '{"engines": ["maya"]}'. It stops the engines and takes about an hour.
+- name: Benchmark the engines
+  hosts: all
+  become: true
+  vars:
+    bench_date: "{{ now(utc=true, fmt='%Y-%m-%d') }}"
+    bench_dir: /home/{{ ansible_user }}/bench/{{ bench_date }}
+    bench_local: "{{ playbook_dir }}/../docs/benchmarks/{{ bench_date }}"
+    bench_client: /home/{{ ansible_user }}/bench/owl_bench.py
+  tasks:
+    - name: Read the services
+      ansible.builtin.service_facts:
+
+    - name: Keep the installed engines
+      ansible.builtin.set_fact:
+        installed: "{{ engines | select('in', ansible_facts.services.keys() | map('replace', '.service', '') | list) | list }}"
+
+    - name: Read the Maya and Strata paths
+      ansible.builtin.include_vars: "{{ item }}"
+      loop: [roles/maya/vars/main.yml, roles/strata/vars/main.yml]
+
+    - name: Make the bench folder
+      ansible.builtin.file:
+        path: "{{ bench_dir }}"
+        state: directory
+        mode: "0755"
+      become: false
+
+    - name: Copy the shared bench
+      ansible.builtin.copy:
+        src: bench/owl_bench.py
+        dest: "{{ bench_client }}"
+        mode: "0755"
+      become: false
+
+    - name: Benchmark each engine and restore the default
+      block:
+        - name: Stop the engines
+          ansible.builtin.systemd_service:
+            name: "{{ item }}"
+            state: stopped
+          loop: "{{ installed }}"
+
+        - name: Benchmark each engine
+          ansible.builtin.include_tasks: bench/{{ engine }}.yml
+          loop: "{{ installed }}"
+          loop_control:
+            loop_var: engine
+      always:
+        - name: Stop the bench engine
+          ansible.builtin.systemd_service:
+            name: owl-bench
+            state: stopped
+          failed_when: false
+
+        - name: Start the default engine again
+          ansible.builtin.systemd_service:
+            name: "{{ default_engine }}"
+            state: started
+
+    - name: Hash every model file
+      ansible.builtin.shell: >-
+        cd {{ models_dir }} && find {{ installed | join(' ') }} -type f -size +1M -not -path '*/.cache/*'
+        -not -path '*/slots/*' -not -path '*/conversation-spill/*' -print0
+        | xargs -0 -P 8 -n 1 sha256sum > {{ bench_dir }}/sha256sums.txt
+      become: false
+      changed_when: true
+
+    - name: Write the machine and engine versions
+      ansible.builtin.copy:
+        dest: "{{ bench_dir }}/run.json"
+        content: "{{ bench_run | to_nice_json }}"
+        mode: "0644"
+      vars:
+        bench_run:
+          machine:
+            vendor: "{{ ansible_facts.system_vendor }}"
+            name: "{{ ansible_facts.product_name }}"
+            bios: "{{ ansible_facts.bios_version }} ({{ ansible_facts.bios_date }})"
+            cpu: "{{ ansible_facts.processor[2] | default('') }}"
+            ram: "{{ (ansible_facts.memtotal_mb / 1024) | round | int }} GiB"
+            os: "{{ ansible_facts.lsb.description | default(ansible_facts.distribution ~ ' ' ~ ansible_facts.distribution_version) }}"
+            kernel: "{{ ansible_facts.kernel }}"
+            rocm: "{{ rocm_version }}"
+            ttm.pages_limit: "{{ ttm_pages_limit }}"
+          context: "{{ bench_context }}"
+          engines: "{{ bench_engines | default([]) }}"
+      become: false
+
+    - name: Pack the results
+      ansible.builtin.command: tar -czf /home/{{ ansible_user }}/bench/{{ bench_date }}.tgz -C {{ bench_dir }} .
+      become: false
+      changed_when: true
+
+    - name: Fetch the results
+      ansible.builtin.fetch:
+        src: /home/{{ ansible_user }}/bench/{{ bench_date }}.tgz
+        dest: /tmp/owl-bench-{{ bench_date }}.tgz
+        flat: true
+      become: false
+
+    - name: Unpack the results, without the home folder in the paths, and write the SBOMs
+      ansible.builtin.shell: >-
+        mkdir -p {{ bench_local }} && tar -xzf /tmp/owl-bench-{{ bench_date }}.tgz -C {{ bench_local }}
+        && grep -rlF '/home/{{ ansible_user }}' {{ bench_local }} | xargs -r sed -i.bak 's|/home/{{ ansible_user }}|~|g'
+        && find {{ bench_local }} -name '*.bak' -delete
+        && uv run --no-project python -I {{ playbook_dir }}/../docs/benchmarks/sbom.py {{ bench_local }}
+      delegate_to: localhost
+      become: false
+      changed_when: true

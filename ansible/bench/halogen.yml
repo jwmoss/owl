@@ -1,0 +1,37 @@
+---
+# halogen: its own bench (the image's bench mode) and the shared bench, on the checkpoint that owl serves.
+- name: Read the halogen image digest
+  ansible.builtin.command: podman image inspect --format {% raw %}'{{.Digest}}'{% endraw %} {{ halogen_image }}
+  become: false
+  register: bench_halogen_digest
+  changed_when: false
+
+- name: Note the halogen version
+  ansible.builtin.set_fact:
+    bench_engines: "{{ bench_engines | default([]) + [{'name': 'halogen-flash-server', 'version': halogen_image.split(':')[-1],
+      'image': halogen_image, 'digest': bench_halogen_digest.stdout}] }}"
+    bench_halogen_run: >-
+      podman run --rm --name owl-bench-halogen --device /dev/kfd --device /dev/dri --group-add keep-groups --ipc=host
+      --ulimit memlock=-1:-1 -e HALOGEN_CHECKPOINT=/models/{{ bench_halogen_ck }}
+      {% for k, v in halogen_env.items() %}-e {{ k }}={{ v }} {% endfor %}-v {{ models_dir }}/halogen:/models:ro
+  vars:
+    bench_halogen_ck: qwen38-flash-next-v2{{ '-abliterated' if halogen_abliterated else '' }}.hgn
+
+- name: Run halogen's own bench
+  ansible.builtin.shell: "{{ bench_halogen_run }} {{ halogen_image }} bench > {{ bench_dir }}/halogen.txt 2>&1"
+  become: false
+  changed_when: true
+  when: bench_native
+
+- name: Run the shared bench on halogen
+  ansible.builtin.include_tasks: shared.yml
+  vars:
+    bench_label: halogen
+    bench_workdir: /home/{{ ansible_user }}
+    bench_cmd: exec {{ bench_halogen_run }} -p {{ engine_port }}:8731 -e HALOGEN_CTX={{ bench_context }} {{ halogen_image }}
+    bench_meta:
+      engine: halogen
+      engine_version: "{{ halogen_image.split(':')[-1] }}"
+      model: "{{ 'qwen38-flash-next-v2-abliterated' if halogen_abliterated else 'qwen38-flash-next-v2' }}"
+      files: halogen/qwen38-flash-next-v2{{ '-abliterated' if halogen_abliterated else '' }}.hgn
+      context: "{{ bench_context }}"

@@ -1,0 +1,18 @@
+---
+# Maya: its own bench (maya.sh --bench) and the shared bench, for each model in maya_models.
+- name: Read the Maya version
+  ansible.builtin.command: git -C {{ maya_dir }} describe --tags --always
+  become: false
+  register: bench_maya_version
+  changed_when: false
+
+- name: Note the Maya version
+  ansible.builtin.set_fact:
+    bench_engines: "{{ bench_engines | default([]) + [{'name': 'project-maya', 'version': bench_maya_version.stdout,
+      'commit': maya_commit}] }}"
+
+- name: Benchmark each Maya model
+  ansible.builtin.include_tasks: maya-model.yml
+  loop: "{{ maya_models.keys() | list }}"
+  loop_control:
+    loop_var: maya_item
