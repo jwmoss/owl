@@ -60,7 +60,7 @@
 # The AMD driver pauses all GPU work while Linux moves memory the GPU uses (Strata logged 74 s of pauses).
 # halogen's docs/host-setup.md: keep compaction off the locked weights; proactiveness 0 slowed its KV pool reservation
 # and did not stop the pauses (issue #85), so it stays at the kernel default.
-- name: Keep memory compaction off locked memory, {{ item.name }}
+- name: Keep memory compaction off locked memory
   ansible.posix.sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
