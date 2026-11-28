@@ -1,0 +1,21 @@
+---
+# Save every engine's model files to the model store: ansible-playbook backup.yml
+# The copy skips files the store has. It does not delete a file from the store.
+- name: Save the models to the model store
+  hosts: all
+  become: true
+  roles: [model_cache]
+  tasks:
+    - name: Find the engine folders
+      ansible.builtin.stat:
+        path: "{{ models_dir }}/{{ item }}"
+      loop: "{{ engines }}"
+      register: backup_dirs
+
+    - name: Save each engine folder to the store
+      ansible.builtin.include_role:
+        name: model_cache
+        tasks_from: push
+      vars:
+        model_cache_engine: "{{ item }}"
+      loop: "{{ backup_dirs.results | selectattr('stat.exists') | map(attribute='item') | list }}"

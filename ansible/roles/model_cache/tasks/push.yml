@@ -1,5 +1,5 @@
 ---
-# Saves an engine's model files to the store after its download; .done marks a complete copy.
+# Saves an engine's model files to the store; .done marks a complete copy.
 - name: Save the model files to the store, {{ model_cache_engine }}
   ansible.builtin.shell: >-
     mkdir -p {{ model_cache_dir }}/owl/{{ model_cache_engine }}

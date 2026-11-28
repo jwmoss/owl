@@ -2,6 +2,4 @@
 - name: Set up Strata with strata_presets
   hosts: all
   become: true
-  roles:
-    - { role: model_cache, when: model_cache_nfs | length > 0 }
-    - strata
+  roles: [strata]
